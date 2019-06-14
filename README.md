@@ -2,6 +2,12 @@
 
 A Remote Administration Tool for Linux
 
+Dependencies : Install GTK 2.0 with the following commands : 
+
+sudo apt-get install gtk2.0
+
+sudo apt-get install build-essential libgtk2.0-dev
+
 Video Tutoriel : https://anonfile.com/heIez3Ucm7/hodin_tuto_mp
 
 https://www.youtube.com/watch?v=bTlxE4Tugpg
