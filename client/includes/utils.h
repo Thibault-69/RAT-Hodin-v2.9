@@ -9,6 +9,8 @@ void nEraser(char *chaine);
 
 void get_file_name(void);
 
+void get_binder_file_name(void);
+
 void get_open_filename(void);
 
 #endif

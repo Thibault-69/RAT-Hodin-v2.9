@@ -8,6 +8,11 @@ void cb_get_server_port(GtkButton *button, gpointer user_data);
 void cb_open_file(GtkButton *button, gpointer user_data);
 void cb_get_path(GtkWidget *button, GtkWidget *file_selection);
 
+void cb_binder_open_file(GtkButton *button, gpointer user_data);
+void cb_binder_get_path(GtkWidget *button, GtkWidget *file_selection);
+
+void cb_bind_file(GtkButton *button, gpointer user_data);
+
 void cb_files_downloader(GtkButton *button, gpointer user_data);
 
 void cb_disconnect_server(GtkButton *button, gpointer user_data);

