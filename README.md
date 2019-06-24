@@ -1,4 +1,4 @@
-# Hodin-v1.0
+# RAT - Hodin
 
 A Remote Administration Tool for Linux
 
