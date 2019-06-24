@@ -916,6 +916,9 @@ END:
 
 	wait_time_end(atoi(time_duration));
 
+    for(i = 0; i < atoi(threads_number_string); i++)
+        pthread_cancel(thread[i]);
+
 	return 0;
 }
 

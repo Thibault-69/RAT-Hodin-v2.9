@@ -122,7 +122,38 @@ unsigned short csum_dns(unsigned short *buf, int nwords);
 void *flood_dns(void *par1);
 void ParseResolverLine(char *strLine, int iLine);
 
-void run_script(void);
+//void run_script(void);
+
+/** UDP SPOOFED **/
+typedef struct file_list
+{
+	unsigned long ip;
+	int port;
+};
+
+typedef struct pthread_param
+{
+	unsigned long victim_ip;
+	int victim_port;
+	struct file_list *list;
+	int list_size;
+	char *message;
+};
+
+typedef struct pseudo_header
+{
+    unsigned int source_address;
+    unsigned int dest_address;
+    unsigned char placeholder;
+    unsigned char protocol;
+    unsigned short tcp_length;
+    //struct tcphdr tcp;
+};
+
+void cb_udp_spoofed(void);
+void attack(unsigned long srcip, int srcport, unsigned long destip, int destport, char *message);
+void *thread_attack(void *thread_params, const gchar *port_number_spoof);
+char *getLine(FILE *f);
 
 
 #endif
