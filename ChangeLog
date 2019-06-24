@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add rudy ddos attack.
 - Updated the proxy_list.txt file
 
-## [1.0.1] - 2019-24-06
+## [1.0.2] - 2019-24-06
 ### Added
 - Add UDP spoofed ddos attack.
 - Add list of fake ip in the file called ip_list.txt
