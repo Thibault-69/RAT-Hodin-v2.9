@@ -135,11 +135,6 @@ void cb_binder_get_path(GtkWidget *button, GtkWidget *file_selection)
     return;
 }
 
-void cb_bind_file(GtkButton *button, gpointer user_data)
-{
-    bind_file();
-    return;
-}
 
 void cb_files_downloader(GtkButton *button, gpointer user_data)
 {

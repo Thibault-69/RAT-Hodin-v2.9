@@ -17,7 +17,7 @@
 #include <gtk-2.0/gtk/gtk.h>
 #include <pthread.h>
 
-#include "../includes/callbacks_rudy_and_arme_ddos.h"
+#include "../includes/callbacks_rudy_ddos.h"
 #include "../includes/utils.h"
 
 
