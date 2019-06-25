@@ -469,7 +469,7 @@ computer across a computer network.\"", -1);
     arme_send_script = gtk_button_new_with_label("ARME DDOS");
     gtk_widget_set_size_request(arme_send_script, 200, 30);
     gtk_fixed_put(GTK_FIXED(zone[2]), arme_send_script, 760, 100);
-    //g_signal_connect(G_OBJECT(arme_send_script), "clicked", G_CALLBACK(cb_exec_DDOS_script), NULL);
+    g_signal_connect(G_OBJECT(arme_send_script), "clicked", G_CALLBACK(cb_arme_ddos), NULL);
 
     get_send_script = gtk_button_new_with_label("GET DDOS");
     gtk_widget_set_size_request(get_send_script, 200, 30);
