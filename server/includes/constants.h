@@ -32,5 +32,3 @@ void *start_remote_shell(char *argv[]);
 void daemonize(void);
 
 #endif
-
-
