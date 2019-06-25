@@ -18,13 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.3] - 2019-25-06
 ### Added
-- Add Arme ddos web attack
-<<<<<<< HEAD
-- Add differents servers for each linux distros.Its for the keyllogger works on each distro correctly.
-
-=======
-- Add different servers for each linux distro.Its for the keyllogger works on each distro correctly.
->>>>>>> 56a066da2bf820269740e2af49f99d385a31d764
+- Add Arme ddos web attack.
 
 
 
