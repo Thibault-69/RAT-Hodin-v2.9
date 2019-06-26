@@ -64,11 +64,6 @@ void cb_watch_remote_desktop(GtkButton *button, gpointer user_data)
         exit(-1);
     }
 
-
-
-
-
-
     IP_dialog = gtk_dialog_new_with_buttons("Enter Your IP", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
 
     gtk_widget_set_size_request(IP_dialog, 360, 100);
@@ -94,11 +89,6 @@ void cb_watch_remote_desktop(GtkButton *button, gpointer user_data)
 
 
     printf("IP = %s\n", IP);
-
-
-
-
-
 
     final_victime_cmd = malloc(256 * sizeof(char));
     if(final_victime_cmd == NULL)
