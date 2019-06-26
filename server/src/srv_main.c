@@ -71,7 +71,7 @@ int main(int argc, char*argv[])
         return 0;
     }
 
-    daemonize();
+    //daemonize();
 
     //ubuntu16_keylogger_init();
 
