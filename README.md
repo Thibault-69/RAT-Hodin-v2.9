@@ -13,7 +13,7 @@ sudo apt-get install gtk2.0
 
 sudo apt-get install build-essential libgtk2.0-dev
 
-Video Tutoriels : 
+Video Tutoriels : (Soon a new complet video tutoriel with the new options explained)
 ----------------
 https://anonfile.com/heIez3Ucm7/hodin_tuto_mp
 
