@@ -5,7 +5,7 @@ A Remote Administration Tool for Linux
 Dependencies : 
 -------------
 
-1) Execute the appropriate installer from the folder "gstreamer_ffmpeg_installers" on your machine.
+1)Execute the appropriate installer from the folder "gstreamer_ffmpeg_installers" on your machine.
 
 2)Install GTK 2.0 with the following commands : 
 
