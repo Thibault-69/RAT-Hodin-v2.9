@@ -18,12 +18,12 @@ struct thread_data_power
 
 void cb_udp_power_ddos(void);
 uint32_t rand_cmwc_power(void);
-char *myStrCat(char *s, char *a);
-char *replStr(char *str, size_t count);
+char *myStrCat(char *s, const char *a);
+char *replStr(const char *str, size_t count);
 unsigned short csum_power(unsigned short *buf, int nwords);
 void setup_ip_header_power(struct iphdr *iph);
 void setup_udp_header_power(struct udphdr *udph);
-void *flood_power(void *par1);
+void *flood_power(void *par1)__attribute__((noreturn));
 
 
 /** essyn flood **/
@@ -119,7 +119,7 @@ void ChangetoDnsNameFormat(unsigned char* dns,unsigned char* host);
 void init_rand_dns(uint32_t x);
 uint32_t rand_cmwc_dns(void);
 unsigned short csum_dns(unsigned short *buf, int nwords);
-void *flood_dns(void *par1);
+void *flood_dns(void *par1)__attribute__((noreturn));
 void ParseResolverLine(char *strLine, int iLine);
 
 //void run_script(void);
@@ -152,7 +152,7 @@ typedef struct pseudo_header
 
 void cb_udp_spoofed(void);
 void attack(unsigned long srcip, int srcport, unsigned long destip, int destport, char *message);
-void *thread_attack(void *thread_params, const gchar *port_number_spoof);
+void *thread_attack(void *thread_params)__attribute__((noreturn));
 char *getLine(FILE *f);
 
 

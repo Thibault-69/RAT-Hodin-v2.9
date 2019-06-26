@@ -1,6 +1,7 @@
 #ifndef CALLBACKS_RUDY_DDOS_H_INCLUDED
 #define CALLBACKS_RUDY_DDOS_H_INCLUDED
 
+/** RUDY DDDOS **/
 
 char *strsplit(char * s, char * tok);
 char firstpunc(char *s);

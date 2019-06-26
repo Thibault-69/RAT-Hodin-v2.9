@@ -537,7 +537,7 @@ void cb_files_uploader(GtkButton *button, gpointer user_data)
     text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_view));
 
     /** Set the default buffer text. **/
-    gtk_text_buffer_set_text(text_buffer, "Installing ... It can take several minutes ...\nClose the windows for continue the installation process", -1);
+    gtk_text_buffer_set_text(text_buffer, "Installing ... It can take several minutes ...\n", -1);
 
     /** Obtain iters for the start and end of points of the buffer **/
     gtk_text_buffer_get_start_iter(text_buffer, &start);
