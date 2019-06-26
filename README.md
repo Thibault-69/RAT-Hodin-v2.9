@@ -4,10 +4,7 @@ A Remote Administration Tool for Linux
 
 Dependencies : 
 -------------
-
-1)Execute the appropriate installer from the folder "gstreamer_ffmpeg_installers" on your machine.
-
-2)Install GTK 2.0 with the following commands : 
+Install GTK 2.0 with the following commands : 
 
 sudo apt-get install gtk2.0
 
@@ -15,7 +12,6 @@ sudo apt-get install build-essential libgtk2.0-dev
 
 Video Tutoriels :
 ----------------
-Soon a new complet video tutoriel with the new options explained.
 
 https://anonfile.com/heIez3Ucm7/hodin_tuto_mp
 
