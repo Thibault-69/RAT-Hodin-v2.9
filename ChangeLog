@@ -28,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Fixing bugs
 
-## [1.0.4] - 2019-29-06
+## [1.1] - 2019-29-06
 ### Added
 - Add remote webcam streaming option.
 
