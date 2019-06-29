@@ -27,3 +27,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 - Fixing bugs
+
+## [1.0.4] - 2019-29-06
+### Added
+- Add remote webcam streaming option.
+
+### Trying
+- Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.
