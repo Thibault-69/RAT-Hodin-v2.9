@@ -7,36 +7,16 @@ sudo ln -s /dev/video0 /dev/video
 echo -e "[+] The activation of the webcam is over, now we need to reboot your machine\n"
 read -p "[?] Reboot [Yes/No] ? " choice
 
-if [ "$choice" == "Yes" ]
-then
-  reboot
-fi
 
-if [ "$choice" == "Y" ]
-then
-  reboot
-fi
-
-if [ "$choice" == "y" ]
+if [ "$choice" == "Yes" ] || [ "$choice" == "Y" ] || [ "$choice" == "y" ] || [ "$choice" == "yes" ]
 then
   reboot
 fi
 
 
-
-if [ "$choice" == "No" ]
+if [ "$choice" == "No" ] || [ "$choice" == "N" ] || [ "$choice" == "no" ] || [ "$choice" == "n" ]
 then
   echo -e "[!] The webcam won't work correctly !\n"
 fi
 
-if [ "$choice" == "N" ]
-then
-  echo -e "[!] The webcam won't work correctly !\n"
-fi
-
-if [ "$choice" == "n" ]
-then
-  echo -e "[!] The webcam won't work correctly !\n"
-fi
-
-echo -e "\nGoodBye !\n"
+echo -e "GoodBye !\n"

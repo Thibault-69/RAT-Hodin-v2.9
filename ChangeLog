@@ -37,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.2] - 2019-30-06
 ### Added
 - Add record remote webcam option.
+- Add a bash file for activate the webcam if the stream / record options does not detect it.
 
 ### Trying
 - Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.
