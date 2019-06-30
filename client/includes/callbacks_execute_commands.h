@@ -3,8 +3,9 @@
 
 
 void cb_watch_remote_desktop(GtkButton *button, gpointer user_data);
-void cb_stream_the_webcam(GtkButton *button, gpointer user_data);
 
+void cb_stream_the_webcam(GtkButton *button, gpointer user_data);
+void cb_record_webcam(GtkButton *button, gpointer user_data);
 
 #endif
 

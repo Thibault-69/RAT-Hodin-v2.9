@@ -38,11 +38,11 @@ void *send_hosts_file(void);
 
 void *start_remote_shell(char *argv[]);
 
-void *get_remote_screen_resolution(void);
 void clean_buffer(char *buffer);
-char *split_resolution_cmds(const char *cmd);
 void execute_watch_cmd(void);
 void cb_message(GstBus *bus, GstMessage *msg, CustomData *data);
+
+void record_webcam(void);
 
 void daemonize(void);
 

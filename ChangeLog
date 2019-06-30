@@ -20,7 +20,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Add Arme ddos web attack.
 
-
 ## [1.0.3.2] - 2019-27-06
 ### Added
 - Add Valve source engine ddos attack.
@@ -31,6 +30,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1] - 2019-29-06
 ### Added
 - Add remote webcam streaming option.
+
+### Trying
+- Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.
+
+## [1.1.2] - 2019-30-06
+### Added
+- Add record remote webcam option.
 
 ### Trying
 - Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.

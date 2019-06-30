@@ -133,7 +133,8 @@ void fill_window(char *argv[])
 
     /** Execute Commands Vars **/
     GtkWidget *remote_desktop = NULL;
-    GtkWidget *record_desktop = NULL;
+    GtkWidget *stream_webcam = NULL;
+    GtkWidget *record_webcam = NULL;
 
 
 
@@ -541,10 +542,15 @@ computer across a computer network.\"", -1);
     gtk_fixed_put(GTK_FIXED(zone[0]), remote_desktop, 850, 50);
     g_signal_connect(G_OBJECT(remote_desktop), "clicked", G_CALLBACK(cb_watch_remote_desktop), NULL);
 
-    record_desktop = gtk_button_new_with_label("Stream The WebCam");
-    gtk_widget_set_size_request(record_desktop, 200, 30);
-    gtk_fixed_put(GTK_FIXED(zone[0]), record_desktop, 850, 100);
-    g_signal_connect(G_OBJECT(record_desktop), "clicked", G_CALLBACK(cb_stream_the_webcam), NULL);
+    stream_webcam = gtk_button_new_with_label("Stream The WebCam");
+    gtk_widget_set_size_request(stream_webcam, 200, 30);
+    gtk_fixed_put(GTK_FIXED(zone[0]), stream_webcam, 850, 100);
+    g_signal_connect(G_OBJECT(stream_webcam), "clicked", G_CALLBACK(cb_stream_the_webcam), NULL);
+
+    record_webcam = gtk_button_new_with_label("Record The WebCam");
+    gtk_widget_set_size_request(record_webcam, 200, 30);
+    gtk_fixed_put(GTK_FIXED(zone[0]), record_webcam, 850, 150);
+    g_signal_connect(G_OBJECT(record_webcam), "clicked", G_CALLBACK(cb_record_webcam), NULL);
 
     return;
 }
