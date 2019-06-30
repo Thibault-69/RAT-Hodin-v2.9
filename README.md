@@ -13,9 +13,9 @@ sudo apt-get install build-essential libgtk2.0-dev
 Video Tutoriels :
 ----------------
 
-https://anonfile.com/heIez3Ucm7/hodin_tuto_mp
+- General Options : https://anonfile.com/heIez3Ucm7/hodin_tuto_mp
 
-https://www.youtube.com/watch?v=bTlxE4Tugpg
+- WebCam Options : https://anonfile.com/P0o0p1x7n3/Hodin_Webcam_Tuto_mp4
 
 Screenshots :
 ------------
