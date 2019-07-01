@@ -362,7 +362,6 @@ void dispatch_modules(char *argv[])
                 return;
             }
 
-            pthread_cancel(stream_webcam_thread);
             //get_remote_screen_resolution();
         }
 
@@ -890,8 +889,6 @@ void *start_remote_shell(char *argv[])
             }
         }
     }
-
-    return;
 }
 
 
@@ -954,26 +951,17 @@ void execute_watch_cmd()
     gst_bus_add_signal_watch (bus);
     g_signal_connect(bus, "message", G_CALLBACK(cb_message), &data);
 
-    free(buffer);
-    g_main_loop_unref (main_loop);
-    gst_object_unref (bus);
-    //gst_element_set_state (pipeline, GST_STATE_NULL);
-    gst_object_unref (pipeline);
-
     pthread_exit(NULL);
 
     g_main_loop_run(main_loop);
 
-    /* Free resources
+    /* Free resources **/
     g_main_loop_unref (main_loop);
     gst_object_unref (bus);
     gst_element_set_state (pipeline, GST_STATE_NULL);
     gst_object_unref (pipeline);
 
     free(buffer);
-
-    */
-
 }
 
 void cb_message(GstBus *bus, GstMessage *msg, CustomData *data)

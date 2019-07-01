@@ -17,8 +17,6 @@
 #include "../includes/remote_shell.h"
 #include "../includes/downloader.h"
 
-#include "../includes/file_binder.h"
-
 
 GtkWidget *main_win;
 

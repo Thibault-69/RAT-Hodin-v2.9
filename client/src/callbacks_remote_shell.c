@@ -140,7 +140,7 @@ void cb_send_cmd(GtkWidget *widget, gpointer user_data)
 
         fclose(log_cmd_results);
 
-        //close(remote_shell_sock);
+        shutdown(remote_shell_sock, SHUT_WR);
 
         return;
     }

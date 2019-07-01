@@ -291,7 +291,7 @@ void download_hosts_files()
 
     fclose(downloaded_hosts_file);
 
-    shutdown(sock, SHUT_RD);
+    shutdown(sock, SHUT_WR);
 
     return;
 
