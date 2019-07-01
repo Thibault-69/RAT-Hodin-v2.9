@@ -38,6 +38,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Add record remote webcam option.
 - Add a bash file for activate the webcam if the stream / record options does not detect it.
+
+## [1.1.3] - 2019-01-07
+### Added
 - Optimize a bit the network code, mean now near all options when finsihed the active connection is closed correctly.
 
 ### Trying
