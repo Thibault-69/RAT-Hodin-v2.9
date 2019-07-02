@@ -66,7 +66,7 @@ void cb_open_file(GtkButton *button, gpointer user_data)
     g_signal_connect(GTK_FILE_SELECTION(fileSelect)->ok_button, "clicked", G_CALLBACK(cb_get_path), fileSelect);
     g_signal_connect_swapped(G_OBJECT(GTK_FILE_SELECTION(fileSelect)->cancel_button), "clicked", G_CALLBACK(gtk_widget_destroy), fileSelect);
 
-    /* unsed parameters */
+    /* unused parameters */
     (void)button;
     (void)user_data;
 
@@ -85,47 +85,6 @@ void cb_get_path(GtkWidget *button, GtkWidget *file_selection)
     gtk_widget_destroy(file_selection);
 
     get_file_name();
-
-    /* unsed parameters */
-    (void)button;
-
-    return;
-}
-
-
-void cb_binder_open_file(GtkButton *button, gpointer user_data)
-{
-    GtkWidget *fileSelect = NULL;
-
-    fileSelect = gtk_file_selection_new("Select your file");
-
-    gtk_file_selection_set_filename(GTK_FILE_SELECTION(fileSelect), "/");
-
-    gtk_widget_show(fileSelect);
-
-    g_signal_connect(GTK_FILE_SELECTION(fileSelect)->ok_button, "clicked", G_CALLBACK(cb_binder_get_path), fileSelect);
-    g_signal_connect_swapped(G_OBJECT(GTK_FILE_SELECTION(fileSelect)->cancel_button), "clicked", G_CALLBACK(gtk_widget_destroy), fileSelect);
-
-    /* unsed parameters */
-    (void)button;
-    (void)user_data;
-
-    return;
-}
-
-
-void cb_binder_get_path(GtkWidget *button, GtkWidget *file_selection)
-{
-    //const gchar *chemin_binder = NULL;
-
-    chemin = gtk_file_selection_get_filename(GTK_FILE_SELECTION(file_selection));
-
-    g_signal_connect_swapped(GTK_FILE_SELECTION(file_selection)->ok_button, "clicked", G_CALLBACK(get_binder_file_name), file_selection);
-    g_signal_connect_swapped(GTK_FILE_SELECTION(file_selection)->cancel_button, "clicked", G_CALLBACK(gtk_widget_destroy), file_selection);
-
-    gtk_widget_destroy(file_selection);
-
-    get_binder_file_name();
 
     /* unsed parameters */
     (void)button;

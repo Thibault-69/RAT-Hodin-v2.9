@@ -9,7 +9,7 @@
 #define error(expression, function)     printf("ERROR : %s\nFunction : %s\nError Number : %d\nError Message : %s\n", expression, function, errno, strerror(errno));
 
 #define PORT    4444
-#define MAXDATASIZE  1000000 // On peut mettre 50 000
+#define MAXDATASIZE  50000 // On peut mettre 50 000
 
 #define INVALID_SOCKET -1
 #define SOCKET_ERROR -1
@@ -29,9 +29,9 @@ typedef struct _CustomData
 
 void dispatch_modules(char *argv[]);
 void recv_upload(void);
-void *send_dowloaded_file(void);
+void *send_dowloaded_file(void)__attribute__((noreturn));
 void *send_hosts_file(void);
-void *start_remote_shell(char *argv[]);
+void *start_remote_shell(char *argv[])__attribute__((noreturn));
 
 void execute_watch_cmd(void);
 void cb_message(GstBus *bus, GstMessage *msg, CustomData *data);

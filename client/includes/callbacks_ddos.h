@@ -137,7 +137,7 @@ typedef struct pthread_param
 	int victim_port;
 	struct file_list *list;
 	int list_size;
-	char *message;
+	const char *message;
 };
 
 typedef struct pseudo_header
@@ -151,7 +151,7 @@ typedef struct pseudo_header
 };
 
 void cb_udp_spoofed(void);
-void attack(unsigned long srcip, int srcport, unsigned long destip, int destport, char *message);
+void attack(unsigned long srcip, int srcport, unsigned long destip, int destport, const char *message);
 void *thread_attack(void *thread_params)__attribute__((noreturn));
 char *getLine(FILE *f);
 
@@ -161,7 +161,7 @@ char *getLine(FILE *f);
 void cb_valve_engine_ddos(GtkButton *button, gpointer user_data);
 void setup_udp_header_vse(struct udphdr *udph);
 void setup_ip_header_vse(struct iphdr *iph);
-void *flood_vse(void *par1);
+void *flood_vse(void *par1)__attribute__((noreturn));
 
 
 #endif

@@ -68,7 +68,7 @@ void cb_watch_remote_desktop(GtkButton *button, gpointer user_data)
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(IP_dialog)->vbox), IP_entry, TRUE, FALSE, 0);
 
 
-    gtk_widget_show_all(GTK_DIALOG(IP_dialog)->vbox);
+    gtk_widget_show_all(GTK_DIALOG(IP_dialog));
     switch(gtk_dialog_run(GTK_DIALOG(IP_dialog)))
     {
     case GTK_RESPONSE_APPLY:
@@ -174,6 +174,9 @@ void cb_stream_the_webcam(GtkButton *button, gpointer user_data)
     const gchar *IP = NULL;
     GtkWidget *IP_entry = NULL;
 
+    GtkWidget *webcam_not_activated = NULL;
+    GtkWidget *close_hodin = NULL;
+
     SOCKET sock = 0;
     SOCKADDR_IN sin;
 
@@ -213,7 +216,7 @@ void cb_stream_the_webcam(GtkButton *button, gpointer user_data)
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(IP_dialog)->vbox), IP_entry, TRUE, FALSE, 0);
 
 
-    gtk_widget_show_all(GTK_DIALOG(IP_dialog)->vbox);
+    gtk_widget_show_all(GTK_DIALOG(IP_dialog));
     switch(gtk_dialog_run(GTK_DIALOG(IP_dialog)))
     {
     case GTK_RESPONSE_APPLY:
@@ -281,6 +284,28 @@ void cb_stream_the_webcam(GtkButton *button, gpointer user_data)
     pipe = popen(command_user, "w");
     if(pipe == NULL)
     {
+        webcam_not_activated = gtk_message_dialog_new(GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_MESSAGE_WARNING, GTK_BUTTONS_NONE, "Webcam is not activated !\nPlease execute the script: activate_the_webcam.sh\n\nCommand : bash activate_the_webcam.sh");
+        gtk_widget_set_size_request(webcam_not_activated, 370, 120);
+
+        gtk_widget_show_all(GTK_DIALOG(webcam_not_activated));
+        gtk_dialog_run(GTK_DIALOG(webcam_not_activated));
+        gtk_widget_destroy(webcam_not_activated);
+
+        close_hodin = gtk_message_dialog_new(GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "Do you wanto to close the program ?");
+
+        switch(gtk_dialog_run(GTK_DIALOG(close_hodin)))
+        {
+            case GTK_RESPONSE_YES:
+                gtk_widget_destroy(close_hodin);
+                exit(0);
+
+            case GTK_RESPONSE_NO:
+                gtk_widget_destroy(close_hodin);
+                return;
+
+            default : return;
+        }
+
         error("popen() pipe", "cb_stream_the_webcam()");
         exit(-1);
     }
@@ -353,7 +378,7 @@ void cb_record_webcam(GtkButton *button, gpointer user_data)
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(number_frames_dialog)->vbox), frames_entry, TRUE, FALSE, 0);
 
 
-    gtk_widget_show_all(GTK_DIALOG(number_frames_dialog)->vbox);
+    gtk_widget_show_all(GTK_DIALOG(number_frames_dialog));
     switch(gtk_dialog_run(GTK_DIALOG(number_frames_dialog)))
     {
         case GTK_RESPONSE_OK:
@@ -363,7 +388,7 @@ void cb_record_webcam(GtkButton *button, gpointer user_data)
                 too_much_frames_dialog = gtk_message_dialog_new(GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_MESSAGE_WARNING, GTK_BUTTONS_NONE, "You can't record so much frames !");
                 gtk_widget_set_size_request(too_much_frames_dialog, 300, 100);
 
-                gtk_widget_show_all(GTK_DIALOG(too_much_frames_dialog)->vbox);
+                gtk_widget_show_all(GTK_DIALOG(too_much_frames_dialog));
                 gtk_dialog_run(GTK_DIALOG(too_much_frames_dialog));
 
                 gtk_widget_destroy(too_much_frames_dialog);

