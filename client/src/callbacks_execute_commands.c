@@ -303,7 +303,9 @@ void cb_stream_the_webcam(GtkButton *button, gpointer user_data)
                 gtk_widget_destroy(close_hodin);
                 return;
 
-            default : return;
+            default :
+                gtk_widget_destroy(close_hodin);
+                return;
         }
 
         error("popen() pipe", "cb_stream_the_webcam()");

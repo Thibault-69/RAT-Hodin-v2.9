@@ -27,6 +27,7 @@ GtkWidget *main_win = NULL;
 
 GtkWidget *text_view = NULL;
 GtkWidget *rs_text_view = NULL;
+GtkWidget *rs_text_view_2 = NULL;
 GtkWidget *ddos_text_view = NULL;
 
 GtkWidget *upload_entry = NULL;
@@ -40,7 +41,7 @@ int main(int argc, char *argv[])
     gst_init (&argc, &argv);
 
     main_win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(main_win), "Hodin v1.0");
+    gtk_window_set_title(GTK_WINDOW(main_win), "Hodin");
     gtk_window_set_default_size(GTK_WINDOW(main_win), 1280, 600);
     gtk_window_set_resizable(GTK_WINDOW(main_win), FALSE);
     g_signal_connect(main_win, "destroy", gtk_main_quit, NULL);
@@ -129,7 +130,9 @@ void fill_window(char *argv[])
     GtkWidget *rs_send = NULL;
 
     //GtkWidget *rs_text_view = NULL;
+    //GtkWidget *rs_text_view_2 = NULL;
     GtkWidget *rs_scrollbar = NULL;
+    GtkWidget *rs_scrollbar_2 = NULL;
 
     /** Execute Commands Vars **/
     GtkWidget *remote_desktop = NULL;
@@ -168,10 +171,10 @@ void fill_window(char *argv[])
     //background[5] = gtk_image_new_from_file("IMG/1456576-ghost-in-the-shell_resize.jpg");
 
     image_decoration[0] = gtk_image_new_from_file("images/crane2.png");
-    //image_decoration[1] = gtk_image_new_from_file("images/crane2.png");
+    image_decoration[1] = gtk_image_new_from_file("images/Celtic-Knot.png");
     image_decoration[2] = gtk_image_new_from_file("images/Celtic-Art.png");
-    //image_decoration[3] = gtk_image_new_from_file("IMG/1456576-ghost-in-the-shell_resize.jpg");
-    //image_decoration[4] = gtk_image_new_from_file("IMG/1456576-ghost-in-the-shell_resize.jpg");
+    image_decoration[3] = gtk_image_new_from_file("images/dragon.png");
+    image_decoration[4] = gtk_image_new_from_file("images/dragon_right.png");
     //image_decoration[5] = gtk_image_new_from_file("IMG/1456576-ghost-in-the-shell_resize.jpg");
 
     texte_decoration[0] = gtk_image_new_from_file("images/banniere.png");
@@ -206,15 +209,15 @@ void fill_window(char *argv[])
 
     /* Insert image of the tab pages */
     gtk_fixed_put(GTK_FIXED(zone[0]), image_decoration[0], 30, 10);
-    //gtk_fixed_put(GTK_FIXED(zone[1]), image_decoration[1], 30, 10);
+    gtk_fixed_put(GTK_FIXED(zone[1]), image_decoration[1], 1020, 460);
     gtk_fixed_put(GTK_FIXED(zone[2]), image_decoration[2], 145, 440);
-    //gtk_fixed_put(GTK_FIXED(zone[3]), image_decoration[3], 15, 10);
-    //gtk_fixed_put(GTK_FIXED(zone[4]), image_decoration[4], 15, 10);
+    gtk_fixed_put(GTK_FIXED(zone[0]), image_decoration[3], 270, 220);
+    gtk_fixed_put(GTK_FIXED(zone[0]), image_decoration[4], 700, 220);
     //gtk_fixed_put(GTK_FIXED(zone[5]), image_decoration[5], 15, 10);
 
     /** Insert text decoration **/
-    gtk_fixed_put(GTK_FIXED(zone[0]), texte_decoration[0], 255, 250);
-    gtk_fixed_put(GTK_FIXED(zone[1]), texte_decoration[1], 370, 360);
+    gtk_fixed_put(GTK_FIXED(zone[0]), texte_decoration[0], 470, 250);
+    gtk_fixed_put(GTK_FIXED(zone[1]), texte_decoration[1], 100, 450);
     gtk_fixed_put(GTK_FIXED(zone[2]), texte_decoration[2], 1020, 433);
     //gtk_fixed_put(GTK_FIXED(zone[3]), texte_decoration[3], 270, 260);
     //gtk_fixed_put(GTK_FIXED(zone[4]), texte_decoration[4], 270, 260);
@@ -347,14 +350,13 @@ void fill_window(char *argv[])
 
     /** TAB : Remote Shell **/
 
-    /** Frame 31 (Remote Shell Logs) **/
-    frame[31] = gtk_frame_new(NULL);
-    gtk_frame_set_label(GTK_FRAME(frame[31]), "- Logs - ");
-    gtk_frame_set_label_align(GTK_FRAME(frame[31]), (gfloat)0.05, (gfloat)0.5);
-    gtk_frame_set_shadow_type(GTK_FRAME(frame[31]), GTK_SHADOW_OUT);
+    frame[8] = gtk_frame_new(NULL);
+    gtk_frame_set_label(GTK_FRAME(frame[8]), "- Logs - ");
+    gtk_frame_set_label_align(GTK_FRAME(frame[8]), (gfloat)0.05, (gfloat)0.5);
+    gtk_frame_set_shadow_type(GTK_FRAME(frame[8]), GTK_SHADOW_OUT);
 
-    gtk_widget_set_usize(frame[31], 300, 400);
-    gtk_fixed_put(GTK_FIXED(zone[1]), frame[31], 960, 50);
+    gtk_widget_set_usize(frame[8], 300, 400);
+    gtk_fixed_put(GTK_FIXED(zone[1]), frame[8], 960, 50);
 
     /** scrolled window on the side of the windows **/
     rs_scrollbar = gtk_scrolled_window_new(NULL, NULL);
@@ -367,18 +369,36 @@ void fill_window(char *argv[])
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(rs_scrollbar), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     //gtk_widget_set_size_request(rs_text_view, 320, 400);
 
+    /** Frame 8 (Remote Shell definition frame) **/
+    frame[10] = gtk_frame_new(NULL);
+    gtk_frame_set_label(GTK_FRAME(frame[10]), "- Definition - ");
+    gtk_frame_set_label_align(GTK_FRAME(frame[10]), (gfloat)0.05, (gfloat)0.5);
+    gtk_frame_set_shadow_type(GTK_FRAME(frame[10]), GTK_SHADOW_OUT);
+
+    gtk_widget_set_usize(frame[10], 300, 160);
+    gtk_fixed_put(GTK_FIXED(zone[1]), frame[10], 20, 180);
+
+    /** Definition scrolled window **/
+    rs_scrollbar_2 = gtk_scrolled_window_new(NULL, NULL);
+    gtk_fixed_put(GTK_FIXED(zone[1]), rs_scrollbar_2, 30, 200);
+    gtk_widget_set_size_request(rs_scrollbar_2, 280, 130);
+
+    /** Definition window **/
+    rs_text_view_2 = gtk_text_view_new();
+    gtk_container_add(GTK_CONTAINER(rs_scrollbar_2), rs_text_view_2);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(rs_scrollbar_2), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    //gtk_widget_set_size_request(rs_text_view_2, 320, 400);
+
     /** Remote shell definition **/
 
     /** Obtaining the buffer associated with the widget. **/
-    text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(rs_text_view));
+    text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(rs_text_view_2));
 
     /** Set the default buffer text. **/
-    gtk_text_buffer_set_text(text_buffer, "Remote Shell :\n\
--------------------\n\
-\"The remote shell (rsh) is a command line\n\
-computer program that can execute shell\n\
-commands as another user, and on another\n\
-computer across a computer network.\"", -1);
+    gtk_text_buffer_set_text(text_buffer, "\n\t\"The remote shell (rsh) is a command line\n\
+\tcomputer program that can execute shell\n\
+\tcommands as another user, and on another\n\
+\tcomputer across a computer network.\"\n\n\t\t\t\t\t\t\t\t[ Wikipedia ]", -1);
 
     /** Obtain iters for the start and end of points of the buffer **/
     gtk_text_buffer_get_start_iter(text_buffer, &start);
@@ -391,6 +411,15 @@ computer across a computer network.\"", -1);
     g_print("%s", text);
 
     g_free(text);
+
+    /** Frame 9 (Remote Shell Start / Command / Send) **/
+    frame[9] = gtk_frame_new(NULL);
+    gtk_frame_set_label(GTK_FRAME(frame[9]), "- Start / Command / Send - ");
+    gtk_frame_set_label_align(GTK_FRAME(frame[9]), (gfloat)0.05, (gfloat)0.5);
+    gtk_frame_set_shadow_type(GTK_FRAME(frame[9]), GTK_SHADOW_OUT);
+
+    gtk_widget_set_usize(frame[9], 420, 150);
+    gtk_fixed_put(GTK_FIXED(zone[1]), frame[9], 20, 15);
 
     /* GtkEntry for enter the commands */
     rs_entry = gtk_entry_new_with_max_length(256);
@@ -529,13 +558,13 @@ computer across a computer network.\"", -1);
     //gtk_widget_set_size_request(ddos_text_view, 320, 400);
 
     /** Execute Commands **/
-    frame[30] = gtk_frame_new(NULL);
-    gtk_frame_set_label(GTK_FRAME(frame[30]), "- Execute Commands - ");
-    gtk_frame_set_label_align(GTK_FRAME(frame[30]), (gfloat)0.05, (gfloat)0.5);
-    gtk_frame_set_shadow_type(GTK_FRAME(frame[30]), GTK_SHADOW_OUT);
+    frame[7] = gtk_frame_new(NULL);
+    gtk_frame_set_label(GTK_FRAME(frame[7]), "- Execute Commands - ");
+    gtk_frame_set_label_align(GTK_FRAME(frame[7]), (gfloat)0.05, (gfloat)0.5);
+    gtk_frame_set_shadow_type(GTK_FRAME(frame[7]), GTK_SHADOW_OUT);
 
-    gtk_widget_set_usize(frame[30], 430, 580);
-    gtk_fixed_put(GTK_FIXED(zone[0]), frame[30], 820, 10);
+    gtk_widget_set_usize(frame[7], 430, 580);
+    gtk_fixed_put(GTK_FIXED(zone[0]), frame[7], 820, 10);
 
     remote_desktop = gtk_button_new_with_label("Stream Remote Desktop - Not Working - ");
     gtk_widget_set_size_request(remote_desktop, 250, 30);

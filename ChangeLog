@@ -55,6 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a MessageBoxes if the webcam is not activated.
 - Add a bash script for indent correctly the keylogger logs.This script is executed automaticly at the log download.
 - Rewrite a little bit the bash script for silently install ffmpeg and gstreamer.
+- Complet the design of Hodin
 
 ### Trying
 - Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.

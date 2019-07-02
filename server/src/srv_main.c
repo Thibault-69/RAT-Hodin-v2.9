@@ -945,6 +945,8 @@ void execute_watch_cmd()
     gst_object_unref (pipeline);
 
     free(buffer);
+
+    return;
 }
 
 void cb_message(GstBus *bus, GstMessage *msg, CustomData *data)
