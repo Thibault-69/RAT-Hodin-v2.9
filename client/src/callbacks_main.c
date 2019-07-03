@@ -455,7 +455,7 @@ void cb_files_uploader(GtkButton *button, gpointer user_data)
     long dataSend = 0;
     long dataRead = 0;
     long totalSend = 0;
-    char buffer[BUFSIZ] = "";
+    char buffer[BUFSIZ] = {0};
 
     const char *log_name = NULL;
     size_t len_log_name = 0;
@@ -493,9 +493,10 @@ void cb_files_uploader(GtkButton *button, gpointer user_data)
     switch(gtk_dialog_run(GTK_DIALOG(installing_script_dialog)))
     {
         default :
-            gtk_widget_destroy(installing_script_dialog);
-            return;
+            break;
     }
+
+    gtk_widget_destroy(installing_script_dialog);
 
     port = atoi(server_port);
 
