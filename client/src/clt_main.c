@@ -385,6 +385,9 @@ void fill_window(char *argv[])
 
     /** Definition window **/
     rs_text_view_2 = gtk_text_view_new();
+    gtk_text_view_set_editable(rs_text_view_2, FALSE);
+    gtk_text_view_set_cursor_visible(rs_text_view_2, FALSE);
+
     gtk_container_add(GTK_CONTAINER(rs_scrollbar_2), rs_text_view_2);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(rs_scrollbar_2), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     //gtk_widget_set_size_request(rs_text_view_2, 320, 400);
@@ -454,7 +457,7 @@ void fill_window(char *argv[])
     run_udp_script_1 = gtk_button_new_with_label("UDP BASIC 1 DDOS");
     gtk_widget_set_size_request(run_udp_script_1, 200, 30);
     gtk_fixed_put(GTK_FIXED(zone[2]), run_udp_script_1, 115, 50);
-    g_signal_connect(G_OBJECT(run_udp_script_1), "clicked", G_CALLBACK(cb_udp_ddos_script_1), NULL);
+    g_signal_connect(G_OBJECT(run_udp_script_1), "clicked", G_CALLBACK(cb_udp_ddos_script_1), run_udp_script_1);
 
     run_udp_script_2 = gtk_button_new_with_label("UDP BASIC 2 DDOS");
     gtk_widget_set_size_request(run_udp_script_2, 200, 30);
