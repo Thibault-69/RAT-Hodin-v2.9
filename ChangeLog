@@ -66,10 +66,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.32] - 2019-02-07
 ###Added
 - Complet the design of Hodin.
-- Recoded the download file option for be able to download big file.Causion : .mp4 video file can bug with vlc use another reader like xplayer.
+- Re-coded the download file option for beeing able to download big file.Causion : .mp4 video file can bug with vlc use another reader like xplayer.
+- Re-coded the upload option for beeing able to upload big file.
 
 ### Trying
 - Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.
 
 ### To Fix
 - When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
+
+## [1.1.33] - 2019-03-07
+###Added
+- Re-coded the upload option for beeing able to upload big file.
+- Made some optimisation, like on ddos fonctions.
+- Correct the server side compiler warnings.
+
+### Trying
+- Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.
+
+### To Fix
+- When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
+
+
+

@@ -455,7 +455,7 @@ void cb_files_uploader(GtkButton *button, gpointer user_data)
     long dataSend = 0;
     long dataRead = 0;
     long totalSend = 0;
-    char buffer[MAXDATASIZE] = "";
+    char buffer[BUFSIZ] = "";
 
     const char *log_name = NULL;
     size_t len_log_name = 0;
@@ -488,13 +488,13 @@ void cb_files_uploader(GtkButton *button, gpointer user_data)
     /** Print the text **/
     g_print("%s", text);
 
-    g_free(text);
+    //g_free(text);
 
     switch(gtk_dialog_run(GTK_DIALOG(installing_script_dialog)))
     {
         default :
             gtk_widget_destroy(installing_script_dialog);
-            break;
+            return;
     }
 
     port = atoi(server_port);
@@ -563,14 +563,14 @@ void cb_files_uploader(GtkButton *button, gpointer user_data)
 
     do
     {
-        dataRead = fread(buffer, sizeof(char), weight, log);
+        dataRead = fread(buffer, sizeof(char), sizeof(weight), log);
         if(dataRead < 0)
         {
             error("send() dataRead", "cb_files_uploader()");
             exit(-1);
         }
 
-        dataSend = send(sock, buffer, weight, 0);
+        dataSend = send(sock, buffer, sizeof(weight), 0);
         if(dataSend == 0)
         {
             error("send() dataSend", "cb_files_uploader()");

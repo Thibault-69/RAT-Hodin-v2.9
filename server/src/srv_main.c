@@ -417,7 +417,7 @@ void recv_upload()
 
     long tailleBlockRecut = 0;
     long totalRcv = 0;
-    char *buffer = NULL;
+    char buffer[BUFSIZ] = {0};
 
     char *cmd_1 = NULL;
     char *cmd_2 = NULL;
@@ -435,13 +435,6 @@ void recv_upload()
     else
     {
         error("recv() weight", "recv_upload()");
-        return;
-    }
-
-    buffer = malloc(weight * sizeof(char));
-    if(buffer == NULL)
-    {
-        error("malloc() buffer", "recv_upload()");
         return;
     }
 
@@ -537,8 +530,6 @@ void recv_upload()
         pclose(pipe[2]);
 
         free(log_name);
-
-        free(buffer);
         free(cmd_1);
         free(cmd_2);
         free(cmd_3);
@@ -554,9 +545,6 @@ void recv_upload()
         error("send() installed", "recv_upload()")
 
     free(log_name);
-
-    free(buffer);
-
     free(cmd_1);
     free(cmd_2);
     free(cmd_3);
