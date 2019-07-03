@@ -120,24 +120,6 @@ void cb_files_downloader(GtkButton *button, gpointer user_data)
     {
         case GTK_RESPONSE_APPLY:
             file_path = gtk_entry_get_text(GTK_ENTRY(downloader_entry));
-
-            /** Obtaining the buffer associated with the widget. **/
-            text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_view));
-
-            /** Set the default buffer text. **/
-            gtk_text_buffer_set_text(text_buffer, "Downloading the file please be patient ...", -1);
-
-            /** Obtain iters for the start and end of points of the buffer **/
-            gtk_text_buffer_get_start_iter(text_buffer, &start);
-            gtk_text_buffer_get_end_iter(text_buffer, &end);
-
-            /** Get the entire buffer text. **/
-            text = gtk_text_buffer_get_text(text_buffer, &start, &end, FALSE);
-
-            /** Print the text **/
-            g_print("%s", text);
-            g_free(text);
-
             download_files(file_path);
             gtk_widget_destroy(downloader_dialog);
             break;

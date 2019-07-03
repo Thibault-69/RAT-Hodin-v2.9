@@ -35,13 +35,13 @@ void download_files(const gchar *path)
     struct hostent *he = NULL;
     struct in_addr ipv4addr;
 
-    long weight = 0;
+    int weight = 0;
     int err = 0;
     size_t flag = 9;
 
     long tailleBlockRecut = 0;
     long totalRcv = 0;
-    char buffer[MAXDATASIZE] = "";
+    char buffer[BUFSIZ] = {0};
 
     GtkTextBuffer *text_buffer = NULL;
     gchar *text = NULL;
@@ -133,9 +133,10 @@ The path must have this form : /path/path/file", -1);
 
     printf("recv weight of the file : %ld\n\n", weight);
 
+
     do
     {
-        tailleBlockRecut = recv(sock, buffer, weight, 0);
+        tailleBlockRecut = recv(sock, buffer, sizeof(weight), 0);
 
         fwrite(buffer, sizeof(char), (size_t)tailleBlockRecut, downloaded_file);
 

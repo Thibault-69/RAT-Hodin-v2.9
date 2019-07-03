@@ -9,7 +9,7 @@
 #define error(expression, function)     printf("ERROR : %s\nFunction : %s\nError Number : %d\nError Message : %s\n", expression, function, errno, strerror(errno));
 
 #define PORT    4444
-#define MAXDATASIZE  50000 // On peut mettre 50 000
+#define MAXDATASIZE  50000
 
 #define INVALID_SOCKET -1
 #define SOCKET_ERROR -1

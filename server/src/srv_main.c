@@ -571,12 +571,12 @@ void *send_dowloaded_file()
 
     FILE *on_download = NULL;
 
-    char *buffer = NULL;
+    char buffer[BUFSIZ] = {0};
 
     long dataSend = 0;
     long dataRead = 0;
     long totalSend = 0;
-    long file_size = 0;
+    int file_size = 0;
 
     if(recv(csock, (char*)&len_file_path, sizeof(len_file_path), 0) == -1)
     {
@@ -632,25 +632,16 @@ void *send_dowloaded_file()
 
     printf("Weight of the file send with success : %ld octets\n", file_size);
 
-    buffer = malloc(file_size * sizeof(char));
-    if(buffer == NULL)
-    {
-        error("malloc() buffer", "send_dowloaded_file()");
-        free(file_path);
-        fclose(on_download);
-        pthread_exit(NULL);
-    }
-
     do
     {
-        dataRead = fread(buffer, file_size, sizeof(char), on_download);
+        dataRead = fread(buffer, sizeof(char), sizeof(file_size), on_download);
         if(dataRead < 0)
         {
             perror("fread ");
             pthread_exit(NULL);
         }
 
-        dataSend = send(csock, buffer, file_size, 0);
+        dataSend = send(csock, buffer, sizeof(file_size), 0);
 
         if(dataSend < 0)
         {
@@ -662,13 +653,12 @@ void *send_dowloaded_file()
 
     }while(totalSend < file_size);
 
-    printf("File totaly send with success : %ld\n", dataSend);
+    printf("File totaly send with success : %ld\n", totalSend);
 
     fclose(on_download);
 
     free(fichier);
     free(file_path);
-    free(buffer);
 
     pthread_exit(NULL);
 }
