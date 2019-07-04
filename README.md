@@ -17,6 +17,10 @@ Video Tutoriels :
 
 - WebCam Options : https://anonfile.com/P0o0p1x7n3/Hodin_Webcam_Tuto_mp4
 
+EDIT : 
+------
+One word about webcam, for some reason you must first turn on the webcam even if the module is loaded in kernel and webcam activated no matter.You can actualy do it by launching cheese program, i will of course find a better and much more personnal way to do that.Iam working on it.
+
 Screenshots :
 ------------
 
