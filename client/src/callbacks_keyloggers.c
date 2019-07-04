@@ -198,7 +198,7 @@ void cb_download_log_file(GtkButton *button, gpointer user_data)
     struct hostent *he = NULL;
     struct in_addr ipv4addr;
 
-    char buffer[MAXDATASIZE] = "";
+    char buffer[BUFSIZ] = "";
 
     long tailleBlockRecut = 0;
     long data_len = 0;

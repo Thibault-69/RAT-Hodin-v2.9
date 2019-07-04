@@ -23,8 +23,6 @@ GtkWidget *main_win;
 const gchar *chemin;
 GtkWidget *upload_entry;
 
-GtkWidget *binder_entry;
-
 const gchar *server_ip;
 const gchar *server_port;
 int port;

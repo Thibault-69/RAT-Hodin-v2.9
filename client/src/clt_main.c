@@ -61,7 +61,7 @@ void fill_window(char *argv[])
     GtkWidget *note_book = {NULL};
     GtkWidget *tab_label[6] = {NULL};;
     GtkWidget *background[6] = {NULL};
-    GtkWidget *image_decoration[6] = {NULL};
+    GtkWidget *image_decoration[16] = {NULL};
     GtkWidget *texte_decoration[6] = {NULL};
 
     gchar *main_tab_label = NULL;
@@ -168,14 +168,27 @@ void fill_window(char *argv[])
     background[2] = gtk_image_new_from_file("images/main_BG.jpg");
     background[3] = gtk_image_new_from_file("images/main_BG.jpg");
     background[4] = gtk_image_new_from_file("images/main_BG.jpg");
-    //background[5] = gtk_image_new_from_file("IMG/1456576-ghost-in-the-shell_resize.jpg");
+    background[5] = gtk_image_new_from_file("images/main_BG.jpg");
 
     image_decoration[0] = gtk_image_new_from_file("images/crane2.png");
     image_decoration[1] = gtk_image_new_from_file("images/Celtic-Knot.png");
     image_decoration[2] = gtk_image_new_from_file("images/Celtic-Art.png");
     image_decoration[3] = gtk_image_new_from_file("images/dragon.png");
     image_decoration[4] = gtk_image_new_from_file("images/dragon_right.png");
-    //image_decoration[5] = gtk_image_new_from_file("IMG/1456576-ghost-in-the-shell_resize.jpg");
+    image_decoration[5] = gtk_image_new_from_file("images/pirates.png");
+    //image_decoration[6] = gtk_image_new_from_file("images/dragon_bis.png");
+
+    /*
+    image_decoration[7] = gtk_image_new_from_file("images/dragon_right.png");
+    image_decoration[8] = gtk_image_new_from_file("images/dragon_right.png");
+    image_decoration[9] = gtk_image_new_from_file("images/dragon_right.png");
+    image_decoration[10] = gtk_image_new_from_file("images/dragon_right.png");
+    image_decoration[11] = gtk_image_new_from_file("images/dragon_right.png");
+    image_decoration[12] = gtk_image_new_from_file("images/dragon_right.png");
+    image_decoration[13] = gtk_image_new_from_file("images/dragon_right.png");
+    image_decoration[14] = gtk_image_new_from_file("images/dragon_right.png");
+    image_decoration[15] = gtk_image_new_from_file("images/dragon_right.png");
+    */
 
     texte_decoration[0] = gtk_image_new_from_file("images/banniere.png");
     texte_decoration[1] = gtk_image_new_from_file("images/banniere.png");
@@ -204,8 +217,8 @@ void fill_window(char *argv[])
     gtk_fixed_put(GTK_FIXED(zone[1]), background[1], 0, 0);
     gtk_fixed_put(GTK_FIXED(zone[2]), background[2], 0, 0);
     gtk_fixed_put(GTK_FIXED(zone[3]), background[3], 0, 0);
-    //gtk_fixed_put(GTK_FIXED(zone[4]), background[4], 15, 10);
-    //gtk_fixed_put(GTK_FIXED(zone[5]), background[5], 15, 10);
+    gtk_fixed_put(GTK_FIXED(zone[4]), background[4], 0, 0);
+    gtk_fixed_put(GTK_FIXED(zone[5]), background[5], 0, 0);
 
     /* Insert image of the tab pages */
     gtk_fixed_put(GTK_FIXED(zone[0]), image_decoration[0], 30, 10);
@@ -213,7 +226,14 @@ void fill_window(char *argv[])
     gtk_fixed_put(GTK_FIXED(zone[2]), image_decoration[2], 145, 440);
     gtk_fixed_put(GTK_FIXED(zone[0]), image_decoration[3], 270, 220);
     gtk_fixed_put(GTK_FIXED(zone[0]), image_decoration[4], 700, 220);
-    //gtk_fixed_put(GTK_FIXED(zone[5]), image_decoration[5], 15, 10);
+    gtk_fixed_put(GTK_FIXED(zone[2]), image_decoration[5], 10, 10);
+    //gtk_fixed_put(GTK_FIXED(zone[2]), image_decoration[6], 980, 350);
+
+    /*
+    gtk_fixed_put(GTK_FIXED(zone[5]), image_decoration[5], 15, 10);
+    gtk_fixed_put(GTK_FIXED(zone[5]), image_decoration[5], 15, 10);
+    gtk_fixed_put(GTK_FIXED(zone[5]), image_decoration[5], 15, 10);
+    */
 
     /** Insert text decoration **/
     gtk_fixed_put(GTK_FIXED(zone[0]), texte_decoration[0], 470, 250);
@@ -234,7 +254,7 @@ void fill_window(char *argv[])
     gtk_widget_set_usize(frame[0], 540, 200);
     gtk_fixed_put(GTK_FIXED(zone[0]), frame[0], 250, 10);
 
-    upload_entry = gtk_entry_new_with_max_length(40);
+    upload_entry = gtk_entry_new_with_max_length(256);
     gtk_entry_set_text(GTK_ENTRY(upload_entry), "Upload files or install applications");
     gtk_widget_set_size_request(upload_entry, 240, 30);
     gtk_fixed_put(GTK_FIXED(zone[0]), upload_entry, 270, 150);
@@ -507,7 +527,7 @@ void fill_window(char *argv[])
     gtk_frame_set_label_align(GTK_FRAME(frame[5]), (gfloat)0.05, (gfloat)0.5);
     gtk_frame_set_shadow_type(GTK_FRAME(frame[5]), GTK_SHADOW_OUT);
 
-    gtk_widget_set_usize(frame[5], 440, 200);
+    gtk_widget_set_usize(frame[5], 440, 100);
     gtk_fixed_put(GTK_FIXED(zone[2]), frame[5], 750, 10);
 
     rudy_send_script = gtk_button_new_with_label("RUDY DDOS");
@@ -517,28 +537,8 @@ void fill_window(char *argv[])
 
     arme_send_script = gtk_button_new_with_label("ARME DDOS");
     gtk_widget_set_size_request(arme_send_script, 200, 30);
-    gtk_fixed_put(GTK_FIXED(zone[2]), arme_send_script, 760, 100);
+    gtk_fixed_put(GTK_FIXED(zone[2]), arme_send_script, 980, 50);
     g_signal_connect(G_OBJECT(arme_send_script), "clicked", G_CALLBACK(cb_arme_ddos), NULL);
-
-    get_send_script = gtk_button_new_with_label("GET DDOS");
-    gtk_widget_set_size_request(get_send_script, 200, 30);
-    gtk_fixed_put(GTK_FIXED(zone[2]), get_send_script, 760, 150);
-    //g_signal_connect(G_OBJECT(get_send_script), "clicked", G_CALLBACK(cb_exec_DDOS_script), NULL);
-
-    head_send_script = gtk_button_new_with_label("HEAD DDOS");
-    gtk_widget_set_size_request(head_send_script, 200, 30);
-    gtk_fixed_put(GTK_FIXED(zone[2]), head_send_script, 980, 50);
-    //g_signal_connect(G_OBJECT(head_send_script), "clicked", G_CALLBACK(cb_exec_DDOS_script), NULL);
-
-    post_send_script = gtk_button_new_with_label("POST DDOS");
-    gtk_widget_set_size_request(post_send_script, 200, 30);
-    gtk_fixed_put(GTK_FIXED(zone[2]), post_send_script, 980, 100);
-    //g_signal_connect(G_OBJECT(post_send_script), "clicked", G_CALLBACK(cb_exec_DDOS_script), NULL);
-
-    slowloris_send_script = gtk_button_new_with_label("SLOWLORIS DDOS");
-    gtk_widget_set_size_request(slowloris_send_script, 200, 30);
-    gtk_fixed_put(GTK_FIXED(zone[2]), slowloris_send_script, 980, 150);
-    //g_signal_connect(G_OBJECT(slowloris_send_script), "clicked", G_CALLBACK(cb_exec_DDOS_script), NULL);
 
     /** Frame 4 (Logs) **/
     frame[6] = gtk_frame_new(NULL);
@@ -560,7 +560,7 @@ void fill_window(char *argv[])
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(ddos_scrollbar), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     //gtk_widget_set_size_request(ddos_text_view, 320, 400);
 
-    /** Execute Commands **/
+    /** Frame 7 Execute Commands **/
     frame[7] = gtk_frame_new(NULL);
     gtk_frame_set_label(GTK_FRAME(frame[7]), "- Execute Commands - ");
     gtk_frame_set_label_align(GTK_FRAME(frame[7]), (gfloat)0.05, (gfloat)0.5);
