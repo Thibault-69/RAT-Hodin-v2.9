@@ -466,6 +466,8 @@ void cb_record_webcam(GtkButton *button, gpointer user_data)
 
     free(final_victime_cmd);
 
+    shutdown(sock, SHUT_RDWR);
+
     /* unused parameters */
     (void)button;
     (void)user_data;

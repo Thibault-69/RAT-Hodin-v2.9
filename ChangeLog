@@ -101,3 +101,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Mint19 keylogger not working properly, Ubuntu one is ok other i dunno actualy.Will investigate.
 
 
+## [1.1.4] - 2019-05-07
+###Added
+- Fixed the webcam options.
+
+### Trying
+- Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.
+
+### To Fix
+- When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
+
+
