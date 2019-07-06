@@ -134,6 +134,49 @@ void cb_files_downloader(GtkButton *button, gpointer user_data)
     return;
 }
 
+void cb_binaries_downloader(GtkButton *button, gpointer user_data)
+{
+    GtkWidget *downloader_dialog = NULL;
+    GtkWidget *downloader_entry = NULL;
+    const gchar *file_path = NULL;
+
+    GtkTextBuffer *text_buffer = NULL;
+    gchar *text = NULL;
+    GtkTextIter start;
+    GtkTextIter end;
+
+    downloader_dialog = gtk_dialog_new_with_buttons("Download Binairies", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
+
+    gtk_widget_set_size_request(downloader_dialog, 360, 100);
+
+    downloader_entry = gtk_entry_new();
+
+    gtk_entry_set_text(GTK_ENTRY(downloader_entry), "Enter the full path of the binarie file to download (path + filename)");
+
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(downloader_dialog)->vbox), downloader_entry, TRUE, FALSE, 0);
+
+    gtk_widget_show_all(GTK_DIALOG(downloader_dialog)->vbox);
+
+    switch(gtk_dialog_run(GTK_DIALOG(downloader_dialog)))
+    {
+        case GTK_RESPONSE_APPLY:
+            file_path = gtk_entry_get_text(GTK_ENTRY(downloader_entry));
+            download_binaries(file_path);
+            gtk_widget_destroy(downloader_dialog);
+            break;
+
+        default :
+            gtk_widget_destroy(downloader_dialog);
+            break;
+    }
+
+    /* unsed parameters */
+    (void)button;
+    (void)user_data;
+
+    return;
+}
+
 void cb_hosts_downloader(GtkButton *button, gpointer user_data)
 {
     GtkWidget *download_hosts_dialog = NULL;

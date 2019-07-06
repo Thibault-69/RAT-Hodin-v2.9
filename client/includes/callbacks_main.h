@@ -14,6 +14,7 @@ void cb_binder_get_path(GtkWidget *button, GtkWidget *file_selection);
 void cb_bind_file(GtkButton *button, gpointer user_data);
 
 void cb_files_downloader(GtkButton *button, gpointer user_data);
+void cb_binaries_downloader(GtkButton *button, gpointer user_data);
 
 void cb_disconnect_server(GtkButton *button, gpointer user_data);
 

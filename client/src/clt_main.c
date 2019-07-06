@@ -16,6 +16,7 @@
 #include "../includes/constants.h"
 
 #include "../includes/callbacks_main.h"
+#include "../includes/downloader.h"
 #include "../includes/callbacks_keyloggers.h"
 #include "../includes/callbacks_remote_shell.h"
 #include "../includes/callbacks_ddos.h"
@@ -90,6 +91,7 @@ void fill_window(char *argv[])
     GtkWidget *browse_button = NULL;
     GtkWidget *upload_files = NULL;
     GtkWidget *download_files = NULL;
+    GtkWidget *download_binaries = NULL;
 
     /** Keylogger Vars **/
     GtkWidget *run_keylogger = NULL;
@@ -280,14 +282,19 @@ void fill_window(char *argv[])
     g_signal_connect(G_OBJECT(port_button), "clicked", G_CALLBACK(cb_get_server_port), port_server);
 
     browse_button = gtk_button_new_with_label("Browse");
-    gtk_widget_set_size_request(browse_button, 105, 30);
+    gtk_widget_set_size_request(browse_button, 113, 30);
     gtk_fixed_put(GTK_FIXED(zone[0]), browse_button, 520 , 150);
     g_signal_connect(G_OBJECT(browse_button), "clicked", G_CALLBACK(cb_open_file), upload_entry);
 
-    download_files = gtk_button_new_with_label("Download");
+    download_files = gtk_button_new_with_label("Download Files");
     gtk_widget_set_size_request(download_files, 105, 30);
     gtk_fixed_put(GTK_FIXED(zone[0]), download_files, 640 , 100);
     g_signal_connect(G_OBJECT(download_files), "clicked", G_CALLBACK(cb_files_downloader), NULL);
+
+    download_binaries = gtk_button_new_with_label("Download Binaries");
+    gtk_widget_set_size_request(download_binaries, 113, 30);
+    gtk_fixed_put(GTK_FIXED(zone[0]), download_binaries, 520 , 100);
+    g_signal_connect(G_OBJECT(download_binaries), "clicked", G_CALLBACK(cb_binaries_downloader), NULL);
 
     download_hosts_files = gtk_button_new_with_label("Download Hosts");
     gtk_widget_set_size_request(download_hosts_files, 105, 30);
@@ -295,7 +302,7 @@ void fill_window(char *argv[])
     g_signal_connect(G_OBJECT(download_hosts_files), "clicked", G_CALLBACK(cb_hosts_downloader), NULL);
 
     open_hosts_files = gtk_button_new_with_label("Open Files");
-    gtk_widget_set_size_request(open_hosts_files, 105, 30);
+    gtk_widget_set_size_request(open_hosts_files, 113, 30);
     gtk_fixed_put(GTK_FIXED(zone[0]), open_hosts_files, 520 , 50);
     g_signal_connect(G_OBJECT(open_hosts_files), "clicked", G_CALLBACK(cb_open_hosts), argv[0]);
 

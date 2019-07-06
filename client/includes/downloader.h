@@ -2,7 +2,7 @@
 #define DOWNLOADER_H_INCLUDED
 
 void download_files(const gchar *path);
-
+void download_binaries(const gchar *path);
 void download_hosts_files(void);
 
 
