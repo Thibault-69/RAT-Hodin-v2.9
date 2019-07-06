@@ -118,6 +118,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   No matter the size of the file, even big file like some Giga Octets file can be downloaded.
 - Add new download option for download binaries files even big file. The code for downloading file or bianries isn't totaly the same so i added this new option.
 - For the record webcam option, the webcam at the end of record shutdown correctly, but not in the stream option for now you still need to close the server wish is annoying.
+- Fixed a bug on the remote shell, if you run it then close it then use another option and go back to run remote shell he crash, 
+  now he run well.
 
 ### Trying
 - Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.
