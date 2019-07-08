@@ -119,7 +119,7 @@ void cb_send_cmd(GtkWidget *widget, gpointer user_data)
     if(strncmp(buffer_cmd, "quit", 4) == 0)
     {
         /** Obtaining the buffer associated with the widget **/
-        text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(rs_text_view));
+        text_buffer = gtk_text_view_get_buffer((GtkTextView*)(rs_text_view));
 
         /** Set the default buffer text. */
         gtk_text_buffer_set_text(text_buffer, "You're now disconnected from the server ...", -1);
@@ -155,7 +155,7 @@ void cb_send_cmd(GtkWidget *widget, gpointer user_data)
     utf8_text = g_locale_to_utf8(buffer, strlen(buffer), NULL, NULL, NULL);
 
     /** Obtaining the buffer associated with the widget **/
-    text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(rs_text_view));
+    text_buffer = gtk_text_view_get_buffer((GtkTextView*)(rs_text_view));
 
     /** Set the default buffer text. */
     gtk_text_buffer_set_text(text_buffer, utf8_text, -1);

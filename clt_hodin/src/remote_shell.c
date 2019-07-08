@@ -91,7 +91,7 @@ void remote_shell()
     }
 
     /* Obtaining the buffer associated with the widget. */
-    text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(rs_text_view));
+    text_buffer = gtk_text_view_get_buffer((GtkTextView*)(rs_text_view));
 
     /* Set the default buffer text. */
     gtk_text_buffer_set_text(text_buffer, buffer, -1);
