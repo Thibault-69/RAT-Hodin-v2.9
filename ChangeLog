@@ -128,3 +128,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
 
 
+## [1.1.5] - 2019-08-07
+###Added
+- Add record the remote microphone option.And download the file then destroy it (server side).
+- Add code for download video file from the record of webcam.And then destroy it on server side.
+- Re write the bash files from "gstreamer_ffmpeg_installers" folder.
+
+### Trying
+- Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.
+
+### To Fix
+- When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
+
+
