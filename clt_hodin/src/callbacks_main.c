@@ -514,7 +514,7 @@ void cb_files_uploader(GtkButton *button, gpointer user_data)
     installing_script_dialog = gtk_message_dialog_new (GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_NONE, "Installing ...");
 
     /** Obtaining the buffer associated with the widget. **/
-    text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_view));
+    text_buffer = gtk_text_view_get_buffer((GtkTextView*)(text_view));
 
     /** Set the default buffer text. **/
     gtk_text_buffer_set_text(text_buffer, "Installing ... It can take several minutes ...\n", -1);
@@ -586,6 +586,8 @@ void cb_files_uploader(GtkButton *button, gpointer user_data)
         error("send() file weight", "cb_files_uploader()");
         exit(-1);
     }
+    
+    printf("Poid du fichier envoyé : %ld\n", weight);
 
     log_name = gtk_entry_get_text(GTK_ENTRY(upload_entry));
 
@@ -622,8 +624,10 @@ void cb_files_uploader(GtkButton *button, gpointer user_data)
         totalSend += dataSend;
 
     }while(totalSend < weight);
+    
+    printf("fichier envoyé avec success : %ld\n", totalSend);
 
-
+      
     if(recv(sock, (char*)&installed, sizeof(installed), 0) == SOCKET_ERROR)
     {
         error("recv() installed", "cb_files_uploader()");

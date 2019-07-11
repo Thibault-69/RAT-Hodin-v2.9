@@ -18,7 +18,7 @@ if __name__ == '__main__' :
 
     parser.add_argument('dst_ip', default="127.0.0.1", help ="Destination IP.")
     parser.add_argument('dst_port', default=4444, help="Destination port.")
-    parser.add_argument('time', default=10, help="Time of the DDOS attack.")
+    parser.add_argument('time', default=30, help="Time of the DDOS attack.")
 
     args = parser.parse_args()
 

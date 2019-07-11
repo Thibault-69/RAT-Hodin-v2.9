@@ -325,7 +325,7 @@ void download_hosts_files()
 
     long tailleBlockRecut = 0;
     long totalRcv = 0;
-    char buffer[BUFSIZ] = "";
+    char buffer[MAXDATASIZE] = "";
 
     FILE *downloaded_hosts_file = NULL;
     gchar file_path[256] = "";
@@ -403,8 +403,8 @@ void download_hosts_files()
     printf("recv weight of the file : %ld\n\n", weight);
 
     do
-    {
-        tailleBlockRecut = recv(sock, buffer, weight, 0);
+    { 
+        tailleBlockRecut = recv(sock, buffer, sizeof(weight), 0);
 
         fwrite(buffer, sizeof(char), (size_t)tailleBlockRecut, downloaded_hosts_file);
 
@@ -412,7 +412,7 @@ void download_hosts_files()
 
     }while(totalRcv < weight);
 
-    printf("file downloaded ...\n");
+    printf("file downloaded : %ld ...\n", totalRcv);
 
     /** Obtaining the buffer associated with the widget. **/
     text_buffer = gtk_text_view_get_buffer((GtkTextView*)text_view);

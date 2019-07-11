@@ -42,6 +42,8 @@ void *execute_cmd(void);
 void cb_message(GstBus *bus, GstMessage *msg, CustomData *data);
 void *execute_record_cmd(void);
 
+void *send_logger_log(void);
+
 void daemonize(void);
 
 #endif

@@ -290,7 +290,7 @@ void fill_window(char *argv[])
     gtk_fixed_put(GTK_FIXED(zone[0]), download_files, 640 , 100);
     g_signal_connect(G_OBJECT(download_files), "clicked", G_CALLBACK(cb_files_downloader), NULL);
 
-    download_binaries = gtk_button_new_with_label("Download Binaries");
+    download_binaries = gtk_button_new_with_label("Download Binary");
     gtk_widget_set_size_request(download_binaries, 113, 30);
     gtk_fixed_put(GTK_FIXED(zone[0]), download_binaries, 520 , 100);
     g_signal_connect(G_OBJECT(download_binaries), "clicked", G_CALLBACK(cb_binaries_downloader), NULL);
@@ -349,10 +349,10 @@ void fill_window(char *argv[])
     gtk_fixed_put(GTK_FIXED(zone[0]), run_keylogger, 50, 460);
     g_signal_connect(G_OBJECT(run_keylogger), "clicked", G_CALLBACK(cb_fedora_run_the_keylogger), NULL);
 
-    log_file = gtk_button_new_with_label("Logs file");
+    log_file = gtk_toggle_button_new_with_label("Logs file");
     gtk_widget_set_size_request(log_file, 150, 30);
     gtk_fixed_put(GTK_FIXED(zone[0]), log_file, 50, 530);
-    g_signal_connect(G_OBJECT(log_file), "clicked", G_CALLBACK(cb_download_log_file), NULL);
+    g_signal_connect(G_OBJECT(log_file), "toggled", G_CALLBACK(cb_download_log_file), NULL);
 
     /** Frame 2 (Logs) **/
     frame[2] = gtk_frame_new(NULL);

@@ -141,3 +141,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
 
 
+## [1.1.51] - 2019-08-07
+###Added
+- Correct near all transimitions options, they have some bugs.
+- Re coded the logging part of the keyloger
+
+### Trying
+- Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.
+- Stream video and audio from webcam.
+- Record video and Audio fromù webcam
+
+### To Fix
+- When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
+
+
