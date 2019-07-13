@@ -30,7 +30,7 @@ int port;
 SOCKET remote_shell_sock;
 
 GtkWidget *text_view;
-GtkWidget *rs_text_view;
+GtkWidget *rs_text_iew;
 GtkWidget *ddos_text_view;
 GtkWidget *hosts_text_view = NULL;
 
@@ -101,19 +101,38 @@ void cb_files_downloader(GtkButton *button, gpointer user_data)
     gchar *text = NULL;
     GtkTextIter start;
     GtkTextIter end;
+    
+    GtkWidget *files_infos;
+
+    files_infos = gtk_message_dialog_new(GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_MESSAGE_WARNING , GTK_BUTTONS_YES_NO, "With this option you can download scripts and text files.\nFor download video, executable, music and so on please use the option : Download Binary.\nClose this window ?");
+    
+    gtk_widget_show_all(GTK_DIALOG(files_infos)->vbox);
+    switch(gtk_dialog_run(GTK_DIALOG(files_infos)))
+    {
+        case GTK_RESPONSE_YES:
+            gtk_widget_destroy(files_infos);
+            return;
+        
+        case GTK_RESPONSE_NO:
+            gtk_widget_destroy(files_infos);
+            break;
+        
+        default : 
+            gtk_widget_destroy(files_infos);
+            return;
+    }
+    
+    
 
     downloader_dialog = gtk_dialog_new_with_buttons("Download files", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
-
     gtk_widget_set_size_request(downloader_dialog, 360, 100);
-
+    
     downloader_entry = gtk_entry_new();
-
     gtk_entry_set_text(GTK_ENTRY(downloader_entry), "Enter the full path of the file to download (path + filename)");
 
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(downloader_dialog)->vbox), downloader_entry, TRUE, FALSE, 0);
-
+    
     gtk_widget_show_all(GTK_DIALOG(downloader_dialog)->vbox);
-
     switch(gtk_dialog_run(GTK_DIALOG(downloader_dialog)))
     {
         case GTK_RESPONSE_APPLY:

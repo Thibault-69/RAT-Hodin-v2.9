@@ -105,7 +105,7 @@ void dispatch_modules(char *argv[])
     SOCKADDR_IN sin;
     socklen_t recsize = sizeof(sin);
 
-    SOCKADDR_IN csin;
+    SOCKADDR_IN csin;                                                                                                                         
     socklen_t crecsize = sizeof(csin);
 
     int option = 1;

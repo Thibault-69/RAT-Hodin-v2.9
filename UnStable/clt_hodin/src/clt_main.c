@@ -28,10 +28,11 @@ GtkWidget *main_win = NULL;
 
 GtkWidget *text_view = NULL;
 GtkWidget *rs_text_view = NULL;
-GtkWidget *rs_text_view_2 = NULL;
+GtkWidget *definition_text_view_2 = NULL;
 GtkWidget *ddos_text_view = NULL;
-
+GtkWidget *historic_text_view = NULL;
 GtkWidget *upload_entry = NULL;
+
 
 int main(int argc, char *argv[])
 {
@@ -132,10 +133,11 @@ void fill_window(char *argv[])
     GtkWidget *rs_send = NULL;
 
     //GtkWidget *rs_text_view = NULL;
-    //GtkWidget *rs_text_view_2 = NULL;
+    //GtkWidget *definition_text_view_2 = NULL;
     GtkWidget *rs_scrollbar = NULL;
     GtkWidget *rs_scrollbar_2 = NULL;
-
+    GtkWidget *rs_historic_scrollbar = NULL;
+    
     /** Execute Commands Vars **/
     GtkWidget *remote_desktop = NULL;
     GtkWidget *stream_webcam = NULL;
@@ -165,7 +167,7 @@ void fill_window(char *argv[])
 
     /** Load decoration image **/
     background[0] = gtk_image_new_from_file("images/main_BG.jpg");
-    background[1] = gtk_image_new_from_file("images/remote_shell_BG.jpg");
+    background[1] = gtk_image_new_from_file("images/main_BG.jpg");
     background[2] = gtk_image_new_from_file("images/main_BG.jpg");
     background[3] = gtk_image_new_from_file("images/main_BG.jpg");
     background[4] = gtk_image_new_from_file("images/main_BG.jpg");
@@ -177,7 +179,7 @@ void fill_window(char *argv[])
     image_decoration[3] = gtk_image_new_from_file("images/dragon.png");
     image_decoration[4] = gtk_image_new_from_file("images/dragon_right.png");
     image_decoration[5] = gtk_image_new_from_file("images/pirates.png");
-    //image_decoration[6] = gtk_image_new_from_file("images/dragon_bis.png");
+    image_decoration[6] = gtk_image_new_from_file("images/DSC100163938.png");
 
     /*
     image_decoration[7] = gtk_image_new_from_file("images/dragon_right.png");
@@ -228,7 +230,7 @@ void fill_window(char *argv[])
     gtk_fixed_put(GTK_FIXED(zone[0]), image_decoration[3], 270, 220);
     gtk_fixed_put(GTK_FIXED(zone[0]), image_decoration[4], 700, 220);
     gtk_fixed_put(GTK_FIXED(zone[2]), image_decoration[5], 10, 10);
-    //gtk_fixed_put(GTK_FIXED(zone[2]), image_decoration[6], 980, 350);
+    //gtk_fixed_put(GTK_FIXED(zone[1]), image_decoration[6],  800, 10);
 
     /*
     gtk_fixed_put(GTK_FIXED(zone[5]), image_decoration[5], 15, 10);
@@ -285,8 +287,8 @@ void fill_window(char *argv[])
     gtk_fixed_put(GTK_FIXED(zone[0]), browse_button, 520 , 150);
     g_signal_connect(G_OBJECT(browse_button), "clicked", G_CALLBACK(cb_open_file), upload_entry);
 
-    download_files = gtk_button_new_with_label("Download Files");
-    gtk_widget_set_size_request(download_files, 105, 30);
+    download_files = gtk_button_new_with_label("Download Text Files");
+    gtk_widget_set_size_request(download_files, 130, 30);
     gtk_fixed_put(GTK_FIXED(zone[0]), download_files, 640 , 100);
     g_signal_connect(G_OBJECT(download_files), "clicked", G_CALLBACK(cb_files_downloader), NULL);
 
@@ -296,7 +298,7 @@ void fill_window(char *argv[])
     g_signal_connect(G_OBJECT(download_binaries), "clicked", G_CALLBACK(cb_binaries_downloader), NULL);
 
     download_hosts_files = gtk_button_new_with_label("Download Hosts");
-    gtk_widget_set_size_request(download_hosts_files, 105, 30);
+    gtk_widget_set_size_request(download_hosts_files, 130, 30);
     gtk_fixed_put(GTK_FIXED(zone[0]), download_hosts_files, 640 , 50);
     g_signal_connect(G_OBJECT(download_hosts_files), "clicked", G_CALLBACK(cb_hosts_downloader), NULL);
 
@@ -306,7 +308,7 @@ void fill_window(char *argv[])
     g_signal_connect(G_OBJECT(open_hosts_files), "clicked", G_CALLBACK(cb_open_hosts), argv[0]);
 
     upload_files = gtk_button_new_with_label("Upload / Install");
-    gtk_widget_set_size_request(upload_files, 105, 30);
+    gtk_widget_set_size_request(upload_files, 130, 30);
     gtk_fixed_put(GTK_FIXED(zone[0]), upload_files, 640 , 150);
     g_signal_connect(G_OBJECT(upload_files), "clicked", G_CALLBACK(cb_files_uploader), NULL);
 
@@ -373,7 +375,7 @@ void fill_window(char *argv[])
     gtk_container_add(GTK_CONTAINER(scrollbar), text_view);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrollbar), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     //gtk_widget_set_size_request(text_view, 320, 400);
-
+    
     /** TAB : Remote Shell **/
 
     frame[8] = gtk_frame_new(NULL);
@@ -381,20 +383,50 @@ void fill_window(char *argv[])
     gtk_frame_set_label_align(GTK_FRAME(frame[8]), (gfloat)0.05, (gfloat)0.5);
     gtk_frame_set_shadow_type(GTK_FRAME(frame[8]), GTK_SHADOW_OUT);
 
-    gtk_widget_set_usize(frame[8], 300, 400);
-    gtk_fixed_put(GTK_FIXED(zone[1]), frame[8], 960, 50);
+    gtk_widget_set_usize(frame[8], 550, 300);
+    gtk_fixed_put(GTK_FIXED(zone[1]), frame[8], 350, 250);
 
     /** scrolled window on the side of the windows **/
     rs_scrollbar = gtk_scrolled_window_new(NULL, NULL);
-    gtk_fixed_put(GTK_FIXED(zone[1]), rs_scrollbar, 970, 70);
-    gtk_widget_set_size_request(rs_scrollbar, 280, 370);
-
+    gtk_fixed_put(GTK_FIXED(zone[1]), rs_scrollbar, 360, 270);
+    gtk_widget_set_size_request(rs_scrollbar, 530, 270);
+    
     /** Side window (log) **/
     rs_text_view = gtk_text_view_new();
+    
+    gtk_text_view_set_editable((GtkTextView*)rs_text_view, FALSE);
+    gtk_text_view_set_cursor_visible((GtkTextView*)rs_text_view, TRUE);
+    
     gtk_container_add(GTK_CONTAINER(rs_scrollbar), rs_text_view);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(rs_scrollbar), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    
     //gtk_widget_set_size_request(rs_text_view, 320, 400);
+    
+     /* Command Historic */
+    frame[11] = gtk_frame_new(NULL);
+    gtk_frame_set_label(GTK_FRAME(frame[11]), "- Historic - ");
+    gtk_frame_set_label_align(GTK_FRAME(frame[11]), (gfloat)0.05, (gfloat)0.5);
+    gtk_frame_set_shadow_type(GTK_FRAME(frame[11]), GTK_SHADOW_OUT);
 
+    gtk_widget_set_usize(frame[11], 450, 230);
+    gtk_fixed_put(GTK_FIXED(zone[1]), frame[11], 450, 15);
+
+    /** scrolled window on the side of the windows **/
+    rs_historic_scrollbar = gtk_scrolled_window_new(NULL, NULL);
+    gtk_fixed_put(GTK_FIXED(zone[1]), rs_historic_scrollbar, 460, 35);
+    gtk_widget_set_size_request(rs_historic_scrollbar, 430, 200);
+    
+    historic_text_view = gtk_text_view_new();
+    
+    gtk_text_view_set_editable((GtkTextView*)historic_text_view, FALSE);
+    gtk_text_view_set_cursor_visible((GtkTextView*)historic_text_view, TRUE);
+    //gtk_widget_set_size_request(rs_text_view, 320, 400);
+    
+    gtk_container_add(GTK_CONTAINER(rs_historic_scrollbar), historic_text_view);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(rs_historic_scrollbar), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    //gtk_widget_set_size_request(rs_text_view_2, 320, 400);
+    
+   
     /** Frame 8 (Remote Shell definition frame) **/
     frame[10] = gtk_frame_new(NULL);
     gtk_frame_set_label(GTK_FRAME(frame[10]), "- Definition - ");
@@ -410,18 +442,20 @@ void fill_window(char *argv[])
     gtk_widget_set_size_request(rs_scrollbar_2, 280, 130);
 
     /** Definition window **/
-    rs_text_view_2 = gtk_text_view_new();
-    gtk_text_view_set_editable((GtkTextView*)rs_text_view_2, FALSE);
-    gtk_text_view_set_cursor_visible((GtkTextView*)rs_text_view_2, FALSE);
+    definition_text_view_2 = gtk_text_view_new();
+    gtk_text_view_set_editable((GtkTextView*)definition_text_view_2, FALSE);
+    gtk_text_view_set_cursor_visible((GtkTextView*)definition_text_view_2, FALSE);
 
-    gtk_container_add(GTK_CONTAINER(rs_scrollbar_2), rs_text_view_2);
+    gtk_container_add(GTK_CONTAINER(rs_scrollbar_2), definition_text_view_2);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(rs_scrollbar_2), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     //gtk_widget_set_size_request(rs_text_view_2, 320, 400);
 
+    
+    
     /** Remote shell definition **/
 
     /** Obtaining the buffer associated with the widget. **/
-    text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(rs_text_view_2));
+    text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(definition_text_view_2));
 
     /** Set the default buffer text. **/
     gtk_text_buffer_set_text(text_buffer, "\n\t\"The remote shell (rsh) is a command line\n\

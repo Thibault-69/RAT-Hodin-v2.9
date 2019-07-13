@@ -266,7 +266,8 @@ void rudy_ddos(void)
 	rewind(pFile);
 
 	char *buffer = (char *)malloc(lSize*sizeof(char));
-	fread(buffer, 1, lSize, pFile);
+	if(fread(buffer, 1, lSize, pFile) == 0)
+            perror("fread buffer ");
 	fclose (pFile);
 
 	int i = 0;

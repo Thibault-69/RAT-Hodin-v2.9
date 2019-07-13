@@ -163,7 +163,7 @@ The path must have this form : /path/path/file", -1);
 
     fclose(downloaded_file);
 
-    shutdown(sock, SHUT_RD);
+    //shutdown(sock, SHUT_RDWR);
 
     return;
 }
