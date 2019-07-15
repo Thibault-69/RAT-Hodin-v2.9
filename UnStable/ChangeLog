@@ -169,3 +169,21 @@ i steel need to save the historic in some way for the whole historic stay on the
 
 ### To Fix
 - When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
+
+
+## [1.1.53] - 2019-15-07
+###Added
+- Fixing some bugs in transmition of files.
+- Add progress bar in download binary , download file , record webcam options
+- Add messagebox text in same options.
+- Add condition code for prevent buffer overflow.
+- Securize the code like use strncat not only strcat , same for strcpy using strncpy.
+- Checking deeeply the programm, searching bugs, i guesss actualy it works pretty well, i guess.....
+
+### Trying
+- Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.
+- Stream video and audio from webcam.
+- Record video and Audio fromù webcam
+
+### To Fix
+- When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.

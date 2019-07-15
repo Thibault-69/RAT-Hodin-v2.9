@@ -33,6 +33,8 @@ GtkWidget *ddos_text_view = NULL;
 GtkWidget *historic_text_view = NULL;
 GtkWidget *upload_entry = NULL;
 
+GtkWidget *zone[6] = {NULL};
+
 
 int main(int argc, char *argv[])
 {
@@ -75,7 +77,7 @@ void fill_window(char *argv[])
 
     /** General Vars **/
     GtkWidget *frame[32] = {NULL};
-    GtkWidget *zone[6] = {NULL};
+    //GtkWidget *zone[6] = {NULL};
 
     GtkTextBuffer *text_buffer = NULL;
     gchar *text = NULL;
@@ -408,13 +410,13 @@ void fill_window(char *argv[])
     gtk_frame_set_label_align(GTK_FRAME(frame[11]), (gfloat)0.05, (gfloat)0.5);
     gtk_frame_set_shadow_type(GTK_FRAME(frame[11]), GTK_SHADOW_OUT);
 
-    gtk_widget_set_usize(frame[11], 450, 230);
-    gtk_fixed_put(GTK_FIXED(zone[1]), frame[11], 450, 15);
+    gtk_widget_set_usize(frame[11], 330, 535);
+    gtk_fixed_put(GTK_FIXED(zone[1]), frame[11], 930, 15);
 
     /** scrolled window on the side of the windows **/
     rs_historic_scrollbar = gtk_scrolled_window_new(NULL, NULL);
-    gtk_fixed_put(GTK_FIXED(zone[1]), rs_historic_scrollbar, 460, 35);
-    gtk_widget_set_size_request(rs_historic_scrollbar, 430, 200);
+    gtk_widget_set_size_request(rs_historic_scrollbar, 310, 505);
+    gtk_fixed_put(GTK_FIXED(zone[1]), rs_historic_scrollbar, 940, 35);
     
     historic_text_view = gtk_text_view_new();
     
@@ -455,7 +457,7 @@ void fill_window(char *argv[])
     /** Remote shell definition **/
 
     /** Obtaining the buffer associated with the widget. **/
-    text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(definition_text_view_2));
+    text_buffer = gtk_text_view_get_buffer((GtkTextView*)definition_text_view_2);
 
     /** Set the default buffer text. **/
     gtk_text_buffer_set_text(text_buffer, "\n\t\"The remote shell (rsh) is a command line\n\
@@ -628,8 +630,92 @@ void fill_window(char *argv[])
     gtk_widget_set_size_request(record_micro, 200, 30);
     gtk_fixed_put(GTK_FIXED(zone[0]), record_micro, 850, 200);
     g_signal_connect(G_OBJECT(record_micro), "clicked", G_CALLBACK(cb_record_micro), NULL);
+    
+    
+    /** TAB CLIENTS */
+    
+    /* TAB CLIENTS VARS*/
+    GtkWidget *identity_label = gtk_label_new(NULL);
+    GtkWidget *country_label = gtk_label_new(NULL); 
+    GtkWidget *ping_label = gtk_label_new(NULL);
+    GtkWidget *cpu_label = gtk_label_new(NULL);
+    GtkWidget *ram_label = gtk_label_new(NULL);
+    GtkWidget *Idle_label = gtk_label_new(NULL);
+    GtkWidget *active_window_label = gtk_label_new(NULL);
+    GtkWidget *up_time_label = gtk_label_new(NULL);
+    GtkWidget *IP_label = gtk_label_new(NULL);
+    GtkWidget *port_label = gtk_label_new(NULL);
+    GtkWidget *OS_label = gtk_label_new(NULL);
+    GtkWidget *OS_Bits_label = gtk_label_new(NULL);
+    GtkWidget *anti_virus_label = gtk_label_new(NULL);
+    
+    GtkWidget *gather_info = NULL;
 
-    return;
+    gchar *utf8_indentity;
+    gchar *utf8_country;
+    gchar *utf8_ping;
+    gchar *utf8_cpu;
+    gchar *utf8_ram;
+    gchar *utf8_Idle;
+    gchar *utf8_active_window;
+    gchar *utf8_up_time;
+    gchar *utf8_IP;
+    gchar *utf8_port;
+    gchar *utf8_OS;
+    gchar *utf8_OS_bits;
+    gchar *utf8_av;
+   
+    utf8_indentity = g_locale_to_utf8("<span foreground=\"#000000\">Identity : </span>\n", -1, NULL, NULL, NULL);
+    utf8_country = g_locale_to_utf8("<span foreground=\"#000000\">Counry : </span>\n", -1, NULL, NULL, NULL);
+    utf8_ping = g_locale_to_utf8("<span foreground=\"#000000\">Ping : </span>\n", -1, NULL, NULL, NULL);
+    utf8_cpu = g_locale_to_utf8("<span foreground=\"#000000\">CPU : </span>\n", -1, NULL, NULL, NULL);
+    utf8_ram = g_locale_to_utf8("<span foreground=\"#000000\">RAM : </span>\n", -1, NULL, NULL, NULL);
+    utf8_Idle = g_locale_to_utf8("<span foreground=\"#000000\">Idle : </span>\n", -1, NULL, NULL, NULL);
+    utf8_active_window = g_locale_to_utf8("<span foreground=\"#000000\">Active Window : </span>\n", -1, NULL, NULL, NULL);
+    
+    utf8_up_time = g_locale_to_utf8("<span foreground=\"#000000\">Up_Time : </span>\n", -1, NULL, NULL, NULL);
+    utf8_IP = g_locale_to_utf8("<span foreground=\"#000000\">IP Adresse : </span>\n", -1, NULL, NULL, NULL);
+    utf8_port = g_locale_to_utf8("<span foreground=\"#000000\">Port : </span>\n", -1, NULL, NULL, NULL);
+    utf8_OS = g_locale_to_utf8("<span foreground=\"#000000\">OS : </span>\n", -1, NULL, NULL, NULL);
+    utf8_OS_bits = g_locale_to_utf8("<span foreground=\"#000000\">OS_Bits : </span>\n", -1, NULL, NULL, NULL);
+    utf8_av = g_locale_to_utf8("<span foreground=\"#000000\">Anti Virus : </span>\n", -1, NULL, NULL, NULL);
+     
+    gtk_label_set_markup(GTK_LABEL(identity_label), utf8_indentity);
+    gtk_label_set_markup(GTK_LABEL(country_label), utf8_country);
+    gtk_label_set_markup(GTK_LABEL(ping_label), utf8_ping);
+    gtk_label_set_markup(GTK_LABEL(cpu_label), utf8_cpu);
+    gtk_label_set_markup(GTK_LABEL(ram_label), utf8_ram);
+    gtk_label_set_markup(GTK_LABEL(Idle_label), utf8_Idle);
+    gtk_label_set_markup(GTK_LABEL(active_window_label), utf8_active_window);
+    
+    gtk_label_set_markup(GTK_LABEL(up_time_label), utf8_up_time);
+    gtk_label_set_markup(GTK_LABEL(IP_label), utf8_IP);
+    gtk_label_set_markup(GTK_LABEL(port_label), utf8_port);
+    gtk_label_set_markup(GTK_LABEL(OS_label), utf8_OS);
+    gtk_label_set_markup(GTK_LABEL(OS_Bits_label), utf8_OS_bits);
+    gtk_label_set_markup(GTK_LABEL(anti_virus_label), utf8_av);
+    
+    gtk_fixed_put(GTK_FIXED(zone[3]), identity_label, 50, 50);
+    gtk_fixed_put(GTK_FIXED(zone[3]), country_label, 50, 100);
+    gtk_fixed_put(GTK_FIXED(zone[3]), ping_label, 50, 150);
+    gtk_fixed_put(GTK_FIXED(zone[3]), cpu_label, 50, 200);
+    gtk_fixed_put(GTK_FIXED(zone[3]), ram_label, 50, 250);
+    gtk_fixed_put(GTK_FIXED(zone[3]), Idle_label, 50, 300);
+    gtk_fixed_put(GTK_FIXED(zone[3]), active_window_label, 50, 350);
+    
+    gtk_fixed_put(GTK_FIXED(zone[3]), up_time_label, 350, 50);
+    gtk_fixed_put(GTK_FIXED(zone[3]), IP_label, 350, 100);
+    gtk_fixed_put(GTK_FIXED(zone[3]), port_label, 350, 150);
+    gtk_fixed_put(GTK_FIXED(zone[3]), OS_label, 350, 200);
+    gtk_fixed_put(GTK_FIXED(zone[3]), OS_Bits_label, 350, 250);
+    gtk_fixed_put(GTK_FIXED(zone[3]), anti_virus_label, 350, 300);
+    
+    gather_info = gtk_button_new_with_label("Gather client informations");
+    gtk_widget_set_size_request(gather_info, 200, 30);
+    gtk_fixed_put(GTK_FIXED(zone[3]), gather_info, 600, 50);
+    //g_signal_connect(G_OBJECT(gather_info), "clicked", G_CALLBACK(cb_record_micro), NULL);
+  
+  return;
 }
 
 

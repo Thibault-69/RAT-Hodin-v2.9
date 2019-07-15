@@ -33,6 +33,7 @@ GtkWidget *text_view;
 GtkWidget *rs_text_iew;
 GtkWidget *ddos_text_view;
 GtkWidget *hosts_text_view = NULL;
+GtkWidget *zone[6];
 
 /** TAB : Main **/
 void cb_get_server_ip(GtkButton *button, gpointer user_data)
@@ -96,6 +97,9 @@ void cb_files_downloader(GtkButton *button, gpointer user_data)
     GtkWidget *downloader_dialog = NULL;
     GtkWidget *downloader_entry = NULL;
     const gchar *file_path = NULL;
+    
+    GtkWidget *progress_bar_text = NULL;
+    GtkWidget *pbar_hbox = NULL;
 
     GtkTextBuffer *text_buffer = NULL;
     gchar *text = NULL;
@@ -132,12 +136,19 @@ void cb_files_downloader(GtkButton *button, gpointer user_data)
 
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(downloader_dialog)->vbox), downloader_entry, TRUE, FALSE, 0);
     
+    
+    pbar_hbox = gtk_hbox_new(TRUE, 0);
+    progress_bar_text = gtk_progress_bar_new();
+    gtk_widget_set_size_request(progress_bar_text, 130, 10);
+    
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(downloader_dialog)->vbox), progress_bar_text, TRUE, FALSE, 0);
+
     gtk_widget_show_all(GTK_DIALOG(downloader_dialog)->vbox);
     switch(gtk_dialog_run(GTK_DIALOG(downloader_dialog)))
     {
         case GTK_RESPONSE_APPLY:
             file_path = gtk_entry_get_text(GTK_ENTRY(downloader_entry));
-            download_files(file_path);
+            download_files(file_path, progress_bar_text);
             gtk_widget_destroy(downloader_dialog);
             break;
 
@@ -158,29 +169,30 @@ void cb_binaries_downloader(GtkButton *button, gpointer user_data)
     GtkWidget *downloader_dialog = NULL;
     GtkWidget *downloader_entry = NULL;
     const gchar *file_path = NULL;
-
-    GtkTextBuffer *text_buffer = NULL;
-    gchar *text = NULL;
-    GtkTextIter start;
-    GtkTextIter end;
-
+    
+    GtkWidget *progress_bar_binary = NULL;
+    GtkWidget *pbar_hbox = NULL;
+    
+    
     downloader_dialog = gtk_dialog_new_with_buttons("Download Binairies", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
-
     gtk_widget_set_size_request(downloader_dialog, 360, 100);
 
     downloader_entry = gtk_entry_new();
-
     gtk_entry_set_text(GTK_ENTRY(downloader_entry), "Enter the full path of the binarie file to download (path + filename)");
-
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(downloader_dialog)->vbox), downloader_entry, TRUE, FALSE, 0);
+    
+    pbar_hbox = gtk_hbox_new(TRUE, 0);
+    progress_bar_binary = gtk_progress_bar_new();
+    gtk_widget_set_size_request(progress_bar_binary, 130, 10);
+    
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(downloader_dialog)->vbox), progress_bar_binary, TRUE, FALSE, 0);
 
     gtk_widget_show_all(GTK_DIALOG(downloader_dialog)->vbox);
-
     switch(gtk_dialog_run(GTK_DIALOG(downloader_dialog)))
     {
         case GTK_RESPONSE_APPLY:
             file_path = gtk_entry_get_text(GTK_ENTRY(downloader_entry));
-            download_binaries(file_path);
+            download_binaries(file_path, progress_bar_binary);
             gtk_widget_destroy(downloader_dialog);
             break;
 
@@ -546,17 +558,17 @@ void cb_files_uploader(GtkButton *button, gpointer user_data)
     text = gtk_text_buffer_get_text(text_buffer, &start, &end, FALSE);
 
     /** Print the text **/
-    g_print("%s", text);
+    g_print("%s", text);    
 
     //g_free(text);
-
+            
+    gtk_widget_show_all(GTK_DIALOG(installing_script_dialog)->vbox);
     switch(gtk_dialog_run(GTK_DIALOG(installing_script_dialog)))
     {
         default :
+            gtk_widget_destroy(installing_script_dialog);
             break;
     }
-
-    gtk_widget_destroy(installing_script_dialog);
 
     port = atoi(server_port);
 

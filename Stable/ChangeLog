@@ -63,4 +63,111 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
 
 
+## [1.1.32] - 2019-02-07
+###Added
+- Complet the design of Hodin.
+- Re-coded the download file option for beeing able to download big file.Causion : .mp4 video file can bug with vlc use another reader like xplayer.
+- Re-coded the upload option for beeing able to upload big file.
+
+### Trying
+- Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.
+
+### To Fix
+- When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
+
+## [1.1.33] - 2019-03-07
+###Added
+- Re-coded the upload option for beeing able to upload big file.
+- Made some optimisation, like on ddos fonctions.
+- Correct the server side compiler warnings.
+
+### Trying
+- Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.
+
+### To Fix
+- When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
+
+
+## [1.1.34] - 2019-04-07
+###Added
+- Optimize the network code and fixing some bugs in it.
+- Add some decoration pictures and changed the design in some tabs.
+
+### Trying
+- Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.
+
+### To Fix
+- When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
+- Mint19 keylogger not working properly, Ubuntu one is ok other i dunno actualy.Will investigate.
+
+
+## [1.1.4] - 2019-05-07
+###Added
+- Fixed the webcam options.
+
+### Trying
+- Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.
+
+### To Fix
+- When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
+
+
+## [1.1.41] - 2019-06-07
+###Added
+- Re-coded all the download options, they have kind of bugs.Now you can download file or binaries with the appropriate option.
+  No matter the size of the file, even big file like some Giga Octets file can be downloaded.
+- Add new download option for download binaries files even big file. The code for downloading file or bianries isn't totaly the same so i added this new option.
+- For the record webcam option, the webcam at the end of record shutdown correctly, but not in the stream option for now you still need to close the server wish is annoying.
+- Fixed a bug on the remote shell, if you run it then close it then use another option and go back to run remote shell he crash, 
+  now he run well.
+
+### Trying
+- Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.
+
+### To Fix
+- When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
+
+
+## [1.1.5] - 2019-08-07
+###Added
+- Add record the remote microphone option.And download the file then destroy it (server side).
+- Add code for download video file from the record of webcam.And then destroy it on server side.
+- Re write the bash files from "gstreamer_ffmpeg_installers" folder.
+
+### Trying
+- Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.
+
+### To Fix
+- When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
+
+
+## [1.1.51] - 2019-011-07
+###Added
+- Correct near all transimitions options, they have some bugs.
+- Re coded the logging part of the keyloger
+
+### Trying
+- Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.
+- Stream video and audio from webcam.
+- Record video and Audio fromù webcam
+
+### To Fix
+
+- When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
+
+
+## [1.1.52] - 2019-13-07
+###Added
+- Re Coded the remote shell tab, and adding a new textview window.This text view keep the historic of command and command's result.The implementation is at 80%,
+i steel need to save the historic in some way for the whole historic stay on the screen, not only the last command.
+- Fixing a bug on the "download file" option, and added a messagebox window for explain wish kind of file this options can download.
+
+### Trying
+- Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.
+- Stream video and audio from webcam.
+- Record video and Audio fromù webcam
+
+### To Fix
+- When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
+
 

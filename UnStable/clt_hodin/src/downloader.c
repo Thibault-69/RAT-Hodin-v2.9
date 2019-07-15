@@ -27,7 +27,7 @@ GtkWidget *text_view;
 GtkWidget *rs_text_view;
 GtkWidget *ddos_text_view;
 
-void download_files(const gchar *path)
+void download_files(const gchar *path, GtkWidget *progress_bar_text)
 {
     SOCKET sock = 0;
     SOCKADDR_IN sin;
@@ -38,10 +38,12 @@ void download_files(const gchar *path)
     long weight = 0;
     int err = 0;
     size_t flag = 9;
+    
+    gdouble step_foreward  = 0.0;
 
     long tailleBlockRecut = 0;
     long totalRcv = 0;
-    char buffer[BUFSIZ] = "";
+    char *buffer = NULL;
 
     GtkTextBuffer *text_buffer = NULL;
     gchar *text = NULL;
@@ -132,7 +134,15 @@ The path must have this form : /path/path/file", -1);
     }
 
     printf("recv weight of the file : %ld\n\n", weight);
-
+    
+    buffer = malloc(weight * sizeof(char));
+    if(buffer == NULL)
+    {
+        error("malloc buffer", "download_files()");
+        return;        
+    }
+   
+    gtk_grab_add(progress_bar_text);
 
     do
     {
@@ -141,8 +151,19 @@ The path must have this form : /path/path/file", -1);
         fwrite(buffer, sizeof(char), (size_t)tailleBlockRecut, downloaded_file);
 
         totalRcv += tailleBlockRecut;
+        
+        
+        step_foreward = ((gdouble)totalRcv * 1.0) / (gdouble)weight;
 
+        if(step_foreward > 1.0)
+            step_foreward = 0.0;
+        
+        gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar_text), step_foreward);
+        gtk_main_iteration();
+        
     }while(totalRcv < weight);
+    
+    gtk_grab_remove(progress_bar_text);
 
     /** Obtaining the buffer associated with the widget. **/
     text_buffer = gtk_text_view_get_buffer((GtkTextView*)(text_view));
@@ -162,6 +183,7 @@ The path must have this form : /path/path/file", -1);
     g_free(text);
 
     fclose(downloaded_file);
+    free(buffer);
 
     //shutdown(sock, SHUT_RDWR);
 
@@ -169,7 +191,7 @@ The path must have this form : /path/path/file", -1);
 }
 
 
-void download_binaries(const gchar *path)
+void download_binaries(const gchar *path, GtkWidget *progress_bar_binary)
 {
     SOCKET sock = 0;
     SOCKADDR_IN sin;
@@ -180,10 +202,12 @@ void download_binaries(const gchar *path)
     long weight = 0;
     int err = 0;
     size_t flag = 15;
+    
+    gdouble step_foreward  = 0.0;
 
     long tailleBlockRecut = 0;
     long totalRcv = 0;
-    char buffer[BUFSIZ] = "";
+    char *buffer = NULL;
 
     GtkTextBuffer *text_buffer = NULL;
     gchar *text = NULL;
@@ -270,22 +294,42 @@ The path must have this form : /path/path/file", -1);
     {
         error("rcv() weight", "dispatch_modules()");
         return;
-
     }
 
     printf("recv weight of the file : %ld\n\n", weight);
 
-
+    buffer = malloc(weight * sizeof(char));
+    if(buffer == NULL)
+    {
+        error("malloc buffer", "download_binaries()");
+        return;        
+    }
+   
+    gtk_grab_add(progress_bar_binary);
+    
     do
     {
-        tailleBlockRecut = recv(sock, buffer, sizeof(weight), 0);
+        tailleBlockRecut = recv(sock, buffer, weight, 0);
 
         fwrite(buffer, sizeof(char), (size_t)tailleBlockRecut, downloaded_file);
 
         totalRcv += tailleBlockRecut;
+        
+        printf("totalRcv ----> %ld\n", totalRcv);
+ 
+
+        step_foreward = ((gdouble)totalRcv * 1.0) / (gdouble)weight;
+
+        if(step_foreward > 1.0)
+            step_foreward = 0.0;
+        
+        gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar_binary), step_foreward);
+        gtk_main_iteration();
 
     }while(totalRcv < weight);
-
+    
+    gtk_grab_remove(progress_bar_binary);
+    
     /** Obtaining the buffer associated with the widget. **/
     text_buffer = gtk_text_view_get_buffer((GtkTextView*)text_view);
 
@@ -304,8 +348,8 @@ The path must have this form : /path/path/file", -1);
     g_free(text);
 
     fclose(downloaded_file);
-
-    shutdown(sock, SHUT_RD);
+    
+    free(buffer);
 
     return;
 }
@@ -325,7 +369,7 @@ void download_hosts_files()
 
     long tailleBlockRecut = 0;
     long totalRcv = 0;
-    char buffer[MAXDATASIZE] = "";
+    char *buffer= NULL;
 
     FILE *downloaded_hosts_file = NULL;
     gchar file_path[256] = "";
@@ -399,12 +443,18 @@ void download_hosts_files()
         return;
 
     }
-
     printf("recv weight of the file : %ld\n\n", weight);
+    
+    buffer = malloc(weight * sizeof(char));
+    if(buffer == NULL)
+    {
+        error("malloc buffer hosts", "download_hosts_files()");
+        return;
+    }
 
     do
     { 
-        tailleBlockRecut = recv(sock, buffer, sizeof(weight), 0);
+        tailleBlockRecut = recv(sock, buffer, weight, 0);
 
         fwrite(buffer, sizeof(char), (size_t)tailleBlockRecut, downloaded_hosts_file);
 
@@ -431,6 +481,7 @@ void download_hosts_files()
     g_print("%s", text);
 
     g_free(text);
+    free(buffer);
 
     fclose(downloaded_hosts_file);
 

