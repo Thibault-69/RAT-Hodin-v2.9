@@ -136,7 +136,6 @@ void cb_files_downloader(GtkButton *button, gpointer user_data)
 
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(downloader_dialog)->vbox), downloader_entry, TRUE, FALSE, 0);
     
-    
     pbar_hbox = gtk_hbox_new(TRUE, 0);
     progress_bar_text = gtk_progress_bar_new();
     gtk_widget_set_size_request(progress_bar_text, 130, 10);
@@ -523,6 +522,10 @@ void cb_files_uploader(GtkButton *button, gpointer user_data)
     long weight = 0;
     int err = 0;
     size_t flag = 7;
+    
+    GtkWidget *progress_bar_upload = NULL;
+    GtkWidget *pbar_hbox = NULL;
+    gdouble step_foreward = 0.0;
 
     long dataSend = 0;
     long dataRead = 0;
@@ -541,34 +544,6 @@ void cb_files_uploader(GtkButton *button, gpointer user_data)
     gchar *text = NULL;
     GtkTextIter start;
     GtkTextIter end;
-
-    installing_script_dialog = gtk_message_dialog_new (GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_NONE, "Installing ...");
-
-    /** Obtaining the buffer associated with the widget. **/
-    text_buffer = gtk_text_view_get_buffer((GtkTextView*)(text_view));
-
-    /** Set the default buffer text. **/
-    gtk_text_buffer_set_text(text_buffer, "Installing ... It can take several minutes ...\n", -1);
-
-    /** Obtain iters for the start and end of points of the buffer **/
-    gtk_text_buffer_get_start_iter(text_buffer, &start);
-    gtk_text_buffer_get_end_iter(text_buffer, &end);
-
-    /** Get the entire buffer text. **/
-    text = gtk_text_buffer_get_text(text_buffer, &start, &end, FALSE);
-
-    /** Print the text **/
-    g_print("%s", text);    
-
-    //g_free(text);
-            
-    gtk_widget_show_all(GTK_DIALOG(installing_script_dialog)->vbox);
-    switch(gtk_dialog_run(GTK_DIALOG(installing_script_dialog)))
-    {
-        default :
-            gtk_widget_destroy(installing_script_dialog);
-            break;
-    }
 
     port = atoi(server_port);
 
@@ -635,30 +610,89 @@ void cb_files_uploader(GtkButton *button, gpointer user_data)
         error("send() log_name", "cb_files_uploader()");
         exit(-1);
     }
-
-    do
-    {
-        dataRead = fread(buffer, sizeof(char), sizeof(weight), log);
-        if(dataRead < 0)
-        {
-            error("send() dataRead", "cb_files_uploader()");
-            exit(-1);
-        }
-
-        dataSend = send(sock, buffer, sizeof(weight), 0);
-        if(dataSend == 0)
-        {
-            error("send() dataSend", "cb_files_uploader()");
-            exit(-1);
-        }
-
-        totalSend += dataSend;
-
-    }while(totalSend < weight);
     
-    printf("fichier envoyé avec success : %ld\n", totalSend);
+    installing_script_dialog = gtk_message_dialog_new(GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION , GTK_BUTTONS_YES_NO, "Install file on remote machine ?");
+    
+    gtk_widget_set_size_request(installing_script_dialog, 360, 150);
+    
+    pbar_hbox = gtk_hbox_new(TRUE, 0);
+    progress_bar_upload = gtk_progress_bar_new();
+    gtk_widget_set_size_request(progress_bar_upload, 130, 10);
+    
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(installing_script_dialog)->vbox), progress_bar_upload, TRUE, FALSE, 0);
+    
+    
+    gtk_widget_show_all(GTK_DIALOG(installing_script_dialog)->vbox);
+    switch(gtk_dialog_run(GTK_DIALOG(installing_script_dialog)))
+    {
+        case GTK_RESPONSE_YES:
+        {
+            
+            /** Obtaining the buffer associated with the widget. **/
+            text_buffer = gtk_text_view_get_buffer((GtkTextView*)(text_view));
 
-      
+            /** Set the default buffer text. **/
+            gtk_text_buffer_set_text(text_buffer, "File have been uploaded ...\nNow installing it, unpredictable duration, please be patient ...", -1);
+
+            /** Obtain iters for the start and end of points of the buffer **/
+            gtk_text_buffer_get_start_iter(text_buffer, &start);
+            gtk_text_buffer_get_end_iter(text_buffer, &end);
+
+            /** Get the entire buffer text. **/
+            text = gtk_text_buffer_get_text(text_buffer, &start, &end, FALSE);
+
+            /** Print the text **/
+            g_print("%s", text);    
+
+            //g_free(text);
+            
+            gtk_grab_add(progress_bar_upload);
+
+            do
+            {
+                dataRead = fread(buffer, sizeof(char), sizeof(weight), log);
+                if(dataRead < 0)
+                {
+                    error("send() dataRead", "cb_files_uploader()");
+                    exit(-1);
+                }
+
+                dataSend = send(sock, buffer, sizeof(weight), 0);
+                if(dataSend == 0)
+                {
+                    error("send() dataSend", "cb_files_uploader()");
+                    exit(-1);
+                }
+
+                totalSend += dataSend;
+
+                step_foreward = ((gdouble)totalSend * 1.0) / (gdouble)weight;
+
+                if(step_foreward > 1.0)
+                    step_foreward = 0.0;
+
+                gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar_upload), step_foreward);
+                gtk_main_iteration();
+
+            }while(totalSend < weight);
+
+            gtk_grab_remove(progress_bar_upload);
+
+            printf("fichier envoyé avec success : %ld\n", totalSend);
+        
+            gtk_widget_destroy(installing_script_dialog);
+            break;          
+        }
+        
+        case GTK_RESPONSE_NO:
+            gtk_widget_destroy(installing_script_dialog);
+            return;
+        
+        default :
+            gtk_widget_destroy(installing_script_dialog);
+            return;
+    }
+ 
     if(recv(sock, (char*)&installed, sizeof(installed), 0) == SOCKET_ERROR)
     {
         error("recv() installed", "cb_files_uploader()");

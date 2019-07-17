@@ -230,7 +230,7 @@ void download_binaries(const gchar *path, GtkWidget *progress_bar_binary)
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if(sock == INVALID_SOCKET)
     {
-        error("socket()", "download_files()");
+        error("socket()", "download_binaries()");
         return;
     }
 
@@ -238,13 +238,13 @@ void download_binaries(const gchar *path, GtkWidget *progress_bar_binary)
 
     if(err == SOCKET_ERROR)
     {
-        error("connect()", "download_files()");
+        error("connect()", "download_binaries()");
         return;
     }
 
     if(send(sock, (char*)&flag, sizeof(flag), 0) == SOCKET_ERROR)
     {
-        error("send() flag", "download_files()");
+        error("send() flag", "download_binaries()");
         return;
     }
 
@@ -252,13 +252,13 @@ void download_binaries(const gchar *path, GtkWidget *progress_bar_binary)
 
     if(send(sock, (char*)&len_path, sizeof(len_path), 0) == SOCKET_ERROR)
     {
-        error("send() len_path", "download_files()");
+        error("send() len_path", "download_binaries()");
         return;
     }
 
     if(send(sock, path, len_path, 0) == SOCKET_ERROR)
     {
-        error("send() path", "download_files()");
+        error("send() path", "download_binaries()");
         return;
     }
 
@@ -284,7 +284,7 @@ The path must have this form : /path/path/file", -1);
 
         g_free(text);
 
-        error("fopen() downloaded_file", "download_files()");
+        error("fopen() downloaded_file", "download_binaries()");
 
         return;
     }
@@ -292,7 +292,7 @@ The path must have this form : /path/path/file", -1);
     /** Recieve file weigth **/
     if(recv(sock, (char*)&weight, sizeof(weight), 0) == SOCKET_ERROR)
     {
-        error("rcv() weight", "dispatch_modules()");
+        error("rcv() weight", "download_binaries()");
         return;
     }
 
@@ -315,7 +315,7 @@ The path must have this form : /path/path/file", -1);
 
         totalRcv += tailleBlockRecut;
         
-        printf("totalRcv ----> %ld\n", totalRcv);
+        //printf("totalRcv ----> %ld\n", totalRcv);
  
 
         step_foreward = ((gdouble)totalRcv * 1.0) / (gdouble)weight;
@@ -327,6 +327,8 @@ The path must have this form : /path/path/file", -1);
         gtk_main_iteration();
 
     }while(totalRcv < weight);
+    
+    printf("Success: %ld\n\n", totalRcv);
     
     gtk_grab_remove(progress_bar_binary);
     

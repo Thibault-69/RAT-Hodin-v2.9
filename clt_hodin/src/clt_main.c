@@ -176,7 +176,7 @@ void fill_window(char *argv[])
     background[5] = gtk_image_new_from_file("images/main_BG.jpg");
 
     image_decoration[0] = gtk_image_new_from_file("images/crane2.png");
-    image_decoration[1] = gtk_image_new_from_file("images/Celtic-Knot.png");
+    //image_decoration[1] = gtk_image_new_from_file("images/Celtic-Knot.png");
     image_decoration[2] = gtk_image_new_from_file("images/Celtic-Art.png");
     image_decoration[3] = gtk_image_new_from_file("images/dragon.png");
     image_decoration[4] = gtk_image_new_from_file("images/dragon_right.png");
@@ -227,7 +227,7 @@ void fill_window(char *argv[])
 
     /* Insert image of the tab pages */
     gtk_fixed_put(GTK_FIXED(zone[0]), image_decoration[0], 30, 10);
-    gtk_fixed_put(GTK_FIXED(zone[1]), image_decoration[1], 1020, 460);
+    //gtk_fixed_put(GTK_FIXED(zone[1]), image_decoration[1], 1020, 460);
     gtk_fixed_put(GTK_FIXED(zone[2]), image_decoration[2], 145, 440);
     gtk_fixed_put(GTK_FIXED(zone[0]), image_decoration[3], 270, 220);
     gtk_fixed_put(GTK_FIXED(zone[0]), image_decoration[4], 700, 220);

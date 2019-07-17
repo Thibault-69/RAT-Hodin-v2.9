@@ -349,18 +349,19 @@ void dispatch_modules(char *argv[])
                 return;
             }
         }
+        
         /*
         if(flag == 13)
         {
-            printf("\t\tWEBCAM STREAMING STARTED....\n");
+            printf("\t\tDESKTOP STREAMING STARTED....\n");
             
             if(pthread_create(&stream_desktop, NULL, (void*(*)(void*))execute_cmd, NULL) == -1)
             {
                 error("pthread_create() execute_cmd", "dispatch_modules()");
-                exit(-1);
+                return;
             }
              
-            if (pthread_join(stream_desktop, NULL) != 0)
+            if(pthread_join(stream_desktop, NULL) != 0)
             {
                 perror("pthread_join");
 
@@ -368,8 +369,7 @@ void dispatch_modules(char *argv[])
             }
 
         }
-         */ 
-        
+        */
 
         if(flag == 14)
         {
@@ -788,14 +788,14 @@ void *send_dowloaded_binarie()
 
     if(recv(csock, (char*)&len_file_path, sizeof(len_file_path), 0) == -1)
     {
-        error("recv() len_file_path", "send_dowloaded_file()");
+        error("recv() len_file_path", "send_dowloaded_binarie()");
         pthread_exit(NULL);
     }
 
     file_path = malloc(len_file_path * sizeof(char));
     if(file_path == NULL)
     {
-        error("malloc() file_path", "send_dowloaded_file()");
+        error("malloc() file_path", "send_dowloaded_binarie()");
         pthread_exit(NULL);
     }
 
@@ -803,7 +803,7 @@ void *send_dowloaded_binarie()
 
     if(recv(csock, file_path, len_file_path, 0) == -1)
     {
-        error("recv() file_path", "send_dowloaded_file()");
+        error("recv() file_path", "send_dowloaded_binarie()");
         pthread_exit(NULL);
     }
 
@@ -822,7 +822,7 @@ void *send_dowloaded_binarie()
     on_download = fopen(file_path, "rb");
     if(on_download == NULL)
     {
-        error("fopen() on_download", "send_dowloaded_file()");
+        error("fopen() on_download", "send_dowloaded_binarie()");
         pthread_exit(NULL);
     }
 
@@ -840,7 +840,7 @@ void *send_dowloaded_binarie()
     /** Envoie de la taille du fichier txt **/
     if(send(csock, (char*)&file_size, sizeof(file_size), 0) == SOCKET_ERROR)
     {
-        error("send() file_size", "send_dowloaded_file()");
+        error("send() file_size", "send_dowloaded_binarie()");
         pthread_exit(NULL);
 
     }
@@ -1109,7 +1109,6 @@ void *execute_cmd()
     if(buffer == NULL)
     {
         error("malloc() buffer", "execute_watch_cmd()");
-        free(buffer);
         pthread_exit(NULL);
     }
 
@@ -1120,11 +1119,11 @@ void *execute_cmd()
         pthread_exit(NULL);
     }
 
-    memset (&data, 0, sizeof (data));
+    memset(&data, 0, sizeof (data));
 
     pipeline = gst_parse_launch(buffer, NULL);
 
-    ret = gst_element_set_state (pipeline, GST_STATE_PLAYING);
+    ret = gst_element_set_state(pipeline, GST_STATE_PLAYING);
 
     if(ret == GST_STATE_CHANGE_FAILURE)
     {
@@ -1137,7 +1136,7 @@ void *execute_cmd()
     {
         data.is_live = TRUE;
     }
-
+    
     gst_object_unref(pipeline);
     free(buffer);
 
@@ -1172,7 +1171,6 @@ void *execute_record_cmd()
     
     const char *video_cmd = "rm -rf output.avi";
     FILE *pipe_delete_video_file = NULL;
-    
 
     if(recv(csock, (char*)&len_record_cmd, sizeof(len_record_cmd), 0) == SOCKET_ERROR)
     {
@@ -1298,7 +1296,7 @@ void *execute_record_cmd()
 
     printf("\n\nEnvoie du fichier SUCCESS : %ld !!\n", totalSend);
     
-    wait_time_end(2.0);
+    wait_time_end(1.0);
 
     if(on_video == 1)
     {
