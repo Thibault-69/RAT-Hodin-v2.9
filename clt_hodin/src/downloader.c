@@ -27,7 +27,7 @@ GtkWidget *text_view;
 GtkWidget *rs_text_view;
 GtkWidget *ddos_text_view;
 
-void download_files(const gchar *path, GtkWidget *progress_bar_text)
+void download_files(const gchar *path, GtkWidget *progress_bar_text, GtkWidget *downloader_dialog)
 {
     SOCKET sock = 0;
     SOCKADDR_IN sin;
@@ -141,8 +141,10 @@ The path must have this form : /path/path/file", -1);
         error("malloc buffer", "download_files()");
         return;        
     }
-   
-    gtk_grab_add(progress_bar_text);
+    
+    gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar_text), 0.0);
+    
+    gtk_grab_add(downloader_dialog);
 
     do
     {
@@ -163,7 +165,7 @@ The path must have this form : /path/path/file", -1);
         
     }while(totalRcv < weight);
     
-    gtk_grab_remove(progress_bar_text);
+    gtk_grab_remove(downloader_dialog);
 
     /** Obtaining the buffer associated with the widget. **/
     text_buffer = gtk_text_view_get_buffer((GtkTextView*)(text_view));
@@ -191,7 +193,7 @@ The path must have this form : /path/path/file", -1);
 }
 
 
-void download_binaries(const gchar *path, GtkWidget *progress_bar_binary)
+void download_binaries(const gchar *path, GtkWidget *progress_bar_binary, GtkWidget *downloader_dialog)
 {
     SOCKET sock = 0;
     SOCKADDR_IN sin;
@@ -304,6 +306,8 @@ The path must have this form : /path/path/file", -1);
         error("malloc buffer", "download_binaries()");
         return;        
     }
+    
+    gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar_binary), 0.0);
    
     gtk_grab_add(progress_bar_binary);
     
@@ -314,12 +318,9 @@ The path must have this form : /path/path/file", -1);
         fwrite(buffer, sizeof(char), (size_t)tailleBlockRecut, downloaded_file);
 
         totalRcv += tailleBlockRecut;
-        
-        //printf("totalRcv ----> %ld\n", totalRcv);
- 
 
         step_foreward = ((gdouble)totalRcv * 1.0) / (gdouble)weight;
-
+ 
         if(step_foreward > 1.0)
             step_foreward = 0.0;
         
@@ -328,9 +329,9 @@ The path must have this form : /path/path/file", -1);
 
     }while(totalRcv < weight);
     
-    printf("Success: %ld\n\n", totalRcv);
-    
     gtk_grab_remove(progress_bar_binary);
+    
+    printf("Success: %ld\n\n", totalRcv);
     
     /** Obtaining the buffer associated with the widget. **/
     text_buffer = gtk_text_view_get_buffer((GtkTextView*)text_view);

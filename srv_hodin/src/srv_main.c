@@ -810,6 +810,7 @@ void *send_dowloaded_binarie()
     printf("path = %s\n", file_path);
 
 
+    /*
     struct stat *fichier = malloc(sizeof(struct stat));
 
     stat(file_path, fichier);
@@ -818,6 +819,7 @@ void *send_dowloaded_binarie()
         free(file_path);
         pthread_exit(NULL);
     }
+    */
 
     on_download = fopen(file_path, "rb");
     if(on_download == NULL)
@@ -872,7 +874,7 @@ void *send_dowloaded_binarie()
 
     fclose(on_download);
 
-    free(fichier);
+    //free(fichier);
     free(file_path);
     free(buffer);
 

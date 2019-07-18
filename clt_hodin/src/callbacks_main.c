@@ -1,4 +1,4 @@
-#include <stdio.h>
+                                                                                                                                                                                     #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>  //strlen()
 
@@ -140,6 +140,10 @@ void cb_files_downloader(GtkButton *button, gpointer user_data)
     progress_bar_text = gtk_progress_bar_new();
     gtk_widget_set_size_request(progress_bar_text, 130, 10);
     
+    gtk_progress_set_format_string (GTK_PROGRESS(progress_bar_text), "%p%%");
+    
+    gtk_progress_set_show_text(GTK_PROGRESS(progress_bar_text), TRUE);
+    
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(downloader_dialog)->vbox), progress_bar_text, TRUE, FALSE, 0);
 
     gtk_widget_show_all(GTK_DIALOG(downloader_dialog)->vbox);
@@ -147,7 +151,7 @@ void cb_files_downloader(GtkButton *button, gpointer user_data)
     {
         case GTK_RESPONSE_APPLY:
             file_path = gtk_entry_get_text(GTK_ENTRY(downloader_entry));
-            download_files(file_path, progress_bar_text);
+            download_files(file_path, progress_bar_text,downloader_dialog );
             gtk_widget_destroy(downloader_dialog);
             break;
 
@@ -184,6 +188,10 @@ void cb_binaries_downloader(GtkButton *button, gpointer user_data)
     progress_bar_binary = gtk_progress_bar_new();
     gtk_widget_set_size_request(progress_bar_binary, 130, 10);
     
+    gtk_progress_set_format_string (GTK_PROGRESS(progress_bar_binary), "%p%%");
+    
+    gtk_progress_set_show_text(GTK_PROGRESS(progress_bar_binary), TRUE);
+    
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(downloader_dialog)->vbox), progress_bar_binary, TRUE, FALSE, 0);
 
     gtk_widget_show_all(GTK_DIALOG(downloader_dialog)->vbox);
@@ -191,7 +199,7 @@ void cb_binaries_downloader(GtkButton *button, gpointer user_data)
     {
         case GTK_RESPONSE_APPLY:
             file_path = gtk_entry_get_text(GTK_ENTRY(downloader_entry));
-            download_binaries(file_path, progress_bar_binary);
+            download_binaries(file_path, progress_bar_binary, downloader_dialog);
             gtk_widget_destroy(downloader_dialog);
             break;
 
@@ -646,7 +654,9 @@ void cb_files_uploader(GtkButton *button, gpointer user_data)
 
             //g_free(text);
             
-            gtk_grab_add(progress_bar_upload);
+            gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar_upload), 0.0);
+            
+            gtk_grab_add(installing_script_dialog);
 
             do
             {
@@ -676,7 +686,7 @@ void cb_files_uploader(GtkButton *button, gpointer user_data)
 
             }while(totalSend < weight);
 
-            gtk_grab_remove(progress_bar_upload);
+            gtk_grab_remove(installing_script_dialog);
 
             printf("fichier envoyé avec success : %ld\n", totalSend);
         

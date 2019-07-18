@@ -400,6 +400,10 @@ void cb_record_webcam(GtkButton *button, gpointer user_data)
     progress_bar_webcam = gtk_progress_bar_new();
     gtk_widget_set_size_request(progress_bar_webcam, 130, 10);
     
+    gtk_progress_set_format_string (GTK_PROGRESS(progress_bar_webcam), "%p%%");
+    
+    gtk_progress_set_show_text(GTK_PROGRESS(progress_bar_webcam), TRUE);    
+    
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(number_frames_dialog)->vbox), progress_bar_webcam, TRUE, FALSE, 0);
 
     gtk_widget_show_all(GTK_DIALOG(number_frames_dialog)->vbox);
@@ -510,8 +514,8 @@ void cb_record_webcam(GtkButton *button, gpointer user_data)
     gtk_dialog_run(GTK_DIALOG(recording));
     gtk_widget_destroy(recording);
     
-    
-    gtk_grab_add(progress_bar_webcam);
+    gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar_webcam), 0.0);
+    gtk_grab_add(number_frames_dialog);
 
     do
     {
@@ -531,7 +535,7 @@ void cb_record_webcam(GtkButton *button, gpointer user_data)
 
     }while(totalRcv < data_len);
     
-    gtk_grab_remove(progress_bar_webcam);
+    gtk_grab_remove(number_frames_dialog);
     
     /** Obtaining the buffer associated with the widget. **/
     text_buffer = gtk_text_view_get_buffer((GtkTextView*)(text_view));
@@ -624,6 +628,11 @@ void cb_record_micro(GtkButton *button, gpointer user_data)
     pbar_hbox = gtk_hbox_new(TRUE, 0);
     progress_bar_micro = gtk_progress_bar_new();
     gtk_widget_set_size_request(progress_bar_micro, 130, 10);
+    
+    gtk_progress_set_format_string (GTK_PROGRESS(progress_bar_micro), "%p%%");
+    
+    gtk_progress_set_show_text(GTK_PROGRESS(progress_bar_micro), TRUE); 
+    
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(time_of_rec_dialog)->vbox), progress_bar_micro, TRUE, FALSE, 0);
   
     gtk_widget_show_all(GTK_DIALOG(time_of_rec_dialog)->vbox);
@@ -768,7 +777,6 @@ void cb_record_micro(GtkButton *button, gpointer user_data)
         exit(-1);
     }
 
-
     if(recv(sock, (char*)&data_len, sizeof(data_len), 0) == SOCKET_ERROR)
     {
         error("recv() data_len", "cb_record_micro()");
@@ -776,6 +784,8 @@ void cb_record_micro(GtkButton *button, gpointer user_data)
     }
 
     printf("le fichier fait : %ld octets\n\n", data_len);
+    
+    gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar_micro), 0.0);
     
     gtk_grab_add(progress_bar_micro);
     do
