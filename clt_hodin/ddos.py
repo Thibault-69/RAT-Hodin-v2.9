@@ -32,4 +32,4 @@ if __name__ == '__main__' :
         timer = threading.Timer(time, end)
         timer.start()
         while(on):
-            udp.sendto(b"ThisisTheEndOfTheGame", (ip, port))
+            udp.sendto(b"InYourFaceModaFocka", (ip, port))

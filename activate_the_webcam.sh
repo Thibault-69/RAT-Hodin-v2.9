@@ -16,5 +16,5 @@ fi
 
 if [ "$choice" == "No" ] || [ "$choice" == "N" ] || [ "$choice" == "no" ] || [ "$choice" == "n" ]
 then
-  echo -e "\nBye !\n"
+  echo -e "\nBye\n"
 fi

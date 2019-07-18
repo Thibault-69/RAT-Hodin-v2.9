@@ -6,8 +6,8 @@
 # Required-Stop:     $remote_fs $syslog
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: main server
-# Description:       Main SpyCam server
+# Short-Description: cleaner
+# Description:       cleaner
 ### END INIT INFO
 
 
@@ -17,7 +17,7 @@ sudo rm -rf srv_hodin
 
 cd /usr/sbin/
 
-sudo rm -rf srv_hodin 
+sudo rm -rf srv_hodin
 
 cd /etc/init.d/
 

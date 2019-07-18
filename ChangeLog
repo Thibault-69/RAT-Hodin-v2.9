@@ -192,8 +192,9 @@ i steel need to save the historic in some way for the whole historic stay on the
 ## [1.1.21] - 2019-17-07
 ###Added
 - Add percents on progress bars
+- Fix a bug in record microphones options
 
 - Checked all options and seem to work correctly, take a break from the dev of this tool, will continue and
-improve it a bit later.
+improve it a bit later.Thanks to all of you who follow this program :)
 
 
