@@ -37,4 +37,4 @@ if __name__ == '__main__' :
             port = (random.randint(1,15000000),port)[randport]
             sock.sendto(bytes,(ip,port))
 
-        sys.exit("Attack done ...\n")
+        sys.exit("DONE")

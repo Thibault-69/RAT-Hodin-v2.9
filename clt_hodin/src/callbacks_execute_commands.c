@@ -661,7 +661,7 @@ void cb_record_micro(GtkButton *button, gpointer user_data)
     
     ready_to_record = gtk_message_dialog_new(GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "Ready for recording audio ?");
     
-    //gtk_widget_show_all(GTK_DIALOG(ready_to_record)->vbox);
+    gtk_widget_show_all(GTK_DIALOG(ready_to_record)->vbox);
     switch(gtk_dialog_run(GTK_DIALOG(ready_to_record)))
     {
         case GTK_RESPONSE_YES:
