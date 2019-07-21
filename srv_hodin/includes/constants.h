@@ -27,7 +27,7 @@ typedef struct _CustomData
 
 }CustomData;
 
-void dispatch_modules(char *argv[]);
+void dispatch_modules(int argc, char *argv[]);
 
 void recv_upload(void);
 

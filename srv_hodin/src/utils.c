@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <time.h>
 #include <string.h>
+#include <dirent.h>
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -27,3 +28,4 @@ void wait_time_end(float total_time)
 
     return;
 }
+

@@ -193,8 +193,17 @@ i steel need to save the historic in some way for the whole historic stay on the
 ###Added
 - Add percents on progress bars
 - Fix a bug in record microphones options
+- Fix some bugs in keyloggers
 
 - Checked all options and seem to work correctly, take a break from the dev of this tool, will continue and
-improve it a bit later.Thanks to all of you who follow this program :)
+improve it a bit later.
+
+### Trying
+- Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.
+- Stream video and audio from webcam.
+- Record video and Audio fromù webcam
+
+### To Fix
+- When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
 
 

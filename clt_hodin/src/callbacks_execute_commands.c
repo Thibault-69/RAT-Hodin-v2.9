@@ -665,6 +665,7 @@ void cb_record_micro(GtkButton *button, gpointer user_data)
     switch(gtk_dialog_run(GTK_DIALOG(ready_to_record)))
     {
         case GTK_RESPONSE_YES:
+             gtk_widget_destroy(ready_to_record);
             break;
 
         case GTK_RESPONSE_NO:
@@ -737,8 +738,6 @@ void cb_record_micro(GtkButton *button, gpointer user_data)
         error("recv() recorded", "cb_record_micro()");
         exit(-1);
     }
-    
-    gtk_widget_destroy(ready_to_record);
 
     if(recorded == 1)
     {
@@ -771,10 +770,10 @@ void cb_record_micro(GtkButton *button, gpointer user_data)
     }
     
 
-    record = fopen("output.mp3", "wb");
+    record = fopen("output.wav", "wb");
     if(record == NULL)
     {
-        error("fopen() output.mp3", "cb_record_micro()");
+        error("fopen() output.wav", "cb_record_micro()");
         exit(-1);
     }
 
