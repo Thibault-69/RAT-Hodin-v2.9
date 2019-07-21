@@ -356,7 +356,7 @@ void fill_window(char *argv[])
     log_file = gtk_toggle_button_new_with_label("Logs file");
     gtk_widget_set_size_request(log_file, 150, 30);
     gtk_fixed_put(GTK_FIXED(zone[0]), log_file, 50, 530);
-    g_signal_connect(G_OBJECT(log_file), "toggled", G_CALLBACK(cb_download_log_file), NULL);
+    g_signal_connect(G_OBJECT(log_file), "clicked", G_CALLBACK(cb_download_log_file), NULL);
 
     /** Frame 2 (Logs) **/
     frame[2] = gtk_frame_new(NULL);

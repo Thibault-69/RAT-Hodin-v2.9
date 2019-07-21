@@ -19,6 +19,10 @@ cd /usr/sbin/
 
 sudo rm -rf srv_hodin
 
+cd /bin/
+
+sudo rm -rf srv_hodin
+
 cd /etc/init.d/
 
 sudo rm -rf hodin_daemon.sh

