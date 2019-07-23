@@ -189,7 +189,7 @@ i steel need to save the historic in some way for the whole historic stay on the
 - When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
 
 
-## [1.1.21] - 2019-17-07
+## [1.21] - 2019-17-07
 ###Added
 - Add percents on progress bars
 - Fix a bug in record microphones options
@@ -197,6 +197,21 @@ i steel need to save the historic in some way for the whole historic stay on the
 
 - Checked all options and seem to work correctly, take a break from the dev of this tool, will continue and
 improve it a bit later.
+
+### Trying
+- Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.
+- Stream video and audio from webcam.
+- Record video and Audio fromù webcam
+
+### To Fix
+- When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
+
+
+## [1.22] - 2019-23-07
+###Added
+- Fixing bugs on keyloggers servers.
+- Add a folder called target with server build depending of the target.
+
 
 ### Trying
 - Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.
