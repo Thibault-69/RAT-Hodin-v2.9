@@ -221,4 +221,17 @@ improve it a bit later.
 ### To Fix
 - When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
 
+## [1.3] - 2019-24-07
+###Added
+- Fixing minor bugs.
+
+
+### Trying
+- Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.
+- Stream video and audio from webcam.
+- Record video and Audio fromù webcam
+
+### To Fix
+- When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
+
 

@@ -770,10 +770,10 @@ void cb_record_micro(GtkButton *button, gpointer user_data)
     }
     
 
-    record = fopen("output.wav", "wb");
+    record = fopen("output.mp3", "wb");
     if(record == NULL)
     {
-        error("fopen() output.wav", "cb_record_micro()");
+        error("fopen() output.mp3", "cb_record_micro()");
         exit(-1);
     }
 

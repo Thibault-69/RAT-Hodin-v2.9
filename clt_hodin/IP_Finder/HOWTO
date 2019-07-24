@@ -1,0 +1,63 @@
+IP_Finder script will check random IP/port and save real ones in files.
+
+
+1) Install pip installer :
+-------------------------
+
+Install PIP On Debian/Ubuntu.
+----------------------------
+# apt install python-pip	#python 2
+# apt install python3-pip	#python 3
+
+Install PIP On CentOS and RHEL.
+------------------------------
+# yum install epel-release 
+# yum install python-pip
+
+Install PIP on Fedora.
+---------------------
+# dnf install python-pip	#Python 2
+# dnf install python3		#Python 3
+
+Install PIP on Arch Linux.
+-------------------------
+# pacman -S python2-pip	        #Python 2
+# pacman -S python-pip	        #Python 3
+
+Install PIP on openSUSE.
+-----------------------
+# zypper install python-pip	    #Python 2
+# zypper install python3-pip	#Python 3
+
+
+eg : https://www.tecmint.com/install-pip-in-linux/
+
+/**************************************************************************/
+
+
+2) Install scapy module :
+------------------------
+
+sudo pip install --pre scapy[basic]
+
+eg : https://scapy.readthedocs.io/en/latest/installation.html
+
+/**************************************************************************/
+
+
+3) Run the script IP_Finder.py :
+-------------------------------
+
+sudo chmod +x IP_Finder.py
+sudo ./IP_Finder.py
+
+
+/**************************************************************************/
+
+
+
+
+
+
+
+
