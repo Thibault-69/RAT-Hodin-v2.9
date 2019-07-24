@@ -221,9 +221,11 @@ improve it a bit later.
 ### To Fix
 - When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
 
-## [1.3] - 2019-24-07
+## [2.3] - 2019-24-07
 ###Added
 - Fixing minor bugs.
+-Add Ip Finder tool for find real ip in order to feed the ip_list.txt file, be award ips must be in 
+croissant order on this file for attack work.
 
 
 ### Trying
