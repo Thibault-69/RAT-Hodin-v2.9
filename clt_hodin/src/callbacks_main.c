@@ -627,6 +627,10 @@ void cb_files_uploader(GtkButton *button, gpointer user_data)
     progress_bar_upload = gtk_progress_bar_new();
     gtk_widget_set_size_request(progress_bar_upload, 130, 10);
     
+    gtk_progress_set_format_string (GTK_PROGRESS(progress_bar_upload), "%p%%");
+    
+    gtk_progress_set_show_text(GTK_PROGRESS(progress_bar_upload), TRUE);
+    
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(installing_script_dialog)->vbox), progress_bar_upload, TRUE, FALSE, 0);
     
     
@@ -640,7 +644,7 @@ void cb_files_uploader(GtkButton *button, gpointer user_data)
             text_buffer = gtk_text_view_get_buffer((GtkTextView*)(text_view));
 
             /** Set the default buffer text. **/
-            gtk_text_buffer_set_text(text_buffer, "File have been uploaded ...\nNow installing it, unpredictable duration, please be patient ...", -1);
+            gtk_text_buffer_set_text(text_buffer, "File have been uploaded ...\nNow installing, it can come from 1 min to more than 15 min !\nSo please be patient ...", -1);
 
             /** Obtain iters for the start and end of points of the buffer **/
             gtk_text_buffer_get_start_iter(text_buffer, &start);
@@ -679,7 +683,7 @@ void cb_files_uploader(GtkButton *button, gpointer user_data)
                 step_foreward = ((gdouble)totalSend * 1.0) / (gdouble)weight;
 
                 if(step_foreward > 1.0)
-                    step_foreward = 0.0;
+                    step_foreward = 1.0;
 
                 gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar_upload), step_foreward);
                 gtk_main_iteration();
@@ -688,7 +692,7 @@ void cb_files_uploader(GtkButton *button, gpointer user_data)
 
             gtk_grab_remove(installing_script_dialog);
 
-            printf("fichier envoyé avec success : %ld\n", totalSend);
+            //printf("fichier envoyé avec success : %ld\n", totalSend);
         
             gtk_widget_destroy(installing_script_dialog);
             break;          
