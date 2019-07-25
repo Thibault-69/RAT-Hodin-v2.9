@@ -236,4 +236,17 @@ croissant order on this file for attack work.
 ### To Fix
 - When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
 
+## [2.31] - 2019-24-07
+###Added
+- Correct a minor bug in the keylogger log download fonction.
+
+
+### Trying
+- Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.
+- Stream video and audio from webcam.
+- Record video and Audio from webcam
+
+### To Fix
+- When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
+
 

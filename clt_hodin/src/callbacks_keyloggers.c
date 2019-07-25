@@ -204,7 +204,7 @@ void cb_download_log_file(GtkButton *button, gpointer user_data)
     struct hostent *he = NULL;
     struct in_addr ipv4addr;
 
-    char buffer[BUFSIZ] = "";
+    char *buffer = NULL;
 
     long tailleBlockRecut = 0;
     long data_len = 0;
@@ -271,6 +271,14 @@ void cb_download_log_file(GtkButton *button, gpointer user_data)
     
     printf("\nRecive weight of the file : %ld\n", data_len);
     
+    buffer = malloc(data_len + 1 * sizeof(char));
+    if(buffer == NULL)
+    {
+        error("malloc buffer", "cb_download_log_file'");
+        return;
+    }
+    
+    
     do
     {
         tailleBlockRecut = recv(sock, buffer, data_len, 0);
@@ -310,7 +318,8 @@ void cb_download_log_file(GtkButton *button, gpointer user_data)
     g_print("%s", text);
 
     g_free(text);
- 
+    
+    free(buffer);
     fclose(log_file);
 
     /* Unused Parameters */

