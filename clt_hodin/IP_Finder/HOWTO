@@ -32,7 +32,7 @@ Install PIP on openSUSE.
 
 eg : https://www.tecmint.com/install-pip-in-linux/
 
-/**************************************************************************/
+/***********************************************************************/
 
 
 2) Install scapy module :
@@ -54,6 +54,10 @@ sudo ./IP_Finder.py
 
 /**************************************************************************/
 
+
+----> Copy ip_list.txt in folder client with other .txt files.
+
+----> ip_list.txt will be use in spoofed udp attack.
 
 
 

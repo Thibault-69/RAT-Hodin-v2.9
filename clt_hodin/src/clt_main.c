@@ -99,7 +99,8 @@ void fill_window(char *argv[])
     /** Keylogger Vars **/
     GtkWidget *run_keylogger = NULL;
     GtkWidget *log_file = NULL;
-
+    GtkWidget *close_keylogger = NULL;
+    
     /** Logs View vars **/
     //GtkWidget *text_view = NULL;
     GtkWidget *scrollbar = NULL;
@@ -352,8 +353,8 @@ void fill_window(char *argv[])
     gtk_widget_set_size_request(run_keylogger, 150, 30);
     gtk_fixed_put(GTK_FIXED(zone[0]), run_keylogger, 50, 460);
     g_signal_connect(G_OBJECT(run_keylogger), "clicked", G_CALLBACK(cb_fedora_run_the_keylogger), NULL);
-
-    log_file = gtk_toggle_button_new_with_label("Logs file");
+    
+    log_file = gtk_button_new_with_label("Logs file");
     gtk_widget_set_size_request(log_file, 150, 30);
     gtk_fixed_put(GTK_FIXED(zone[0]), log_file, 50, 530);
     g_signal_connect(G_OBJECT(log_file), "clicked", G_CALLBACK(cb_download_log_file), argv[0] );

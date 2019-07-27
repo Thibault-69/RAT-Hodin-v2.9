@@ -271,8 +271,7 @@ void download_binaries(const gchar *path, GtkWidget *progress_bar_binary, GtkWid
         text_buffer = gtk_text_view_get_buffer((GtkTextView*)(text_view));
 
         /** Set the default buffer text. **/
-        gtk_text_buffer_set_text(text_buffer, "Wrong path !!!\n\
-The path must have this form : /path/path/file", -1);
+        gtk_text_buffer_set_text(text_buffer, "The path must have this form : /path/path/file, or a unknow error occured", -1);
 
         /** Obtain iters for the start and end of points of the buffer **/
         gtk_text_buffer_get_start_iter(text_buffer, &start);
