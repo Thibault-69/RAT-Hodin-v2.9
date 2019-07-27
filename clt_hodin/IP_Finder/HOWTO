@@ -6,8 +6,8 @@ IP_Finder script will check random IP/port and save real ones in files.
 
 Install PIP On Debian/Ubuntu.
 ----------------------------
-# apt install python-pip	#python 2
-# apt install python3-pip	#python 3
+# apt install python-pip	python 2
+# apt install python3-pip	python 3
 
 Install PIP On CentOS and RHEL.
 ------------------------------
@@ -16,8 +16,8 @@ Install PIP On CentOS and RHEL.
 
 Install PIP on Fedora.
 ---------------------
-# dnf install python-pip	#Python 2
-# dnf install python3		#Python 3
+# dnf install python-pip	Python 2
+# dnf install python3		Python 3
 
 Install PIP on Arch Linux.
 -------------------------
