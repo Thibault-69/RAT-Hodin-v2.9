@@ -384,33 +384,126 @@ void dispatch_modules(int argc, char *argv[])
             
             on_video = 0;
             
-            mint_gain_mic_pipe = popen(ubuntu_gain_mic_cmd, "w");
-            if(mint_gain_mic_pipe == NULL)
+            char buffer[256] = "";
+            FILE *pipe = NULL;
+            const char *command = ("uname -a");
+
+            pipe = popen(command, "r");
+            if(pipe == NULL)
             {
-                error("popen() mint_gain_mic_pipe", "dispatch_modules()");
+                error("popen() uname", "dispatch_modules()");
                 return;
             }
 
-            mint_unmute_mic_pipe = popen(ubuntu_check_mic_cmd, "w");
-            if(mint_unmute_mic_pipe == NULL)
+            if(fgets(buffer, 256, pipe) == NULL)
             {
-                error("popen() mint_unmute_mic_pipe", "dispatch_modules()");
+                error("fgets() buffer pipe", "dispatch_modules()");
                 return;
             }
+
+            buffer[strlen(buffer) - 1] = 0;
+            
+            /* checking if we are on Ubuntu*/
+            if(strstr(buffer, "ubuntu") != NULL)
+            {
+                printf(" We are on Ubuntu\n");
                 
+                mint_gain_mic_pipe = popen(ubuntu_gain_mic_cmd, "w");
+                if(mint_gain_mic_pipe == NULL)
+                {
+                    error("popen() mint_gain_mic_pipe", "dispatch_modules()");
+                    return;
+                }
 
-            if(pclose(mint_unmute_mic_pipe) == -1)
+                mint_unmute_mic_pipe = popen(ubuntu_check_mic_cmd, "w");
+                if(mint_unmute_mic_pipe == NULL)
+                {
+                    error("popen() mint_unmute_mic_pipe", "dispatch_modules()");
+                    return;
+                }
+
+
+                if(pclose(mint_unmute_mic_pipe) == -1)
+                {
+                    printf("Fail to close mint_unmute_mic_pipe!\n");
+                    return;
+                }
+
+                if(pclose(mint_gain_mic_pipe) == -1)
+                {
+                    printf("Fail to close mint_gain_mic_pipe!\n");
+                    return;
+                }
+            }
+            
+            /* Checking if we are on kali */
+            if(strstr(buffer, "kali") != NULL)
             {
-                printf("Fail to close mint_unmute_mic_pipe!\n");
-                return;
+                printf(" We are on Kali\n");
+                
+                kali_gain_mic_pipe = popen(kali_check_gain_cmd, "w");
+                if(kali_gain_mic_pipe == NULL)
+                {
+                    error("popen() kali_check_gain_cmd", "dispatch_modules()");
+                    return;
+                }
+
+                kali_set_gain_pipe = popen(kali_set_gain_cmd, "w");
+                if(kali_set_gain_pipe == NULL)
+                {
+                    error("popen() kali_set_gain_pipe", "dispatch_modules()");
+                    return;
+                }
+                
+                if(pclose(kali_set_gain_pipe) == -1)
+                {
+                    printf("Fail to close kali_set_gain_pipe!\n");
+                    return;
+                }
+
+                if(pclose(kali_gain_mic_pipe) == -1)
+                {
+                    printf("Fail to close kali_gain_mic_pipe!\n");
+                    return;
+                }
             }
 
-            if(pclose(mint_gain_mic_pipe) == -1)
+            /* Checking if we are on Debian */
+            if(strstr(buffer, "Debian") != NULL)
             {
-                printf("Fail to close mint_gain_mic_pipe!\n");
-                return;
-            }
+                printf(" We are on Debian\n");
+                
+                debian_main_gain_pipe = popen(debian_set_gain_cmd, "w");
+                if(debian_main_gain_pipe == NULL)
+                {
+                    error("popen() debian_main_gain_pipe", "dispatch_modules()");
+                    return;
+                }  
+                
+                printf("Cmd 1 Ok\n");
 
+                debian_gain_mic_pipe = popen(debian_check_mic_cmd, "w");
+                if(debian_gain_mic_pipe == NULL)
+                {
+                    error("popen() debian_gain_mic_pipe", "dispatch_modules()");
+                    return;
+                }
+                
+                printf("Cmd 2 Ok\n");
+
+                if(pclose(debian_main_gain_pipe) == -1)
+                {
+                    printf("Fail to close debian_main_gain_pipe!\n");
+                    return; 
+                }
+                
+                if(pclose(debian_gain_mic_pipe) == -1)
+                {
+                    printf("Fail to close debian_gain_mic_pipe!\n");
+                    return;
+                }
+            }
+            
             if(pthread_create(&record_audio_thread, NULL, (void*(*)(void*))execute_record_cmd, NULL) == -1)
             {
                 error("pthread_create() record_audio_thread", "dispatch_modules()");
@@ -1205,6 +1298,9 @@ void *execute_record_cmd()
     const char *sound_cmd = "rm -rf output.wav";
     FILE *pipe_delete_sound_file = NULL;
     
+    const char *compress_sound_cmd = "rm -rf output.mp3";
+    FILE *pipe_delete_compress_sound_file = NULL;
+    
     const char *video_cmd = "rm -rf output.avi";
     FILE *pipe_delete_video_file = NULL;
 
@@ -1255,7 +1351,6 @@ void *execute_record_cmd()
 
     g_main_loop_run(main_loop);
 
-
     g_main_loop_unref (main_loop);
     gst_object_unref(bus);
     gst_element_set_state (pipeline, GST_STATE_NULL);
@@ -1294,10 +1389,10 @@ void *execute_record_cmd()
             error("fopen() output.mp3", "execute_record_cmd()");
             pthread_exit(NULL);
         }
-    }
+    }       
 
     /* weight of recorded file */
-    fseek(record_file, 0, SEEK_END);
+    fseek(record_file, 0, SEEK_END);    
     file_weight = ftell(record_file);
     rewind(record_file);
     
@@ -1358,6 +1453,13 @@ void *execute_record_cmd()
             error("popen() delete output.wav", "execute_record_cmd()");
             pthread_exit(NULL);
         }
+        
+        pipe_delete_compress_sound_file = popen(compress_sound_cmd, "r");
+        if(pipe_delete_compress_sound_file == NULL)
+        {
+            error("popen() delete output.mp3", "execute_record_cmd()");
+            pthread_exit(NULL);
+        }
     }
     
     if(on_video == 1)
@@ -1374,6 +1476,12 @@ void *execute_record_cmd()
         if(pclose(pipe_delete_sound_file) == -1)
         {
             printf("Fail to close pipe_delete_sound_file!\n");
+            pthread_exit(NULL);
+        }
+        
+        if(pclose(pipe_delete_compress_sound_file) == -1)
+        {
+            printf("Fail to close pipe_delete_compress_sound_file!\n");
             pthread_exit(NULL);
         }
     }

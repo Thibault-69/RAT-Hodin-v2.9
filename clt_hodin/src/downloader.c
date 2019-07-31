@@ -193,7 +193,7 @@ The path must have this form : /path/path/file", -1);
 }
 
 
-void download_binaries(const gchar *path, GtkWidget *progress_bar_binary, GtkWidget *downloader_dialog)
+void download_binaries(const gchar *path, GtkWidget *progress_bar_binary)
 {
     SOCKET sock = 0;
     SOCKADDR_IN sin;
@@ -306,7 +306,7 @@ void download_binaries(const gchar *path, GtkWidget *progress_bar_binary, GtkWid
         return;        
     }
     
-    gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar_binary), 0.0);
+    //gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar_binary), 0.0);
    
     gtk_grab_add(progress_bar_binary);
     

