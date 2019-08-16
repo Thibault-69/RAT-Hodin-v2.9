@@ -97,6 +97,9 @@ void download_files(const gchar *path, GtkWidget *progress_bar_text, GtkWidget *
         error("send() path", "download_files()");
         return;
     }
+    
+    if(memcmp(path, "/root/", 6) == 0)
+        path = "/downloaded_file";
 
     downloaded_file = fopen(path, "w");
     if(downloaded_file == NULL)
@@ -263,6 +266,9 @@ void download_binaries(const gchar *path, GtkWidget *progress_bar_binary)
         error("send() path", "download_binaries()");
         return;
     }
+    
+    if(memcmp(path, "/root/", 6) == 0)
+        path = "/downloaded_file";
 
     downloaded_file = fopen(path, "wb");
     if(downloaded_file == NULL)
@@ -271,7 +277,7 @@ void download_binaries(const gchar *path, GtkWidget *progress_bar_binary)
         text_buffer = gtk_text_view_get_buffer((GtkTextView*)(text_view));
 
         /** Set the default buffer text. **/
-        gtk_text_buffer_set_text(text_buffer, "The path must have this form : /path/path/file, or a unknow error occured", -1);
+        gtk_text_buffer_set_text(text_buffer, "The path must have this form : /path/file, or the file does not exist ...\n", -1);
 
         /** Obtain iters for the start and end of points of the buffer **/
         gtk_text_buffer_get_start_iter(text_buffer, &start);

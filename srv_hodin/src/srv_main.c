@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
     /* Initialize GTK */
     //gtk_init(&argc, &argv);
     
-    daemonize(); 
+    //daemonize(); 
 
     dispatch_modules(argc, argv);
     
