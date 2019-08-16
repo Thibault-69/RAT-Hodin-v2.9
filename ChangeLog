@@ -298,6 +298,7 @@ croissant order on this file for attack work.
 - The first letter when you started to type wasn't logged, i fixed this issue.Now the letter is logged like others.
 - Deleted tchat with the victime mode only cause i encounter some problems for daemonise the server and using GTK.I make the choice of deleteing this option and keep the server daemonised.
 - Updated the outdated ffmpeg and gstreamer installer bash file.
+- Fixed a downloading file issue when the target is kali linux.
 
 ### Still Trying
 - Add remote desktop streaming, but encouter an X11 server error and i dunno how to fix it.
