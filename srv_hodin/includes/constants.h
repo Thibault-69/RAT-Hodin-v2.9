@@ -4,6 +4,8 @@
 #include <errno.h>  //errno
 #include <string.h> //strerror()
 #include <stdlib.h> //printf()
+
+#include <gtk-2.0/gtk/gtk.h>  // GtkButton
 #include <gst/gst.h> //GstBus, GstMessage
 
 #define error(expression, function)     printf("ERROR : %s\nFunction : %s\nError Number : %d\nError Message : %s\n", expression, function, errno, strerror(errno));
@@ -43,6 +45,10 @@ void cb_message(GstBus *bus, GstMessage *msg, CustomData *data);
 void *execute_record_cmd(void);
 
 void *send_logger_log(void);
+
+void *run_tchat(void);
+
+void cb_send_text(GtkButton *button, gpointer user_data);
 
 void daemonize(void);
 

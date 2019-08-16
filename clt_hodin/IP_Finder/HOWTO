@@ -1,4 +1,5 @@
 IP_Finder script will check random IP/port and save real ones in files.
+Can be use for ip_list.txt file for UDP Spoofed DDos.
 
 
 1) Install pip installer :
@@ -11,7 +12,7 @@ Install PIP On Debian/Ubuntu.
 
 Install PIP On CentOS and RHEL.
 ------------------------------
-# yum install epel-release 
+# yum install epel-release
 # yum install python-pip
 
 Install PIP on Fedora.
@@ -58,10 +59,3 @@ sudo ./IP_Finder.py
 ----> Copy ip_list.txt in folder client with other .txt files.
 
 ----> ip_list.txt will be use in spoofed udp attack.
-
-
-
-
-
-
-

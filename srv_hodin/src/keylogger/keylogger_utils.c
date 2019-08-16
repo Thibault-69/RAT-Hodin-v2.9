@@ -39,13 +39,13 @@ void get_kb_device_filename(const char *command)
     buffer[strlen(buffer) - 1] = 0;
 
     /* all this is only for finally strcpy in devicefile wish is a pointer, for use facilities programming. */
-    strcat(defaultPath, buffer);
+    strncat(defaultPath, buffer, strlen(buffer));
 
     deviceFile = malloc ((strlen (defaultPath) + 1) * sizeof (*deviceFile));
     if(deviceFile == NULL)
         error("malloc()\nFonction : get_kb_device_filename()");
 
-    strcpy(deviceFile, defaultPath);
+    strncpy(deviceFile, defaultPath, strlen(defaultPath));
 
     printf("device file -> %s\n", deviceFile);
 
