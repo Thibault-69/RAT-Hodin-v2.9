@@ -236,7 +236,7 @@ croissant order on this file for attack work.
 ### To Fix
 - When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
 
-## [2.31] - 2019-24-07
+## [2.31] - 2019-25-07
 ###Added
 - Correct a minor bug in the keylogger log download fonction.
 
@@ -249,7 +249,7 @@ croissant order on this file for attack work.
 ### To Fix
 - When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
 
-## [2.4] - 2019-24-07
+## [2.4] - 2019-26-07
 ###Added
 - Correct some bugs in the keyloggers, now the choosen keylogger didn't start at boot, unfortunatly this option is not possible actualy (will try but ...).
   So you have when you want to to launch the keylogger you want, and then it will run until the next boot and will log all keys normaly.
@@ -265,7 +265,7 @@ croissant order on this file for attack work.
 ### To Fix
 - When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
 
-## [2.41] - 2019-24-07
+## [2.41] - 2019-27-07
 ###Added
 - Change a minor bug in keylogger that make you must enter a upper key for the logger start otherwise he don't now it's fixed.
 
@@ -279,7 +279,7 @@ croissant order on this file for attack work.
 - When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
 
 
-## [2.5] - 2019-24-07
+## [2.5] - 2019-28-07
 ###Added
 - Fixing as much bugs as possible, the program seem to work correctly now. They have some minor things to correct like in remote shell some print mistac but nothing very weird.
 - Recoding the output of the keylogger trying to made something clear will increase this in the same way , and add in logs the date of event keystroke.
@@ -292,7 +292,7 @@ croissant order on this file for attack work.
 ### Still need To Fix
 - When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
 
-# [2.6] - 2019-24-07
+# [2.6] - 2019-15-08
 ###Added
 - Mostly worked on Keyloggers, some like the one for debian wasn't effective now it work well like all others.
 - The first letter when you started to type wasn't logged, i fixed this issue.Now the letter is logged like others.
@@ -307,4 +307,19 @@ croissant order on this file for attack work.
 
 ### Still need To Fix
 - When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
+
+
+# [2.7] - 2019-24-08
+###Added
+- Fixed minor bugs in keyloggers and record micro option, still encouter an error with fedora for this last option but i guess i can fix it.
+- Except fedora record micro option wish send me error ALL others options are OK, Hodin v2 is born.
+
+### Still Trying
+- Add remote desktop streaming, but encouter an X11 server error and i dunno how to fix it.
+- Stream video and audio from webcam.
+- Record video and Audio from webcam
+
+### Still need To Fix
+- When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
+
 

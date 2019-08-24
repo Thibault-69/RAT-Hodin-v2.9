@@ -671,8 +671,8 @@ void cb_record_micro(GtkButton *button, gpointer user_data)
         exit(-1);
     }
 
-    time_of_rec_dialog = gtk_dialog_new_with_buttons("How many time you want to record ? (1000 ~ 10sec / max 60 000)", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
-    gtk_widget_set_size_request(time_of_rec_dialog, 500, 100);
+    time_of_rec_dialog = gtk_dialog_new_with_buttons("How many time you want to record ? ((1000 ~ 10sec / on Debian & Fedora 1200 ~ 2min) / max = 60000)", GTK_WINDOW(main_win),  GTK_DIALOG_MODAL, GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
+    gtk_widget_set_size_request(time_of_rec_dialog, 670, 100);
 
     time_of_rec_entry  = gtk_entry_new_with_max_length(8);
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(time_of_rec_dialog)->vbox), time_of_rec_entry, TRUE, FALSE, 0);

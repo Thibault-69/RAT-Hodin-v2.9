@@ -45,7 +45,7 @@ void get_kb_device_filename(const char *command)
     if(deviceFile == NULL)
         error("malloc()\nFonction : get_kb_device_filename()");
 
-    strncpy(deviceFile, defaultPath, strlen(defaultPath));
+    strncpy(deviceFile, defaultPath, strlen(defaultPath) + 1);
 
     printf("device file -> %s\n", deviceFile);
 

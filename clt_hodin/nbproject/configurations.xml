@@ -10,7 +10,6 @@
       <itemPath>includes/callbacks_main.h</itemPath>
       <itemPath>includes/callbacks_remote_shell.h</itemPath>
       <itemPath>includes/callbacks_rudy_arme_ddos.h</itemPath>
-      <itemPath>includes/callbacks_tchat.h</itemPath>
       <itemPath>includes/constants.h</itemPath>
       <itemPath>includes/downloader.h</itemPath>
       <itemPath>includes/keylogger.h</itemPath>
@@ -30,7 +29,6 @@
       <itemPath>src/callbacks_main.c</itemPath>
       <itemPath>src/callbacks_remote_shell.c</itemPath>
       <itemPath>src/callbacks_rudy_arme_ddos.c</itemPath>
-      <itemPath>src/callbacks_tchat.c</itemPath>
       <itemPath>src/clt_main.c</itemPath>
       <itemPath>src/downloader.c</itemPath>
       <itemPath>src/keylogger.c</itemPath>
@@ -90,8 +88,6 @@
             tool="3"
             flavor2="0">
       </item>
-      <item path="includes/callbacks_tchat.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="includes/constants.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="includes/downloader.h" ex="false" tool="3" flavor2="0">
@@ -113,8 +109,6 @@
       <item path="src/callbacks_remote_shell.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/callbacks_rudy_arme_ddos.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="src/callbacks_tchat.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/clt_main.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -176,8 +170,6 @@
             tool="3"
             flavor2="0">
       </item>
-      <item path="includes/callbacks_tchat.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="includes/constants.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="includes/downloader.h" ex="false" tool="3" flavor2="0">
@@ -199,8 +191,6 @@
       <item path="src/callbacks_remote_shell.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/callbacks_rudy_arme_ddos.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="src/callbacks_tchat.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/clt_main.c" ex="false" tool="0" flavor2="0">
       </item>
