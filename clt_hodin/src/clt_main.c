@@ -145,7 +145,7 @@ void fill_window(char *argv[])
     GtkWidget *stream_webcam = NULL;
     GtkWidget *record_webcam = NULL;
     GtkWidget *record_micro = NULL;
-
+ 
     /** Initialize the zone[0] for blit widgets **/
     zone[0] = gtk_fixed_new();
     zone[1] = gtk_fixed_new();
@@ -631,6 +631,7 @@ void fill_window(char *argv[])
     gtk_fixed_put(GTK_FIXED(zone[0]), record_micro, 850, 200);
     g_signal_connect(G_OBJECT(record_micro), "clicked", G_CALLBACK(cb_record_micro), NULL);
     
+    
     /** TAB CLIENTS */
     
     /* TAB CLIENTS VARS*/
@@ -712,7 +713,7 @@ void fill_window(char *argv[])
     gather_info = gtk_button_new_with_label("Gather client informations");
     gtk_widget_set_size_request(gather_info, 200, 30);
     gtk_fixed_put(GTK_FIXED(zone[3]), gather_info, 600, 50);
-    //g_signal_connect(G_OBJECT(gather_info), "clicked", G_CALLBACK(cb_record_micro), NULL);
+    //g_signal_connect(G_OBJECT(gather_info), "clicked", G_CALLBACK(cb_gather_client_info), NULL);
   
   return;
 }

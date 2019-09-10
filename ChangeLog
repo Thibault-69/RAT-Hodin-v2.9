@@ -322,4 +322,18 @@ croissant order on this file for attack work.
 ### Still need To Fix
 - When stream the webcam and close the stream window, the webcam stay activated, need to be fixed.
 
+# [2.8] - 2019-10-09
+###Added
+- Fixed a buffer overflow crash in remote shell while entering ps -aux | less command, now all commands even the ones with long output should works.
+
+### Still Trying
+- Add remote desktop streaming, but encouter an X11 server error and i dunno how to fix it.
+- Stream video and audio from webcam.
+- Record video and Audio from webcam
+
+### Still need To Fix
+- When stream the webcam and close the stream window, the webcam stay activated.
+
+
+
 

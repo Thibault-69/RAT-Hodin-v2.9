@@ -90,12 +90,12 @@ void cb_send_cmd(GtkWidget *widget, gpointer user_data)
     const char *buffer_cmd = NULL;
     char *final_buffer = NULL;
     char *start_command = "> Command : ";
-    char historic[4096] = "";
+    char historic[MAXDATASIZE] = "";
     
     size_t data_len = 0;
 
     
-    final_buffer = malloc(4096  * sizeof(char));
+    final_buffer = malloc(MAXDATASIZE  * sizeof(char));
     if(final_buffer == NULL)
     {
         error("malloc final buffer", "cb_send_cmd()");

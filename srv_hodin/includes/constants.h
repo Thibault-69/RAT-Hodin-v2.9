@@ -11,7 +11,7 @@
 #define error(expression, function)     printf("ERROR : %s\nFunction : %s\nError Number : %d\nError Message : %s\n", expression, function, errno, strerror(errno));
 
 #define PORT    4444
-#define MAXDATASIZE  100000
+#define MAXDATASIZE  200000
 
 #define INVALID_SOCKET -1
 #define SOCKET_ERROR -1
@@ -46,9 +46,7 @@ void *execute_record_cmd(void);
 
 void *send_logger_log(void);
 
-void *run_tchat(void);
-
-void cb_send_text(GtkButton *button, gpointer user_data);
+void exec_get_proces_cmd(void);
 
 void daemonize(void);
 
