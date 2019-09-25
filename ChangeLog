@@ -334,6 +334,16 @@ croissant order on this file for attack work.
 ### Still need To Fix
 - When stream the webcam and close the stream window, the webcam stay activated.
 
+# [2.9] - 2019-25-09
+###Added
+- New skin !
 
+### Still Trying
+- Add remote desktop streaming, but encouter an X11 server error and i dunno how to fix it.
+- Stream video and audio from webcam.
+- Record video and Audio from webcam
+
+### Still need To Fix
+- When stream the webcam and close the stream window, the webcam stay activated.
 
 
