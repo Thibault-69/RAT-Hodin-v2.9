@@ -1389,6 +1389,8 @@ void *execute_cmd()
     
     g_signal_connect(bus, "message", G_CALLBACK(cb_message), &data);
     
+    //gst_element_send_event(pipeline, gst_event_new_eos());
+    
     gst_object_unref(pipeline);
     free(buffer);
 

@@ -168,19 +168,19 @@ void fill_window(char *argv[])
     sixth_tab_label = g_strdup_printf("sixth");
 
     /** Load decoration image **/
-    background[0] = gtk_image_new_from_file("images/main_BG.jpg");
-    background[1] = gtk_image_new_from_file("images/main_BG.jpg");
-    background[2] = gtk_image_new_from_file("images/main_BG.jpg");
-    background[3] = gtk_image_new_from_file("images/main_BG.jpg");
+    background[0] = gtk_image_new_from_file("images/60da3d2a65ec95b8ec915c82af964605.jpg");
+    background[1] = gtk_image_new_from_file("images/179551.jpg");
+    background[2] = gtk_image_new_from_file("images/Cool-Tribal-Wallpapers-043_resize.jpg");
+    background[3] = gtk_image_new_from_file("images/2909439-digital-art-white-background-skull-monochrome-spiral-tribal___mixed-wallpapers.jpg");
     background[4] = gtk_image_new_from_file("images/main_BG.jpg");
     background[5] = gtk_image_new_from_file("images/main_BG.jpg");
 
-    image_decoration[0] = gtk_image_new_from_file("images/crane2.png");
+    //image_decoration[0] = gtk_image_new_from_file("images/crane2.png");
     //image_decoration[1] = gtk_image_new_from_file("images/deadface.png");
-    image_decoration[2] = gtk_image_new_from_file("images/Celtic-Art.png");
+    //image_decoration[2] = gtk_image_new_from_file("images/Celtic-Art.png");
     image_decoration[3] = gtk_image_new_from_file("images/dragon.png");
-    image_decoration[4] = gtk_image_new_from_file("images/dragon_right.png");
-    image_decoration[5] = gtk_image_new_from_file("images/pirates.png");
+    //image_decoration[4] = gtk_image_new_from_file("images/dragon_right.png");
+    //image_decoration[5] = gtk_image_new_from_file("images/pirates.png");
     image_decoration[6] = gtk_image_new_from_file("images/DSC100163938.png");
 
     /*
@@ -195,9 +195,9 @@ void fill_window(char *argv[])
     image_decoration[15] = gtk_image_new_from_file("images/dragon_right.png");
     */
 
-    texte_decoration[0] = gtk_image_new_from_file("images/banniere.png");
+    texte_decoration[0] = gtk_image_new_from_file("images/banniere_white.png");
     texte_decoration[1] = gtk_image_new_from_file("images/banniere.png");
-    texte_decoration[2] = gtk_image_new_from_file("images/banniere.png");
+    texte_decoration[2] = gtk_image_new_from_file("images/banniere_white.png");
     //texte_decoration[3] = gtk_image_new_from_file("IMG/1456576-ghost-in-the-shell_resize.jpg");
     //texte_decoration[4] = gtk_image_new_from_file("IMG/1456576-ghost-in-the-shell_resize.jpg");
     //texte_decoration[5] = gtk_image_new_from_file("IMG/1456576-ghost-in-the-shell_resize.jpg");
@@ -243,7 +243,7 @@ void fill_window(char *argv[])
     /** Insert text decoration **/
     gtk_fixed_put(GTK_FIXED(zone[0]), texte_decoration[0], 470, 250);
     gtk_fixed_put(GTK_FIXED(zone[1]), texte_decoration[1], 100, 450);
-    gtk_fixed_put(GTK_FIXED(zone[2]), texte_decoration[2], 1020, 433);
+    gtk_fixed_put(GTK_FIXED(zone[2]), texte_decoration[2], 120, 433);
     //gtk_fixed_put(GTK_FIXED(zone[3]), texte_decoration[3], 270, 260);
     //gtk_fixed_put(GTK_FIXED(zone[4]), texte_decoration[4], 270, 260);
     //gtk_fixed_put(GTK_FIXED(zone[5]), texte_decoration[5], 270, 260);
