@@ -14,6 +14,10 @@ Videos Tutoriels :
 ----------------
  - Hodin from A to Z : https://anonfile.com/F9s5j16cn1/Hodin_From_A_to_Z_mp4  (87 Mo)
  
+ https://anonfile.com/xcl3zaL4nf/Hodin_From_A_to_Z_mp4
+ 
+ https://www.youtube.com/watch?v=Uqqvjvq4XcY
+ 
  - Keyloggers Option : https://anonfile.com/Zb03h61cn5/keyloggers_tuto_mp4 (105 Mo)
  
  - WebCam Options : https://anonfile.com/P0o0p1x7n3/Hodin_Webcam_Tuto_mp4 (186 Mo)
